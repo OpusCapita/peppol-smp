@@ -1,0 +1,60 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath 'no.nils:wsdl2java:0.10'
+    }
+}
+
+plugins {
+    id 'org.springframework.boot' version '2.1.3.RELEASE'
+}
+
+apply plugin: 'java'
+apply plugin: 'no.nils.wsdl2java'
+apply plugin: "io.spring.dependency-management"
+
+jar {
+    baseName = 'peppol-smp'
+    version = ''
+}
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+    maven { url 'https://repo.spring.io/milestone' }
+}
+
+dependencies {
+    compile 'com.google.guava:guava:24.0-jre'
+    compile 'org.springframework.ws:spring-ws-core'
+    compile 'com.opuscapita.peppol:peppol-commons:1.0.9'
+
+    testCompile 'junit:junit:4.12'
+    testCompile 'org.springframework.boot:spring-boot-starter-test:2.1.0.RELEASE'
+}
+
+dependencyManagement {
+    imports {
+        mavenBom 'org.springframework.cloud:spring-cloud-dependencies:Greenwich.RELEASE'
+    }
+}
+
+wsdl2javaExt {
+    cxfVersion = "3.1.10"
+}
+
+wsdl2java{
+    generatedWsdlDir = file("${projectDir}/build")
+    wsdlDir=file("${projectDir}/src/main/resources/wsdl/")
+    wsdlsToGenerate = [
+            [file("${projectDir}/src/main/resources/wsdl/difi.wsdl")]
+    ]
+}
+
+compileJava.dependsOn wsdl2java
