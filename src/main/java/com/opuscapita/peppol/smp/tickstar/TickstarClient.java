@@ -1,6 +1,6 @@
 package com.opuscapita.peppol.smp.tickstar;
 
-import com.opuscapita.peppol.smp.tickstar.dto.TickstarParticipantListResponse;
+import com.opuscapita.peppol.smp.tickstar.dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -24,17 +24,45 @@ public class TickstarClient {
         this.restTemplate = restTemplateBuilder.build();
     }
 
-    public TickstarParticipantListResponse getAllParticipants() throws Exception {
+    public TickstarParticipantListResponse getAllParticipants() {
         return exchange("/participant", HttpMethod.GET, TickstarParticipantListResponse.class);
     }
 
-    private <T> T exchange(String url, HttpMethod method, Class<T> responseType) throws Exception {
-        String endpoint = String.format("https://api.galaxygw.com/2.0/smp%s", url);
+    public TickstarParticipantListParticipant getParticipant(String icd, String identifier) {
+        String participantId = TickstarLookupParticipant.formParticipantId(icd, identifier);
+        TickstarParticipantListResponse response = exchange("/participant?pid=" + participantId, HttpMethod.GET, TickstarParticipantListResponse.class);
+        if (response == null || response.getParticipant() == null || response.getParticipant().isEmpty()) {
+            return null;
+        }
+        return response.getParticipant().get(0);
+    }
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Token", token);
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<String> entity = new HttpEntity<>("", headers);
+    public String addParticipant(TickstarParticipantAddRequest request) {
+        HttpEntity<TickstarParticipantAddRequest> entity = new HttpEntity<>(request, getCommonHeaders());
+        return exchange("/participant", HttpMethod.POST, entity, String.class);
+    }
+
+    public String editParticipant(TickstarParticipantAddRequest request) {
+        HttpEntity<TickstarParticipantAddRequest> entity = new HttpEntity<>(request, getCommonHeaders());
+        return exchange("/participant", HttpMethod.PUT, entity, String.class);
+    }
+
+    public String deleteParticipant(String icd, String identifier) {
+        String participantId = TickstarLookupParticipant.formParticipantId(icd, identifier);
+        return exchange("/participant?pid=" + participantId, HttpMethod.DELETE, String.class);
+    }
+
+    public TickstarMetadataListResponse getMetadataList() {
+        return exchange("/metadataprofiles", HttpMethod.GET, TickstarMetadataListResponse.class);
+    }
+
+    private <T> T exchange(String url, HttpMethod method, Class<T> responseType) {
+        HttpEntity<String> entity = new HttpEntity<>("", getCommonHeaders());
+        return exchange(url, method, entity, responseType);
+    }
+
+    private <T> T exchange(String url, HttpMethod method, HttpEntity<?> entity, Class<T> responseType) {
+        String endpoint = String.format("https://api.galaxygw.com/2.0/smp%s", url);
 
         try {
             return restTemplate.exchange(endpoint, method, entity, responseType).getBody();
@@ -43,5 +71,12 @@ public class TickstarClient {
         }
 
         return null;
+    }
+
+    private HttpHeaders getCommonHeaders() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Token", token);
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        return headers;
     }
 }

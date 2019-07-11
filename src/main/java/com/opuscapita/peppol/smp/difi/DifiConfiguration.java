@@ -1,5 +1,6 @@
 package com.opuscapita.peppol.smp.difi;
 
+import no.difi.elma.smp.webservice.ElmaService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,7 +24,8 @@ public class DifiConfiguration {
 
     @Bean
     public DifiClient difiClient(Jaxb2Marshaller marshaller) {
-        DifiClient client = new DifiClient(username, password);
+        ElmaService elmaService = new ElmaService();
+        DifiClient client = new DifiClient(elmaService, username, password);
         client.setDefaultUri("https://smp.difi.no/ws/2.0?wsdl");
         client.setMarshaller(marshaller);
         client.setUnmarshaller(marshaller);

@@ -49,4 +49,8 @@ public class TickstarLookupParticipant {
     public void setEndpoint(List<TickstarLookupEndpoint> endpoint) {
         this.endpoint = endpoint;
     }
+
+    public static String formParticipantId(String icd, String identifier) {
+        return String.format("iso6523-actorid-upis::%s:%s", icd, identifier);
+    }
 }
