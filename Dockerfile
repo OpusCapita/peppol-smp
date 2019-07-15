@@ -3,12 +3,25 @@
 FROM openjdk:8 AS TEMP_BUILD_IMAGE
 
 ENV APP_HOME=/usr/app/
+ENV NODE_ENV=development NODE_PATH=$APP_HOME/node_modules
+
 WORKDIR $APP_HOME
 
 COPY build.gradle settings.gradle gradlew $APP_HOME
 COPY gradle $APP_HOME/gradle
 COPY . $APP_HOME
 
+# install nodejs
+RUN apt-get install -y curl \
+  && curl -sL https://deb.nodesource.com/setup_9.x | bash - \
+  && apt-get install -y nodejs \
+  && curl -L https://www.npmjs.com/install.sh | sh
+
+# building local frontend
+RUN npm install && npm cache verify
+RUN npm run build
+
+# building backend
 RUN chmod +x ./gradlew
 RUN ./gradlew build || return 0
 
