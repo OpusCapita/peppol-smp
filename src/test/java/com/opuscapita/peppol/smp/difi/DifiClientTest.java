@@ -22,6 +22,7 @@ public class DifiClientTest {
     private DifiClient difiClient;
 
     @Test
+    @Ignore
     public void testReadOperations() {
         GetAllParticipantsResponse response1 = difiClient.getAllParticipants();
         Assert.assertTrue(response1.getSuccess().isValue());

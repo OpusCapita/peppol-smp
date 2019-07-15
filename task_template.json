@@ -26,7 +26,11 @@
       "snc/rest/password": "${PEPPOL_:env_SNCPASS}",
       "snc/bsc": "peppol-AP",
       "snc/from": "peppol-AP@",
-      "snc/businessGroup": "Itella Information"
+      "snc/businessGroup": "Itella Information",
+
+      "apis/difi/username": "${DIFI_USER}",
+      "apis/difi/password": "${DIFI_PASS}",
+      "apis/tickstar/token": "${TICKSTAR_TOKEN}"
     },
     "oc-db-init": {
       "populate-test-data": "true"

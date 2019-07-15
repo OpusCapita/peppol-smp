@@ -9,10 +9,10 @@ import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 @Configuration
 public class DifiConfiguration {
 
-    @Value("${difi.username:me}")
+    @Value("${apis.difi.username:me}")
     private String username;
 
-    @Value("${difi.password:em}")
+    @Value("${apis.difi.password:em}")
     private String password;
 
     @Bean
