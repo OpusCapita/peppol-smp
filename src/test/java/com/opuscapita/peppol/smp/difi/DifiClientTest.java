@@ -13,7 +13,6 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-@Ignore
 @SpringBootTest
 @RunWith(SpringJUnit4ClassRunner.class)
 @EnableAutoConfiguration
@@ -36,14 +35,18 @@ public class DifiClientTest {
         Assert.assertTrue(response2.getSuccess().isValue());
         Assert.assertNotNull(response2.getParticipant());
         Assert.assertEquals(participantId, response2.getParticipant().getOrganization().getOrganizationNumber().getValue());
-
-        GetProfilesOnParticipantResponse response3 = difiClient.getProfilesOnParticipant(participantId);
-        Assert.assertTrue(response3.getSuccess().isValue());
-        Assert.assertNotNull(response3.getProfiles());
-        Assert.assertFalse(response3.getProfiles().isEmpty());
     }
 
     @Test
+    @Ignore
+    public void testGetSupportedProfiles() {
+        ProfilesSupportedResponse response = difiClient.getSupportedProfiles();
+        Assert.assertNotNull(response.getCenbiiProfiles());
+        Assert.assertFalse(response.getCenbiiProfiles().isEmpty());
+    }
+
+    @Test
+    @Ignore
     public void testWriteOperations() {
         String participantId = "9908:987987988";
         String oldName = "OC Old Webservice Test";

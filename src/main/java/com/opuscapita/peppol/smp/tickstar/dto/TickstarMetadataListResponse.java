@@ -1,14 +1,16 @@
 package com.opuscapita.peppol.smp.tickstar.dto;
 
+import java.util.List;
+
 public class TickstarMetadataListResponse {
 
-    private TickstarMetadataListProfile MetadataProfile;
+    private List<TickstarMetadataListProfile> MetadataProfile;
 
-    public TickstarMetadataListProfile getMetadataProfile() {
+    public List<TickstarMetadataListProfile> getMetadataProfile() {
         return MetadataProfile;
     }
 
-    public void setMetadataProfile(TickstarMetadataListProfile metadataProfile) {
+    public void setMetadataProfile(List<TickstarMetadataListProfile> metadataProfile) {
         MetadataProfile = metadataProfile;
     }
 }

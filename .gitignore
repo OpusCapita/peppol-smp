@@ -68,5 +68,15 @@ crashlytics.properties
 crashlytics-build.properties
 fabric.properties
 
+# Node modules
+node_modules
+
 # My local oxalis home
 oxalis/*
+
+# Webpack bundle.js and bundle.js.map
+**/*bundle.js*
+src/main/resources/static/statistics.html
+
+# WSDL generated DTOs
+generated/*

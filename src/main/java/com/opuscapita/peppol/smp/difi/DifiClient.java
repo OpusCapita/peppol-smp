@@ -67,6 +67,11 @@ public class DifiClient extends WebServiceGatewaySupport {
         return elmaPort.deleteParticipant(deleteParticipantType);
     }
 
+    public ProfilesSupportedResponse getSupportedProfiles() {
+        ProfilesSupportedType profilesSupportedType = new ProfilesSupportedType();
+        return elmaPort.profilesSupported(profilesSupportedType);
+    }
+
     private UserType getAuthUser() {
         UserType user = new UserType();
         UsernameType username = new UsernameType();
