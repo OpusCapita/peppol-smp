@@ -58,6 +58,6 @@ wsdl2javaExt {
 wsdl2java {
     generatedWsdlDir = file("${projectDir}/generated")
     wsdlsToGenerate = [
-            [file("${projectDir}/src/main/resources/wsdl/difi.wsdl")]
+            [file("${projectDir}/difi.wsdl")]
     ]
 }
