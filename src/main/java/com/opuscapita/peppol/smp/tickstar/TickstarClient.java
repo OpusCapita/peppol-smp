@@ -56,6 +56,10 @@ public class TickstarClient {
         return exchange("/metadataprofiles", HttpMethod.GET, TickstarMetadataListResponse.class);
     }
 
+    public String getEndpointList() {
+        return exchange("/endpoint", HttpMethod.GET, String.class);
+    }
+
     private <T> T exchange(String url, HttpMethod method, Class<T> responseType) {
         HttpEntity<String> entity = new HttpEntity<>("", getCommonHeaders());
         return exchange(url, method, entity, responseType);

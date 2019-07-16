@@ -10,9 +10,7 @@ import java.util.Set;
 
 @Entity
 @DynamicUpdate
-@Table(name = "document_types", indexes = {
-        @Index(name = "ix_name", columnList = "name")
-})
+@Table(name = "document_types")
 public class DocumentType {
 
     @Id

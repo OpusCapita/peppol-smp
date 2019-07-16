@@ -1,7 +1,6 @@
 package com.opuscapita.peppol.smp.difi;
 
 import com.opuscapita.peppol.smp.entity.DocumentType;
-import com.opuscapita.peppol.smp.entity.Endpoint;
 import com.opuscapita.peppol.smp.entity.Participant;
 import com.opuscapita.peppol.smp.entity.Smp;
 import com.opuscapita.peppol.smp.repository.*;
@@ -32,16 +31,16 @@ public class DifiScheduler {
 
     private DifiClient client;
     private SmpRepository smpRepository;
-    private EndpointRepository endpointRepository;
+    private EndpointService endpointService;
     private ParticipantService participantService;
     private DocumentTypeService documentTypeService;
 
     @Autowired
-    public DifiScheduler(DifiClient client, SmpRepository smpRepository, EndpointRepository endpointRepository,
+    public DifiScheduler(DifiClient client, SmpRepository smpRepository, EndpointService endpointService,
                          ParticipantService participantService, DocumentTypeService documentTypeService) {
         this.client = client;
         this.smpRepository = smpRepository;
-        this.endpointRepository = endpointRepository;
+        this.endpointService = endpointService;
         this.participantService = participantService;
         this.documentTypeService = documentTypeService;
     }
@@ -97,7 +96,7 @@ public class DifiScheduler {
         participant.setIdentifier(difiParticipant.getParticipant().getOrganization().getOrganizationNumber().getValue());
         participant.setContactInfo(difiParticipant.getParticipant().getOrganization().getContact().getName().getValue());
 
-        participant.setEndpoint(updateEndpoint(smp));
+        participant.setEndpoint(endpointService.getEndpoint(smp));
         participant.setDocumentTypes(getDocumentTypes(difiParticipant, smp));
 
         participantService.saveParticipant(participant);
@@ -111,7 +110,4 @@ public class DifiScheduler {
         return documentTypes;
     }
 
-    private Endpoint updateEndpoint(Smp smp) {
-        return endpointRepository.findBySmp(smp).stream().findFirst().orElse(null);
-    }
 }

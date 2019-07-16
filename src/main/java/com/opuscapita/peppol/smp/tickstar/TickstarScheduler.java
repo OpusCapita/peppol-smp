@@ -1,7 +1,6 @@
 package com.opuscapita.peppol.smp.tickstar;
 
 import com.opuscapita.peppol.smp.entity.DocumentType;
-import com.opuscapita.peppol.smp.entity.Endpoint;
 import com.opuscapita.peppol.smp.entity.Participant;
 import com.opuscapita.peppol.smp.entity.Smp;
 import com.opuscapita.peppol.smp.repository.*;
@@ -24,16 +23,16 @@ public class TickstarScheduler {
 
     private TickstarClient client;
     private SmpRepository smpRepository;
-    private EndpointRepository endpointRepository;
+    private EndpointService endpointService;
     private ParticipantService participantService;
     private DocumentTypeService documentTypeService;
 
     @Autowired
-    public TickstarScheduler(TickstarClient client, SmpRepository smpRepository, EndpointRepository endpointRepository,
+    public TickstarScheduler(TickstarClient client, SmpRepository smpRepository, EndpointService endpointService,
                              ParticipantService participantService, DocumentTypeService documentTypeService) {
         this.client = client;
         this.smpRepository = smpRepository;
-        this.endpointRepository = endpointRepository;
+        this.endpointService = endpointService;
         this.participantService = participantService;
         this.documentTypeService = documentTypeService;
     }
@@ -90,7 +89,7 @@ public class TickstarScheduler {
         participant.setRegisteredAt(tickstarParticipant.getMeta().getRegistrationDate());
 
         TickstarParticipantListAccessPointConfiguration apConfiguration = tickstarParticipant.getAccessPointConfigurations().getAccessPointConfiguration().get(0);
-        participant.setEndpoint(updateEndpoint(apConfiguration, smp));
+        participant.setEndpoint(endpointService.getEndpoint(smp));
         participant.setDocumentTypes(getDocumentTypes(apConfiguration, smp));
 
         participantService.saveParticipant(participant);
@@ -104,17 +103,4 @@ public class TickstarScheduler {
         return documentTypes;
     }
 
-    private Endpoint updateEndpoint(TickstarParticipantListAccessPointConfiguration apConfiguration, Smp smp) {
-        logger.info("TickstarScheduler updating endpoints...");
-        Endpoint endpoint = endpointRepository.findBySmp(smp).stream().filter(e -> e.getEndpointId() == apConfiguration.getEndpointId()).findFirst().orElse(null);
-        if (endpoint == null) {
-            endpoint = new Endpoint();
-        }
-
-        endpoint.setEndpointId(apConfiguration.getEndpointId());
-        endpoint.setName(String.format("%s endpoint[%d]", smp.getName(), apConfiguration.getEndpointId()));
-        endpoint.setSmp(smp);
-
-        return endpointRepository.save(endpoint);
-    }
 }

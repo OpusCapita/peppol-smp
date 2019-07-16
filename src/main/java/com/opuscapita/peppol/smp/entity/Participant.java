@@ -10,11 +10,7 @@ import java.util.Set;
 
 @Entity
 @DynamicUpdate
-@Table(name = "participants", indexes = {
-        @Index(name = "ix_icd", columnList = "icd"),
-        @Index(name = "ix_name", columnList = "name"),
-        @Index(name = "ix_identifier", columnList = "identifier")
-})
+@Table(name = "participants")
 public class Participant {
 
     @Id
