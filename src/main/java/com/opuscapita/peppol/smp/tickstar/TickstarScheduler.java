@@ -1,6 +1,7 @@
 package com.opuscapita.peppol.smp.tickstar;
 
 import com.opuscapita.peppol.smp.entity.DocumentType;
+import com.opuscapita.peppol.smp.entity.Endpoint;
 import com.opuscapita.peppol.smp.entity.Participant;
 import com.opuscapita.peppol.smp.entity.Smp;
 import com.opuscapita.peppol.smp.repository.*;
@@ -13,6 +14,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Component
@@ -50,7 +52,7 @@ public class TickstarScheduler {
         logger.info("TickstarScheduler updating document types...");
         TickstarMetadataListResponse response = client.getMetadataList();
         for (TickstarMetadataListProfile tickstarMetadata : response.getMetadataProfile()) {
-            DocumentType documentType = documentTypeService.getDocumentType(tickstarMetadata.getCommonName(), smp);
+            DocumentType documentType = documentTypeService.getDocumentType(tickstarMetadata.getProfileId(), smp);
             updateDocumentType(documentType, tickstarMetadata, smp);
         }
     }
@@ -88,19 +90,34 @@ public class TickstarScheduler {
         participant.setCountry(tickstarParticipant.getBusinessCard().getBusinessEntity().get(0).getCountryCode());
         participant.setRegisteredAt(tickstarParticipant.getMeta().getRegistrationDate());
 
-        TickstarParticipantListAccessPointConfiguration apConfiguration = tickstarParticipant.getAccessPointConfigurations().getAccessPointConfiguration().get(0);
+        Endpoint endpoint = endpointService.getEndpoint(smp);
+        TickstarParticipantListAccessPointConfigurationMetadata metadata = getMetadataProfileIds(endpoint, tickstarParticipant);
         participant.setEndpoint(endpointService.getEndpoint(smp));
-        participant.setDocumentTypes(getDocumentTypes(apConfiguration, smp));
+        participant.setDocumentTypes(getDocumentTypes(metadata, smp));
 
         participantService.saveParticipant(participant);
     }
 
-    private Set<DocumentType> getDocumentTypes(TickstarParticipantListAccessPointConfiguration apConfiguration, Smp smp) {
+    private Set<DocumentType> getDocumentTypes(TickstarParticipantListAccessPointConfigurationMetadata metadata, Smp smp) {
         Set<DocumentType> documentTypes = new HashSet<>();
-        for (Integer id : apConfiguration.getMetadataProfileIds().getProfileId()) {
+        for (Integer id : metadata.getProfileId()) {
             documentTypes.add(documentTypeService.getDocumentType(id, smp));
         }
         return documentTypes;
+    }
+
+    private TickstarParticipantListAccessPointConfigurationMetadata getMetadataProfileIds(Endpoint endpoint, TickstarParticipantListParticipant tickstarParticipant) {
+        List<TickstarParticipantListAccessPointConfiguration> apConfigs = tickstarParticipant.getAccessPointConfigurations().getAccessPointConfiguration();
+        if (apConfigs == null) {
+            return new TickstarParticipantListAccessPointConfigurationMetadata();
+        }
+
+        TickstarParticipantListAccessPointConfiguration apConfig = apConfigs.stream().filter(ap -> endpoint.getId().intValue() == ap.getEndpointId()).findFirst().orElse(null);
+        if (apConfig == null) {
+            return new TickstarParticipantListAccessPointConfigurationMetadata();
+        }
+
+        return apConfig.getMetadataProfileIds();
     }
 
 }

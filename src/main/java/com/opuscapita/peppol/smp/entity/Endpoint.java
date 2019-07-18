@@ -20,6 +20,9 @@ public class Endpoint {
     @Enumerated(EnumType.STRING)
     private EndpointType type;
 
+    @Column(name = "name", nullable = false)
+    private String name;
+
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "smp_id", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
@@ -39,6 +42,14 @@ public class Endpoint {
 
     public void setType(EndpointType type) {
         this.type = type;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public Smp getSmp() {

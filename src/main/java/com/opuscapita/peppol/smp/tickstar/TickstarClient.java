@@ -53,7 +53,7 @@ public class TickstarClient {
     }
 
     public TickstarMetadataListResponse getMetadataList() {
-        return exchange("/metadataprofiles", HttpMethod.GET, TickstarMetadataListResponse.class);
+        return exchange("/metadataprofile", HttpMethod.GET, TickstarMetadataListResponse.class);
     }
 
     public String getEndpointList() {
