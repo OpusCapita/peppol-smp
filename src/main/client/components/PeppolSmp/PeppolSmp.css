@@ -1,11 +1,60 @@
-.monitoring-home {
+.smp-home {
     font-size: 2em;
     text-align: center;
 }
 
-.monitoring-home .glyphicon {
+.smp-home .glyphicon {
     font-size: 3em;
     margin: auto;
     width: 100%;
     padding: 10px 10px 0;
+}
+
+.smp-home .flex-box {
+    display: flex;
+    margin: 40px 10px;
+}
+
+.smp-home .flex-box .flex-item-5 {
+    flex-grow: 5;
+    padding-right: 10px;
+}
+
+.smp-home .flex-box .flex-item-2 {
+    flex-grow: 2;
+}
+
+.smp-home .flex-box .flex-item-2 .btn {
+    margin: 0;
+    width: 100%;
+    vertical-align: top;
+}
+
+.smp-home .form-group {
+    margin-bottom: 0;
+}
+
+.smp-home .label.label-none {
+    border: none;
+    background: transparent;
+    color: #666;
+}
+
+.smp-home .lookup-result-header {
+    width: 100%;
+    text-align: center;
+    line-height: 0.1em;
+    margin: 10px 0 20px;
+    border-bottom: 1px solid #ccc;
+}
+
+.smp-home .lookup-result-header span {
+    padding: 0 10px;
+    background: #FFF;
+}
+
+.smp-home .lookup-result {
+    font-size: 22px;
+    padding: 0 10px;
+    margin-top: 40px;
 }

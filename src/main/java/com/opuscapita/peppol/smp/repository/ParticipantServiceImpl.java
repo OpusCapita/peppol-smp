@@ -1,10 +1,15 @@
 package com.opuscapita.peppol.smp.repository;
 
+import com.opuscapita.peppol.smp.controller.dto.ParticipantRequestDto;
 import com.opuscapita.peppol.smp.entity.Participant;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -25,6 +30,11 @@ public class ParticipantServiceImpl implements ParticipantService {
     }
 
     @Override
+    public Participant getParticipant(Long id) {
+        return repository.findById(id).orElse(null);
+    }
+
+    @Override
     public Participant getParticipant(String icdIdentifier) {
         if (StringUtils.isBlank(icdIdentifier)) {
             return null;
@@ -41,5 +51,12 @@ public class ParticipantServiceImpl implements ParticipantService {
     @Override
     public Participant getParticipant(String icd, String identifier) {
         return repository.findByIdentifier(identifier).stream().filter(p -> icd.equals(p.getIcd())).findFirst().orElse(null);
+    }
+
+    @Override
+    public Page<Participant> getAllParticipants(ParticipantRequestDto request) {
+        Specification<Participant> spec = ParticipantFilterSpecification.filter(request.getFilter(), request.getPagination().getSorted());
+        Pageable pageable = PageRequest.of(request.getPagination().getPage(), request.getPagination().getPageSize());
+        return repository.findAll(spec, pageable);
     }
 }

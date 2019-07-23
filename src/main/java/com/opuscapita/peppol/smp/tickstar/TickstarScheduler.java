@@ -39,7 +39,7 @@ public class TickstarScheduler {
         this.documentTypeService = documentTypeService;
     }
 
-    @Scheduled(cron = "0 0 0 * * *")
+//    @Scheduled(cron = "0 0 0 * * *")
     public void updateLocalDatabase() {
         logger.info("TickstarScheduler started!");
 
