@@ -73,7 +73,7 @@ class PeppolSmp extends Components.ContextComponent {
                         </div>
                     </div>
                     {
-                        result.participants.length &&
+                        (result && result.participants && result.participants.length) &&
                         this.renderParticipants()
                     }
                 </div>
