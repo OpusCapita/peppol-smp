@@ -38,9 +38,9 @@ public class ParticipantFilterSpecification {
                 predicates.add(namePredicate);
             }
 
-            if (filterDto.getCountry() != null && !filterDto.getCountry().isEmpty()) {
+            if (filterDto.getCountries() != null && !filterDto.getCountries().isEmpty()) {
                 Predicate countryPredicate = criteriaBuilder.and(
-                        criteriaBuilder.in(root.get("country")).value(filterDto.getCountry())
+                        criteriaBuilder.in(root.get("country")).value(filterDto.getCountries())
                 );
                 predicates.add(countryPredicate);
             }

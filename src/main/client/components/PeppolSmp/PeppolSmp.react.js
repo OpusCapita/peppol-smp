@@ -152,6 +152,10 @@ class PeppolSmp extends Components.ContextComponent {
         return (
             <div>
                 <h2>PEPPOL Participant Management</h2>
+                <button className="btn btn-info participant-list-btn"
+                        onClick={(e) => this.showPage('participants', e)}>
+                    Participant List
+                </button>
                 <div className="form-horizontal smp-home">
                     <div className="flex-box">
                         <div className="flex-item-5">

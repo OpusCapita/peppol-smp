@@ -3,6 +3,14 @@
     text-align: center;
 }
 
+.smp-home .participant-list-btn {
+    width: 16%;
+    float: right;
+    position: static;
+    margin-top: -50px;
+    margin-right: 10px;
+}
+
 .smp-home .glyphicon {
     font-size: 3em;
     margin: auto;

@@ -2,12 +2,14 @@ package com.opuscapita.peppol.smp.controller.dto;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
+import java.util.List;
+
 public class ParticipantFilterDto {
 
     private String icd;
     private String name;
     private String identifier;
-    private String country;
+    private List<String> countries;
 
     public String getIcd() {
         return icd;
@@ -33,12 +35,12 @@ public class ParticipantFilterDto {
         this.identifier = identifier;
     }
 
-    public String getCountry() {
-        return country;
+    public List<String> getCountries() {
+        return countries;
     }
 
-    public void setCountry(String country) {
-        this.country = country;
+    public void setCountries(List<String> countries) {
+        this.countries = countries;
     }
 
     @Override
