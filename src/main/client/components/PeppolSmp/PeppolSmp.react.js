@@ -14,20 +14,20 @@ class PeppolSmp extends Components.ContextComponent {
     constructor(props, context) {
         super(props);
 
-        if (props.icd && props.identifier) {
-            this.setState({icd: props.icd, identifier: props.identifier});
-        }
-
         this.api = new ApiBase();
     }
 
     componentDidMount() {
         const page = this.context.router.location.query.r;
+        const participant = this.context.router.location.query.q;
 
         if (page) {
             this.showPage(page)
-        } else {
-            lookup();
+        }
+
+        if (participant) {
+            this.setState({icd: participant.split(':')[0], identifier: participant.split(':')[1]});
+            this.lookup();
         }
     }
 
@@ -142,8 +142,7 @@ class PeppolSmp extends Components.ContextComponent {
                         </div>
                         <hr className="inner-line"/>
                         <div className="form-group">
-                            <div className="col-sm-3"><label className="control-label btn-link">Supported
-                                Documents</label></div>
+                            <div className="col-sm-3"><label className="control-label btn-link">Supported Documents</label></div>
                             <div className="col-sm-9">
                                 {this.renderDocumentTypes(p.documentTypes)}
                             </div>
@@ -162,8 +161,7 @@ class PeppolSmp extends Components.ContextComponent {
             <div>
                 <h2>
                     PEPPOL Participant Management
-                    <button className="btn btn-info participant-list-btn"
-                            onClick={(e) => this.showPage('participants', e)}>
+                    <button className="btn btn-info participant-list-btn" onClick={(e) => this.showPage('participants', e)}>
                         Participant List
                     </button>
                 </h2>

@@ -23,7 +23,7 @@ const participantList = (props) => (
 
 const App = () => (
     <Containers.ServiceLayout serviceName="peppol-smp">
-        <Route path="/:icd/:identifier" component={home}/>
+        <Route path="/" component={home}/>
         <Route path="/participants" component={participantList}/>
     </Containers.ServiceLayout>
 );
