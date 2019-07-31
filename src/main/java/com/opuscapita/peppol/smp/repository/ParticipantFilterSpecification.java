@@ -45,6 +45,20 @@ public class ParticipantFilterSpecification {
                 predicates.add(countryPredicate);
             }
 
+            if (filterDto.getSmpNames() != null && !filterDto.getSmpNames().isEmpty()) {
+                Predicate smpPredicate = criteriaBuilder.and(
+                        criteriaBuilder.in(root.join("endpoint").join("smp").get("name")).value(filterDto.getSmpNames())
+                );
+                predicates.add(smpPredicate);
+            }
+
+            if (filterDto.getEndpointTypes() != null && !filterDto.getEndpointTypes().isEmpty()) {
+                Predicate endpointPredicate = criteriaBuilder.and(
+                        criteriaBuilder.in(root.join("endpoint").get("type")).value(filterDto.getEndpointTypes())
+                );
+                predicates.add(endpointPredicate);
+            }
+
             if (sortingDtos != null && !sortingDtos.isEmpty()) {
                 List<Order> orderList = new ArrayList<>();
                 for (ParticipantPaginationDto.SortingDto sortingDto : sortingDtos) {

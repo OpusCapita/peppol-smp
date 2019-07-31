@@ -10,6 +10,16 @@ import './ParticipantList.css';
 
 class ParticipantList extends Components.ContextComponent {
 
+    static types = [
+        'TEST',
+        'PROD'
+    ];
+
+    static smpNames = [
+        'DIFI',
+        'TICKSTAR'
+    ];
+
     static countries = [
         {code: 'SK'},
         {code: 'SE'},
@@ -78,6 +88,18 @@ class ParticipantList extends Components.ContextComponent {
         window.open(`https://my.galaxygw.com/participantlookup#/${parts[0]}/${parts[1]}`, '_blank');
     }
 
+    mapSmpsSelect() {
+        return ParticipantList.smpNames.map(value => {
+            return {value: value, label: value};
+        });
+    }
+
+    mapTypesSelect() {
+        return ParticipantList.types.map(value => {
+            return {value: value, label: value};
+        });
+    }
+
     mapCountriesSelect() {
         return ParticipantList.countries.map(value => {
             return {value: value.code, label: value.code};
@@ -100,7 +122,9 @@ class ParticipantList extends Components.ContextComponent {
             icd: '',
             name: '',
             identifier: '',
-            countries: []
+            smpNames: [],
+            countries: [],
+            endpointTypes: []
         };
 
         this.setState({searchValues}, () => this.loadParticipantList());
@@ -139,6 +163,21 @@ class ParticipantList extends Components.ContextComponent {
                                             />
                                         </div>
                                     </div>
+                                    <div className="form-group">
+                                        <div className="col-sm-3">
+                                            <label className="control-label">SMP</label>
+                                        </div>
+                                        <div className="offset-md-1 col-md-8">
+                                            <Select className="react-select" isMulti={true}
+                                                    options={this.mapSmpsSelect()}
+                                                    onChange={value => this.handleSearchFormChange('smpNames', value)}
+                                                    value={searchValues.smpNames && searchValues.smpNames.map(cts => ({
+                                                        label: cts,
+                                                        value: cts
+                                                    }))}
+                                            />
+                                        </div>
+                                    </div>
                                 </div>
                                 <div className="col-md-6">
                                     <div className="form-group">
@@ -160,6 +199,21 @@ class ParticipantList extends Components.ContextComponent {
                                                     options={this.mapCountriesSelect()}
                                                     onChange={value => this.handleSearchFormChange('countries', value)}
                                                     value={searchValues.countries && searchValues.countries.map(cts => ({
+                                                        label: cts,
+                                                        value: cts
+                                                    }))}
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="form-group">
+                                        <div className="col-sm-3">
+                                            <label className="control-label">Type</label>
+                                        </div>
+                                        <div className="offset-md-1 col-md-8">
+                                            <Select className="react-select" isMulti={true}
+                                                    options={this.mapTypesSelect()}
+                                                    onChange={value => this.handleSearchFormChange('endpointTypes', value)}
+                                                    value={searchValues.endpointTypes && searchValues.endpointTypes.map(cts => ({
                                                         label: cts,
                                                         value: cts
                                                     }))}
