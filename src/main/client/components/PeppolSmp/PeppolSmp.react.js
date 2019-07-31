@@ -14,6 +14,10 @@ class PeppolSmp extends Components.ContextComponent {
     constructor(props, context) {
         super(props);
 
+        if (props.icd && props.identifier) {
+            this.setState({icd: props.icd, identifier: props.identifier});
+        }
+
         this.api = new ApiBase();
     }
 
@@ -22,6 +26,8 @@ class PeppolSmp extends Components.ContextComponent {
 
         if (page) {
             this.showPage(page)
+        } else {
+            lookup();
         }
     }
 
@@ -36,9 +42,12 @@ class PeppolSmp extends Components.ContextComponent {
         this.setState(searchValues);
     }
 
-    lookup() {
+    lookup(event) {
+        event && event.preventDefault();
         if (!this.state.icd || !this.state.identifier) {
-            this.context.showNotification('Enter icd number and participant identifier first.', 'info', 3);
+            if (event) {
+                this.context.showNotification('Enter icd number and participant identifier first.', 'info', 3);
+            }
             return;
         }
 
@@ -151,11 +160,13 @@ class PeppolSmp extends Components.ContextComponent {
         const {icd, identifier, result} = this.state;
         return (
             <div>
-                <h2>PEPPOL Participant Management</h2>
-                <button className="btn btn-info participant-list-btn"
-                        onClick={(e) => this.showPage('participants', e)}>
-                    Participant List
-                </button>
+                <h2>
+                    PEPPOL Participant Management
+                    <button className="btn btn-info participant-list-btn"
+                            onClick={(e) => this.showPage('participants', e)}>
+                        Participant List
+                    </button>
+                </h2>
                 <div className="form-horizontal smp-home">
                     <div className="flex-box">
                         <div className="flex-item-5">
@@ -167,7 +178,7 @@ class PeppolSmp extends Components.ContextComponent {
                                    value={identifier} onChange={e => this.handleFormChange('identifier', e.target.value)}/>
                         </div>
                         <div className="flex-item-2">
-                            <button className="btn btn-primary" onClick={() => this.lookup()}>Search</button>
+                            <button className="btn btn-primary" onClick={(e) => this.lookup(e)}>Search</button>
                         </div>
                     </div>
                     {this.renderParticipants(result)}
