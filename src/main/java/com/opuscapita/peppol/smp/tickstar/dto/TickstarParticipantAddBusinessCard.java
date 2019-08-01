@@ -1,5 +1,8 @@
 package com.opuscapita.peppol.smp.tickstar.dto;
 
+import com.opuscapita.peppol.smp.entity.Participant;
+
+import java.util.Collections;
 import java.util.List;
 
 public class TickstarParticipantAddBusinessCard {
@@ -12,5 +15,11 @@ public class TickstarParticipantAddBusinessCard {
 
     public void setBusinessEntity(List<TickstarParticipantAddBusinessEntity> businessEntity) {
         this.businessEntity = businessEntity;
+    }
+
+    public static TickstarParticipantAddBusinessCard of(Participant participant) {
+        TickstarParticipantAddBusinessCard businessCard = new TickstarParticipantAddBusinessCard();
+        businessCard.setBusinessEntity(Collections.singletonList(TickstarParticipantAddBusinessEntity.of(participant)));
+        return businessCard;
     }
 }

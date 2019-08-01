@@ -1,5 +1,7 @@
 package com.opuscapita.peppol.smp.tickstar.dto;
 
+import com.opuscapita.peppol.smp.entity.Participant;
+
 public class TickstarParticipantAddContact {
 
     private String name;
@@ -37,5 +39,11 @@ public class TickstarParticipantAddContact {
 
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
+    }
+
+    public static TickstarParticipantAddContact of(Participant participant) {
+        TickstarParticipantAddContact businessContact = new TickstarParticipantAddContact();
+        businessContact.setName(participant.getContactInfo());
+        return businessContact;
     }
 }

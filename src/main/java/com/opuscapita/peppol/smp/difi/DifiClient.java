@@ -8,6 +8,9 @@ import org.springframework.ws.client.core.support.WebServiceGatewaySupport;
 
 public class DifiClient extends WebServiceGatewaySupport {
 
+    public static final String ICD_9908 = "9908";
+    public static final String ICD_0192 = "0192";
+
     private final Difi elmaPort;
     private final String username;
     private final String password;

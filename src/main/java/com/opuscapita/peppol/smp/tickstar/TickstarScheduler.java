@@ -92,7 +92,7 @@ public class TickstarScheduler {
 
         Endpoint endpoint = endpointService.getEndpoint(smp);
         TickstarParticipantListAccessPointConfigurationMetadata metadata = getMetadataProfileIds(endpoint, tickstarParticipant);
-        participant.setEndpoint(endpointService.getEndpoint(smp));
+        participant.setEndpoint(endpoint);
         participant.setDocumentTypes(getDocumentTypes(metadata, smp));
 
         participantService.saveParticipant(participant);

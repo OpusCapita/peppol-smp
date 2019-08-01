@@ -25,6 +25,11 @@ public class DocumentTypeServiceImpl implements DocumentTypeService {
     }
 
     @Override
+    public DocumentType getDocumentType(Long id) {
+        return repository.findById(id).orElse(null);
+    }
+
+    @Override
     public DocumentType getDocumentType(Integer id, Smp smp) {
         return repository.findByDocumentTypeId(id).stream().filter(d -> smp.getId().equals(d.getSmp().getId())).findFirst().orElse(null);
     }

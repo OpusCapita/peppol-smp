@@ -14,7 +14,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.util.HashSet;
@@ -25,9 +24,6 @@ import java.util.Set;
 public class DifiScheduler {
 
     private static final Logger logger = LoggerFactory.getLogger(DifiScheduler.class);
-
-    private static final String ICD_9908 = "9908";
-    private static final String ICD_0192 = "0192";
 
     private DifiClient client;
     private SmpRepository smpRepository;
@@ -45,7 +41,7 @@ public class DifiScheduler {
         this.documentTypeService = documentTypeService;
     }
 
-//    @Scheduled(cron = "0 0 0 * * *")
+    //    @Scheduled(cron = "0 0 0 * * *")
     public void updateLocalDatabase() {
         logger.info("DifiScheduler started!");
 
@@ -81,7 +77,7 @@ public class DifiScheduler {
         GetAllParticipantsResponse response = client.getAllParticipants();
         for (OrganizationNumberType difiParticipantIdentifier : response.getOrganizationNumber()) {
             GetParticipantResponse difiParticipant = client.getParticipant(difiParticipantIdentifier.getValue());
-            Participant participant = participantService.getParticipant(ICD_9908, difiParticipantIdentifier.getValue());
+            Participant participant = participantService.getParticipant(DifiClient.ICD_9908, difiParticipantIdentifier.getValue());
             updateParticipant(participant, difiParticipant, smp);
         }
     }
@@ -92,7 +88,7 @@ public class DifiScheduler {
         }
         participant.setName(difiParticipant.getParticipant().getOrganization().getName().getValue());
         participant.setCountry("NO");
-        participant.setIcd(ICD_9908);
+        participant.setIcd(DifiClient.ICD_9908);
         participant.setIdentifier(difiParticipant.getParticipant().getOrganization().getOrganizationNumber().getValue());
         participant.setContactInfo(difiParticipant.getParticipant().getOrganization().getContact().getName().getValue());
 

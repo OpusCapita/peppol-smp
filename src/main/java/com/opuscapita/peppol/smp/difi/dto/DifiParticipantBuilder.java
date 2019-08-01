@@ -2,6 +2,8 @@ package com.opuscapita.peppol.smp.difi.dto;
 
 import no.difi.elma.smp.webservice.types.*;
 
+import java.util.List;
+
 public class DifiParticipantBuilder {
 
     private ParticipantType participant;
@@ -65,6 +67,11 @@ public class DifiParticipantBuilder {
         ProfileType profileType = new ProfileType();
         profileType.setValue(profile);
         this.participant.getProfiles().add(profileType);
+        return this;
+    }
+
+    public DifiParticipantBuilder addAllProfiles(List<String> profiles) {
+        profiles.forEach(this::addProfile);
         return this;
     }
 

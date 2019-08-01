@@ -29,4 +29,12 @@ public class TickstarParticipantListParticipantIdentifier {
     public void setIdentifierValue(String identifierValue) {
         this.identifierValue = identifierValue;
     }
+
+    public static TickstarParticipantListParticipantIdentifier of(String icd, String identifier) {
+        TickstarParticipantListParticipantIdentifier participantIdentifier = new TickstarParticipantListParticipantIdentifier();
+        participantIdentifier.setScheme("iso6523-actorid-upis");
+        participantIdentifier.setIdentifierCode(icd);
+        participantIdentifier.setIdentifierValue(identifier);
+        return participantIdentifier;
+    }
 }

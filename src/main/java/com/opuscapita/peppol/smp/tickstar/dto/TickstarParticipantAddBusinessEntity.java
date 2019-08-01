@@ -1,5 +1,7 @@
 package com.opuscapita.peppol.smp.tickstar.dto;
 
+import com.opuscapita.peppol.smp.entity.Participant;
+
 public class TickstarParticipantAddBusinessEntity {
 
     private String countryCode;
@@ -64,5 +66,13 @@ public class TickstarParticipantAddBusinessEntity {
 
     public void setAdditionalIdentifiers(TickstarParticipantAddAdditionalIdentifiers additionalIdentifiers) {
         this.additionalIdentifiers = additionalIdentifiers;
+    }
+
+    public static TickstarParticipantAddBusinessEntity of(Participant participant) {
+        TickstarParticipantAddBusinessEntity businessEntity = new TickstarParticipantAddBusinessEntity();
+        businessEntity.setNames(TickstarParticipantListBusinessEntityNames.of(participant));
+        businessEntity.setContacts(TickstarParticipantAddContacts.of(participant));
+        businessEntity.setCountryCode(participant.getCountry());
+        return businessEntity;
     }
 }

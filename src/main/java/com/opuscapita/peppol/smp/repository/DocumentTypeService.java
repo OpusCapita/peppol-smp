@@ -7,6 +7,8 @@ public interface DocumentTypeService {
 
     void saveDocumentType(DocumentType documentType);
 
+    DocumentType getDocumentType(Long id);
+
     DocumentType getDocumentType(Integer id, Smp smp);
 
     DocumentType getDocumentType(String name, Smp smp);

@@ -1,5 +1,7 @@
 package com.opuscapita.peppol.smp.tickstar.dto;
 
+import com.opuscapita.peppol.smp.entity.Participant;
+
 public class TickstarParticipantListAccessPointConfiguration {
 
     private Integer endpointId;
@@ -19,5 +21,12 @@ public class TickstarParticipantListAccessPointConfiguration {
 
     public void setMetadataProfileIds(TickstarParticipantListAccessPointConfigurationMetadata metadataProfileIds) {
         this.metadataProfileIds = metadataProfileIds;
+    }
+
+    public static TickstarParticipantListAccessPointConfiguration of(Participant participant) {
+        TickstarParticipantListAccessPointConfiguration apConfiguration = new TickstarParticipantListAccessPointConfiguration();
+        apConfiguration.setEndpointId(participant.getEndpoint().getId().intValue());
+        apConfiguration.setMetadataProfileIds(TickstarParticipantListAccessPointConfigurationMetadata.of(participant));
+        return apConfiguration;
     }
 }

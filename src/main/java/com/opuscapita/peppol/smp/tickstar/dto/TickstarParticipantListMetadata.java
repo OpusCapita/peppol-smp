@@ -1,5 +1,7 @@
 package com.opuscapita.peppol.smp.tickstar.dto;
 
+import com.opuscapita.peppol.smp.entity.Participant;
+
 public class TickstarParticipantListMetadata {
 
     private Boolean smlActivation;
@@ -37,5 +39,13 @@ public class TickstarParticipantListMetadata {
 
     public void setParticipantIdentifier(TickstarParticipantListParticipantIdentifier participantIdentifier) {
         this.participantIdentifier = participantIdentifier;
+    }
+
+    public static TickstarParticipantListMetadata of(Participant participant) {
+        TickstarParticipantListMetadata metadata = new TickstarParticipantListMetadata();
+        metadata.setPdActivation(true);
+        metadata.setSmlActivation(true);
+        metadata.setParticipantIdentifier(TickstarParticipantListParticipantIdentifier.of(participant.getIcd(), participant.getIdentifier()));
+        return metadata;
     }
 }
