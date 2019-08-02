@@ -43,8 +43,43 @@ class CreateParticipantForm extends Components.ContextComponent {
             return;
         }
 
-        // load document types here
-        this.setState({continued: true});
+        // participant identifier validation can be done here
+
+        this.context.showSpinner();
+        this.api.getDocumentTypes(this.state.participant.icd).then(response => {
+            this.context.hideSpinner();
+            this.setState({documentTypes: response, continued: true});
+
+        }).catch(e => {
+            this.context.hideSpinner();
+            this.context.showNotification(e.message, 'error', 10);
+        });
+    }
+
+    resetState() {
+        this.setState({participant: {}, documentTypes: [], continued: false});
+    }
+
+    handleCancel(event) {
+        event && event.preventDefault();
+        this.context.router.push(`/peppol-smp/participants`);
+    }
+
+    handleSubmit(event) {
+        this.context.showSpinner();
+        if (!continued) {
+            return;
+        }
+
+        this.api.addParticipant(this.state.participant).then(response => {
+            this.context.hideSpinner();
+            this.setState({documentTypes: [], continued: false});
+            this.context.showNotification('The participant is registered successfully', 'success', 10);
+
+        }).catch(e => {
+            this.context.hideSpinner();
+            this.context.showNotification(e.message, 'error', 10);
+        });
     }
 
     render() {
@@ -120,6 +155,10 @@ class CreateParticipantForm extends Components.ContextComponent {
                             </div>
                         </div>
                     }
+                </div>
+                <div className="form-submit text-right participant-form-actions">
+                    <button className="btn btn-link" onClick={e => this.handleCancel(e)}>Cancel</button>
+                    <button className="btn btn-success" onClick={e => this.handleSubmit(e)}>Register</button>
                 </div>
             </div>
         );

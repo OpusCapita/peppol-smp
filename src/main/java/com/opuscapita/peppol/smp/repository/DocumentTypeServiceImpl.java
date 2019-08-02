@@ -7,6 +7,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
 public class DocumentTypeServiceImpl implements DocumentTypeService {
 
@@ -37,5 +39,10 @@ public class DocumentTypeServiceImpl implements DocumentTypeService {
     @Override
     public DocumentType getDocumentType(String name, Smp smp) {
         return repository.findByName(name).stream().filter(d -> smp.getId().equals(d.getSmp().getId())).findFirst().orElse(null);
+    }
+
+    @Override
+    public List<DocumentType> getDocumentTypes(Smp smp) {
+        return repository.findBySmp(smp);
     }
 }

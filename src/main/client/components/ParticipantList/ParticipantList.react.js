@@ -61,8 +61,7 @@ class ParticipantList extends Components.ContextComponent {
     }
 
     showParticipantLookup(participant) {
-        const parts = participant.split(":");
-        window.open(`https://my.galaxygw.com/participantlookup#/${parts[0]}/${parts[1]}`, '_blank');
+        this.context.router.push(`/peppol-smp/?q=${participant}`);
     }
 
     mapSmpsSelect() {

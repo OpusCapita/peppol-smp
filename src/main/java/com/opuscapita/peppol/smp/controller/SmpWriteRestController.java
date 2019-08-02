@@ -1,10 +1,12 @@
 package com.opuscapita.peppol.smp.controller;
 
 import com.opuscapita.peppol.smp.controller.dto.ParticipantAddDto;
-import com.opuscapita.peppol.smp.difi.DifiClient;
 import com.opuscapita.peppol.smp.entity.Participant;
 import com.opuscapita.peppol.smp.entity.Smp;
-import com.opuscapita.peppol.smp.repository.*;
+import com.opuscapita.peppol.smp.repository.DocumentTypeService;
+import com.opuscapita.peppol.smp.repository.EndpointService;
+import com.opuscapita.peppol.smp.repository.ParticipantService;
+import com.opuscapita.peppol.smp.repository.SmpService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,16 +22,16 @@ import java.util.Date;
 @RequestMapping("/api")
 public class SmpWriteRestController {
 
+    private final SmpService smpService;
     private final SimpleDateFormat dateFormat;
-    private final SmpRepository smpRepository;
     private final EndpointService endpointService;
     private final ParticipantService participantService;
     private final DocumentTypeService documentTypeService;
 
     @Autowired
-    public SmpWriteRestController(SmpRepository smpRepository, EndpointService endpointService,
+    public SmpWriteRestController(SmpService smpService, EndpointService endpointService,
                                   ParticipantService participantService, DocumentTypeService documentTypeService) {
-        this.smpRepository = smpRepository;
+        this.smpService = smpService;
         this.endpointService = endpointService;
         this.participantService = participantService;
         this.documentTypeService = documentTypeService;
@@ -45,9 +47,7 @@ public class SmpWriteRestController {
             participant.getDocumentTypes().add(documentTypeService.getDocumentType(id));
         }
 
-        Smp smp = (DifiClient.ICD_9908.equals(participant.getIcd()) || DifiClient.ICD_0192.equals(participant.getIcd())) ?
-                smpRepository.findByName(SmpName.DIFI.name()) :
-                smpRepository.findByName(SmpName.TICKSTAR.name());
+        Smp smp = smpService.getSmpByIcd(participant.getIcd());
         participant.setEndpoint(endpointService.getEndpoint(smp));
 
         if (participantService.saveParticipantRemote(participant, smp)) {

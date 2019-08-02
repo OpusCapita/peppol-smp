@@ -17,3 +17,11 @@
     width: 100%;
     vertical-align: top;
 }
+
+.participant-form-actions {
+    margin-top: 10px;
+}
+
+.participant-form-actions .btn {
+    margin-left: 5px;
+}
