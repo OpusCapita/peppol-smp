@@ -1,4 +1,3 @@
-import request from 'superagent';
 import ApiError from './ApiError';
 
 class ApiBase {
@@ -11,6 +10,10 @@ class ApiBase {
 
     getParticipantList(pagination, filter) {
         return this.ajax.post(`/peppol-smp/api/get-participants`).send({pagination, filter}).then(res => res.body).catch(ApiError.getErrorFromResponse);
+    }
+
+    addParticipant(participant) {
+        return this.ajax.post(`/peppol-smp/api/add-participant`).send(participant).then(res => res.body).catch(ApiError.getErrorFromResponse);
     }
 }
 

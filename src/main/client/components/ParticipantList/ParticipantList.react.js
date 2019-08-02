@@ -4,6 +4,7 @@ import {Components} from '@opuscapita/service-base-ui';
 import ReactTable from 'react-table';
 import ReactTooltip from 'react-tooltip';
 import {ApiBase} from '../../api';
+import {Countries} from '../../api/Countries';
 import Select from '@opuscapita/react-select';
 import 'react-table/react-table.css';
 import './ParticipantList.css';
@@ -18,30 +19,6 @@ class ParticipantList extends Components.ContextComponent {
     static smpNames = [
         'DIFI',
         'TICKSTAR'
-    ];
-
-    static countries = [
-        {code: 'SK'},
-        {code: 'SE'},
-        {code: 'PT'},
-        {code: 'PL'},
-        {code: 'NO'},
-        {code: 'NL'},
-        {code: 'MT'},
-        {code: 'LV'},
-        {code: 'IT'},
-        {code: 'IE'},
-        {code: 'GI'},
-        {code: 'GB'},
-        {code: 'FR'},
-        {code: 'FI'},
-        {code: 'ES'},
-        {code: 'EE'},
-        {code: 'DK'},
-        {code: 'DE'},
-        {code: 'CH'},
-        {code: 'BE'},
-        {code: '00'}
     ];
 
     state = {
@@ -101,8 +78,8 @@ class ParticipantList extends Components.ContextComponent {
     }
 
     mapCountriesSelect() {
-        return ParticipantList.countries.map(value => {
-            return {value: value.code, label: value.code};
+        return Countries.map(value => {
+            return {value: value.code, label: value.name};
         });
     }
 
@@ -130,13 +107,21 @@ class ParticipantList extends Components.ContextComponent {
         this.setState({searchValues}, () => this.loadParticipantList());
     }
 
+    showAddParticipantPage() {
+        this.context.router.push('/peppol-smp/');
+    }
+
     render() {
         const {i18n} = this.context;
         const {loading, participantList, pagination, totalCount, searchValues, showSearch} = this.state;
 
         return (
             <div>
-                <h3>Participant List</h3>
+                <h3>Participant List
+                    <button className="btn btn-info participant-add-btn" onClick={() => this.showAddParticipantPage()}>
+                        New Participant
+                    </button>
+                </h3>
                 {
                     showSearch &&
                     <div>

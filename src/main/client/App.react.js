@@ -2,6 +2,7 @@ import React from 'react';
 import {Containers} from '@opuscapita/service-base-ui';
 import PeppolSmp from './components/PeppolSmp';
 import ParticipantList from './components/ParticipantList';
+import CreateParticipantForm from './components/CreateParticipantForm';
 
 import {Route} from 'react-router';
 
@@ -21,10 +22,15 @@ const participantList = (props) => (
     <ParticipantList/>
 );
 
+const createParticipant = (props) => (
+    <CreateParticipantForm/>
+);
+
 const App = () => (
     <Containers.ServiceLayout serviceName="peppol-smp">
         <Route path="/" component={home}/>
         <Route path="/participants" component={participantList}/>
+        <Route path="/newParticipant" component={createParticipant}/>
     </Containers.ServiceLayout>
 );
 
