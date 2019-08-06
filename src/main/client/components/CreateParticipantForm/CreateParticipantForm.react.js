@@ -66,11 +66,13 @@ class CreateParticipantForm extends Components.ContextComponent {
     }
 
     handleSubmit(event) {
-        this.context.showSpinner();
         if (!continued) {
             return;
         }
 
+        this.context.showSpinner();
+        const {participant} = this.state;
+        participant.documentTypes = participant.documentTypes.map(d => d.value);
         this.api.addParticipant(this.state.participant).then(response => {
             this.context.hideSpinner();
             this.setState({documentTypes: [], continued: false});
@@ -145,10 +147,7 @@ class CreateParticipantForm extends Components.ContextComponent {
                                         <Select className="react-select" isMulti={true}
                                                 options={this.mapDocumentTypesSelect()}
                                                 onChange={value => this.handleFormChange('documentTypes', value)}
-                                                value={participant.documentTypes && participant.documentTypes.map(src => ({
-                                                    label: src,
-                                                    value: src
-                                                }))}
+                                                value={participant.documentTypes}
                                         />
                                     </div>
                                 </div>
