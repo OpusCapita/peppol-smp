@@ -1,3 +1,4 @@
+import request from 'superagent';
 import ApiError from './ApiError';
 
 class ApiBase {
