@@ -105,7 +105,7 @@ class ParticipantList extends Components.ContextComponent {
     }
 
     showAddParticipantPage() {
-        this.context.router.push('/peppol-smp/');
+        this.context.router.push('/peppol-smp/newParticipant');
     }
 
     render() {
