@@ -1,4 +1,5 @@
 import ApiBase from './ApiBase';
+import Countries from './Countries';
 
-export { ApiBase }
+export { ApiBase, Countries }
 export default { ApiBase };

@@ -1,4 +1,4 @@
-export const Countries = [
+const Countries = [
     {code: 'AT', name: 'Austria'},
     {code: 'SK', name: 'Slovakia'},
     {code: 'SI', name: 'Slovenia'},
@@ -28,3 +28,5 @@ export const Countries = [
     {code: 'BG', name: 'Bulgaria'},
     {code: 'HR', name: 'Croatia'}
 ];
+
+export default Countries;

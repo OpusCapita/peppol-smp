@@ -1,10 +1,8 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import {Components} from '@opuscapita/service-base-ui';
 import ReactTable from 'react-table';
 import ReactTooltip from 'react-tooltip';
-import {ApiBase} from '../../api';
-import {Countries} from '../../api/Countries';
+import {ApiBase, Countries} from '../../api';
 import Select from '@opuscapita/react-select';
 import 'react-table/react-table.css';
 import './ParticipantList.css';
