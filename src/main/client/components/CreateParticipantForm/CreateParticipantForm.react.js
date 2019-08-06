@@ -1,7 +1,7 @@
 import React from 'react';
-import {ApiBase} from '../../api';
-import {Countries} from '../../api/Countries';
+import {ApiBase, Countries} from '../../api';
 import {Components} from '@opuscapita/service-base-ui';
+import Select from '@opuscapita/react-select';
 import './CreateParticipantForm.css';
 
 class CreateParticipantForm extends Components.ContextComponent {
