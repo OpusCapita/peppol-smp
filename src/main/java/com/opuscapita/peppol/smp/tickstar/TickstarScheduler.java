@@ -6,6 +6,8 @@ import com.opuscapita.peppol.smp.entity.Participant;
 import com.opuscapita.peppol.smp.entity.Smp;
 import com.opuscapita.peppol.smp.repository.*;
 import com.opuscapita.peppol.smp.tickstar.dto.*;
+import com.opuscapita.peppol.smp.validator.OcDocumentType;
+import com.opuscapita.peppol.smp.validator.OcDocumentTypesLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,18 +30,21 @@ public class TickstarScheduler {
     private EndpointService endpointService;
     private ParticipantService participantService;
     private DocumentTypeService documentTypeService;
+    private OcDocumentTypesLoader ocDocumentTypesLoader;
 
     @Autowired
     public TickstarScheduler(TickstarClient client, SmpRepository smpRepository, EndpointService endpointService,
-                             ParticipantService participantService, DocumentTypeService documentTypeService) {
+                             ParticipantService participantService, DocumentTypeService documentTypeService,
+                             OcDocumentTypesLoader ocDocumentTypesLoader) {
         this.client = client;
         this.smpRepository = smpRepository;
         this.endpointService = endpointService;
         this.participantService = participantService;
         this.documentTypeService = documentTypeService;
+        this.ocDocumentTypesLoader = ocDocumentTypesLoader;
     }
 
-//    @Scheduled(cron = "0 0 0 * * *")
+    @Scheduled(cron = "0 0 0 * * *")
     public void updateLocalDatabase() {
         logger.info("TickstarScheduler started!");
 
@@ -50,24 +55,34 @@ public class TickstarScheduler {
 
     private void updateDocumentTypes(Smp smp) {
         logger.info("TickstarScheduler updating document types...");
+        List<OcDocumentType> ocDocumentTypes = ocDocumentTypesLoader.getOcDocumentTypes();
         TickstarMetadataListResponse response = client.getMetadataList();
         for (TickstarMetadataListProfile tickstarMetadata : response.getMetadataProfile()) {
             DocumentType documentType = documentTypeService.getDocumentType(tickstarMetadata.getProfileId(), smp);
-            updateDocumentType(documentType, tickstarMetadata, smp);
+            updateDocumentType(documentType, tickstarMetadata, smp, ocDocumentTypes);
         }
     }
 
-    private void updateDocumentType(DocumentType documentType, TickstarMetadataListProfile tickstarMetadata, Smp smp) {
+    private void updateDocumentType(DocumentType documentType, TickstarMetadataListProfile tickstarMetadata, Smp smp, List<OcDocumentType> ocDocumentTypes) {
         if (documentType == null) {
             documentType = new DocumentType();
         }
         documentType.setDocumentTypeId(tickstarMetadata.getProfileId());
-        documentType.setName(tickstarMetadata.getCommonName());
+        documentType.setName(getDocumentTypeName(tickstarMetadata, ocDocumentTypes));
         documentType.setProfileIdentifier(tickstarMetadata.getProcessIdentifier().getValue());
         documentType.setDocumentIdentifier(tickstarMetadata.getDocumentIdentifier().getValue());
         documentType.setSmp(smp);
 
         documentTypeService.saveDocumentType(documentType);
+    }
+
+    private String getDocumentTypeName(TickstarMetadataListProfile tickstarMetadata, List<OcDocumentType> ocDocumentTypes) {
+        OcDocumentType ocDocumentType = ocDocumentTypes.stream()
+                .filter(d ->
+                        tickstarMetadata.getProcessIdentifier().getValue().equals(d.getProcessId()) &&
+                                tickstarMetadata.getDocumentIdentifier().getValue().equals(d.getDocumentId()))
+                .findFirst().orElse(null);
+        return ocDocumentType == null ? tickstarMetadata.getCommonName() : ocDocumentType.getDescription();
     }
 
     private void updateParticipants(Smp smp) {

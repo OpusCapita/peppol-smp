@@ -66,12 +66,13 @@ class CreateParticipantForm extends Components.ContextComponent {
     }
 
     handleSubmit(event) {
-        if (!continued) {
+        if (!this.state.continued) {
             return;
         }
 
         this.context.showSpinner();
         const {participant} = this.state;
+        participant.country = participant.country.value;
         participant.documentTypes = participant.documentTypes.map(d => d.value);
         this.api.addParticipant(this.state.participant).then(response => {
             this.context.hideSpinner();
