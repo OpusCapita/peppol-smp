@@ -21,6 +21,11 @@ public class DifiParticipantBuilder {
         return this;
     }
 
+    public DifiParticipantBuilder setOrganization(OrganizationType organization) {
+        this.participant.setOrganization(organization);
+        return this;
+    }
+
     public DifiParticipantBuilder setOrganizationNumber(String organizationNumber) {
         OrganizationNumberType organizationNumberType = new OrganizationNumberType();
         organizationNumberType.setValue(organizationNumber);
@@ -63,15 +68,26 @@ public class DifiParticipantBuilder {
         return this;
     }
 
+    public DifiParticipantBuilder addProfileType(ProfileType profileType) {
+        if (this.participant.getProfiles().stream().noneMatch(p -> p.getValue().equals(profileType.getValue()))) {
+            this.participant.getProfiles().add(profileType);
+        }
+        return this;
+    }
+
     public DifiParticipantBuilder addProfile(String profile) {
         ProfileType profileType = new ProfileType();
         profileType.setValue(profile);
-        this.participant.getProfiles().add(profileType);
-        return this;
+        return addProfileType(profileType);
     }
 
     public DifiParticipantBuilder addAllProfiles(List<String> profiles) {
         profiles.forEach(this::addProfile);
+        return this;
+    }
+
+    public DifiParticipantBuilder addAllProfileTypes(List<ProfileType> profileTypes) {
+        profileTypes.forEach(this::addProfileType);
         return this;
     }
 

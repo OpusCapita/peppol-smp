@@ -28,7 +28,7 @@ public class TickstarClient {
         return exchange("/participant", HttpMethod.GET, TickstarParticipantListResponse.class);
     }
 
-    public TickstarParticipantListParticipant getParticipant(String icd, String identifier) {
+    public TickstarParticipant getParticipant(String icd, String identifier) {
         String participantId = TickstarLookupParticipant.formParticipantId(icd, identifier);
         TickstarParticipantListResponse response = exchange("/participant?pid=" + participantId, HttpMethod.GET, TickstarParticipantListResponse.class);
         if (response == null || response.getParticipant() == null || response.getParticipant().isEmpty()) {
@@ -37,13 +37,13 @@ public class TickstarClient {
         return response.getParticipant().get(0);
     }
 
-    public String addParticipant(TickstarParticipantAddRequest request) {
-        HttpEntity<TickstarParticipantAddRequest> entity = new HttpEntity<>(request, getCommonHeaders());
+    public String addParticipant(TickstarParticipant request) {
+        HttpEntity<TickstarParticipant> entity = new HttpEntity<>(request, getCommonHeaders());
         return exchange("/participant", HttpMethod.POST, entity, String.class);
     }
 
-    public String editParticipant(TickstarParticipantAddRequest request) {
-        HttpEntity<TickstarParticipantAddRequest> entity = new HttpEntity<>(request, getCommonHeaders());
+    public String editParticipant(TickstarParticipant request) {
+        HttpEntity<TickstarParticipant> entity = new HttpEntity<>(request, getCommonHeaders());
         return exchange("/participant", HttpMethod.PUT, entity, String.class);
     }
 

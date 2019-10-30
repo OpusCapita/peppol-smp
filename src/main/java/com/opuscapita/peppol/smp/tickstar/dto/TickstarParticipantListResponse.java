@@ -4,13 +4,13 @@ import java.util.List;
 
 public class TickstarParticipantListResponse {
 
-    private List<TickstarParticipantListParticipant> participant;
+    private List<TickstarParticipant> participant;
 
-    public List<TickstarParticipantListParticipant> getParticipant() {
+    public List<TickstarParticipant> getParticipant() {
         return participant;
     }
 
-    public void setParticipant(List<TickstarParticipantListParticipant> participant) {
+    public void setParticipant(List<TickstarParticipant> participant) {
         this.participant = participant;
     }
 }

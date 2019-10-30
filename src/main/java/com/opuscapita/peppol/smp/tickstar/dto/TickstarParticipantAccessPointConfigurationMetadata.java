@@ -7,11 +7,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class TickstarParticipantListAccessPointConfigurationMetadata {
+public class TickstarParticipantAccessPointConfigurationMetadata {
 
     private List<Integer> profileId;
 
-    public TickstarParticipantListAccessPointConfigurationMetadata() {
+    public TickstarParticipantAccessPointConfigurationMetadata() {
         this.profileId = new ArrayList<>();
     }
 
@@ -23,8 +23,8 @@ public class TickstarParticipantListAccessPointConfigurationMetadata {
         this.profileId = profileId;
     }
 
-    public static TickstarParticipantListAccessPointConfigurationMetadata of(Participant participant) {
-        TickstarParticipantListAccessPointConfigurationMetadata documentTypeIds = new TickstarParticipantListAccessPointConfigurationMetadata();
+    public static TickstarParticipantAccessPointConfigurationMetadata of(Participant participant) {
+        TickstarParticipantAccessPointConfigurationMetadata documentTypeIds = new TickstarParticipantAccessPointConfigurationMetadata();
         documentTypeIds.setProfileId(participant.getDocumentTypes().stream().map(DocumentType::getDocumentTypeId).collect(Collectors.toList()));
         return documentTypeIds;
     }

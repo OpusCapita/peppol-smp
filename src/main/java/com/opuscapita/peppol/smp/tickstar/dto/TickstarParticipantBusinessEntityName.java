@@ -2,7 +2,7 @@ package com.opuscapita.peppol.smp.tickstar.dto;
 
 import com.opuscapita.peppol.smp.entity.Participant;
 
-public class TickstarParticipantListBusinessEntityName {
+public class TickstarParticipantBusinessEntityName {
 
     private String name;
     private String language;
@@ -23,8 +23,8 @@ public class TickstarParticipantListBusinessEntityName {
         this.language = language;
     }
 
-    public static TickstarParticipantListBusinessEntityName of(Participant participant) {
-        TickstarParticipantListBusinessEntityName businessName = new TickstarParticipantListBusinessEntityName();
+    public static TickstarParticipantBusinessEntityName of(Participant participant) {
+        TickstarParticipantBusinessEntityName businessName = new TickstarParticipantBusinessEntityName();
         businessName.setName(participant.getName());
         return businessName;
     }

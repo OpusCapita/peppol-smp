@@ -1,6 +1,6 @@
 package com.opuscapita.peppol.smp.tickstar.dto;
 
-public class TickstarParticipantListParticipantIdentifier {
+public class TickstarParticipantIdentifier {
 
     private String scheme;
     private String identifierCode;
@@ -30,8 +30,8 @@ public class TickstarParticipantListParticipantIdentifier {
         this.identifierValue = identifierValue;
     }
 
-    public static TickstarParticipantListParticipantIdentifier of(String icd, String identifier) {
-        TickstarParticipantListParticipantIdentifier participantIdentifier = new TickstarParticipantListParticipantIdentifier();
+    public static TickstarParticipantIdentifier of(String icd, String identifier) {
+        TickstarParticipantIdentifier participantIdentifier = new TickstarParticipantIdentifier();
         participantIdentifier.setScheme("iso6523-actorid-upis");
         participantIdentifier.setIdentifierCode(icd);
         participantIdentifier.setIdentifierValue(identifier);

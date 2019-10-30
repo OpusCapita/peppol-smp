@@ -43,7 +43,14 @@ class CreateParticipantForm extends Components.ContextComponent {
             return;
         }
 
-        // participant identifier validation can be done here
+
+        /* TODO: select Norway automatically for DIFI */
+        if ('9908' === this.state.participant.icd || '0192' === this.state.participant.icd) {
+            this.handleFormChange('country', {value: 'NO', label: 'Norway'});
+        }
+
+
+        /* TODO: participant identifier validation can be done here */
 
         this.context.showSpinner();
         this.api.getDocumentTypes(this.state.participant.icd).then(response => {

@@ -2,12 +2,12 @@ package com.opuscapita.peppol.smp.tickstar.dto;
 
 import com.opuscapita.peppol.smp.entity.Participant;
 
-public class TickstarParticipantListMetadata {
+public class TickstarParticipantMetadata {
 
     private Boolean smlActivation;
     private Boolean pdActivation;
     private String registrationDate;
-    private TickstarParticipantListParticipantIdentifier participantIdentifier;
+    private TickstarParticipantIdentifier participantIdentifier;
 
     public Boolean getSmlActivation() {
         return smlActivation;
@@ -33,19 +33,19 @@ public class TickstarParticipantListMetadata {
         this.registrationDate = registrationDate;
     }
 
-    public TickstarParticipantListParticipantIdentifier getParticipantIdentifier() {
+    public TickstarParticipantIdentifier getParticipantIdentifier() {
         return participantIdentifier;
     }
 
-    public void setParticipantIdentifier(TickstarParticipantListParticipantIdentifier participantIdentifier) {
+    public void setParticipantIdentifier(TickstarParticipantIdentifier participantIdentifier) {
         this.participantIdentifier = participantIdentifier;
     }
 
-    public static TickstarParticipantListMetadata of(Participant participant) {
-        TickstarParticipantListMetadata metadata = new TickstarParticipantListMetadata();
+    public static TickstarParticipantMetadata of(Participant participant) {
+        TickstarParticipantMetadata metadata = new TickstarParticipantMetadata();
         metadata.setPdActivation(true);
         metadata.setSmlActivation(true);
-        metadata.setParticipantIdentifier(TickstarParticipantListParticipantIdentifier.of(participant.getIcd(), participant.getIdentifier()));
+        metadata.setParticipantIdentifier(TickstarParticipantIdentifier.of(participant.getIcd(), participant.getIdentifier()));
         return metadata;
     }
 }

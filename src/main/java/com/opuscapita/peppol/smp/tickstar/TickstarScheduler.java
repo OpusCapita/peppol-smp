@@ -12,7 +12,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.util.HashSet;
@@ -44,7 +43,7 @@ public class TickstarScheduler {
         this.ocDocumentTypesLoader = ocDocumentTypesLoader;
     }
 
-    @Scheduled(cron = "0 0 0 * * *")
+//    @Scheduled(cron = "0 0 0 * * *")
     public void updateLocalDatabase() {
         logger.info("TickstarScheduler started!");
 
@@ -88,14 +87,14 @@ public class TickstarScheduler {
     private void updateParticipants(Smp smp) {
         logger.info("TickstarScheduler updating participants...");
         TickstarParticipantListResponse response = client.getAllParticipants();
-        for (TickstarParticipantListParticipant tickstarParticipant : response.getParticipant()) {
-            TickstarParticipantListParticipantIdentifier identifier = tickstarParticipant.getMeta().getParticipantIdentifier();
+        for (TickstarParticipant tickstarParticipant : response.getParticipant()) {
+            TickstarParticipantIdentifier identifier = tickstarParticipant.getMeta().getParticipantIdentifier();
             Participant participant = participantService.getParticipant(identifier.getIdentifierCode(), identifier.getIdentifierValue());
             updateParticipant(participant, tickstarParticipant, smp);
         }
     }
 
-    private void updateParticipant(Participant participant, TickstarParticipantListParticipant tickstarParticipant, Smp smp) {
+    private void updateParticipant(Participant participant, TickstarParticipant tickstarParticipant, Smp smp) {
         if (participant == null) {
             participant = new Participant();
         }
@@ -106,14 +105,14 @@ public class TickstarScheduler {
         participant.setRegisteredAt(tickstarParticipant.getMeta().getRegistrationDate());
 
         Endpoint endpoint = endpointService.getEndpoint(smp);
-        TickstarParticipantListAccessPointConfigurationMetadata metadata = getMetadataProfileIds(endpoint, tickstarParticipant);
+        TickstarParticipantAccessPointConfigurationMetadata metadata = getMetadataProfileIds(endpoint, tickstarParticipant);
         participant.setEndpoint(endpoint);
         participant.setDocumentTypes(getDocumentTypes(metadata, smp));
 
         participantService.saveParticipant(participant);
     }
 
-    private Set<DocumentType> getDocumentTypes(TickstarParticipantListAccessPointConfigurationMetadata metadata, Smp smp) {
+    private Set<DocumentType> getDocumentTypes(TickstarParticipantAccessPointConfigurationMetadata metadata, Smp smp) {
         Set<DocumentType> documentTypes = new HashSet<>();
         for (Integer id : metadata.getProfileId()) {
             documentTypes.add(documentTypeService.getDocumentType(id, smp));
@@ -121,15 +120,15 @@ public class TickstarScheduler {
         return documentTypes;
     }
 
-    private TickstarParticipantListAccessPointConfigurationMetadata getMetadataProfileIds(Endpoint endpoint, TickstarParticipantListParticipant tickstarParticipant) {
-        List<TickstarParticipantListAccessPointConfiguration> apConfigs = tickstarParticipant.getAccessPointConfigurations().getAccessPointConfiguration();
+    private TickstarParticipantAccessPointConfigurationMetadata getMetadataProfileIds(Endpoint endpoint, TickstarParticipant tickstarParticipant) {
+        List<TickstarParticipantAccessPointConfiguration> apConfigs = tickstarParticipant.getAccessPointConfigurations().getAccessPointConfiguration();
         if (apConfigs == null) {
-            return new TickstarParticipantListAccessPointConfigurationMetadata();
+            return new TickstarParticipantAccessPointConfigurationMetadata();
         }
 
-        TickstarParticipantListAccessPointConfiguration apConfig = apConfigs.stream().filter(ap -> endpoint.getId().intValue() == ap.getEndpointId()).findFirst().orElse(null);
+        TickstarParticipantAccessPointConfiguration apConfig = apConfigs.stream().filter(ap -> endpoint.getId().intValue() == ap.getEndpointId()).findFirst().orElse(null);
         if (apConfig == null) {
-            return new TickstarParticipantListAccessPointConfigurationMetadata();
+            return new TickstarParticipantAccessPointConfigurationMetadata();
         }
 
         return apConfig.getMetadataProfileIds();

@@ -3,11 +3,11 @@ package com.opuscapita.peppol.smp.tickstar.dto;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TickstarParticipantAddWebsiteURIs {
+public class TickstarParticipantWebsiteURIs {
 
     private List<String> websiteURI;
 
-    public TickstarParticipantAddWebsiteURIs() {
+    public TickstarParticipantWebsiteURIs() {
         this.websiteURI = new ArrayList<>();
     }
 

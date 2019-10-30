@@ -2,7 +2,7 @@
   "default": {
     "name": "${serviceName}",
     "log-driver": "gelf",
-    "log-opt": ["gelf-address=udp://${logstash_ip}:12201", "tag=\"${serviceName}\""],
+    "log-opt": ["gelf-address=udp://localhost:12201", "tag=\"${serviceName}\""],
     "constraint": ["engine.labels.nodetype==worker"],
     "publish": ["mode=host,target=3045,published=3045,protocol=tcp"],
     "host": ["consul:172.17.0.1"],
@@ -11,8 +11,6 @@
       "SERVICE_3045_CHECK_HTTP=/api/health/check",
       "SERVICE_3045_CHECK_INTERVAL=15s",
       "SERVICE_3045_CHECK_TIMEOUT=3s",
-      "RABBITMQ_USER=${SECRET_:env_RABBITMQUSER}",
-      "RABBITMQ_PASS=${SECRET_:env_RABBITMQPASS}",
       "NODE_ENV=production"
     ],
     "oc-consul-injection": {
@@ -35,15 +33,12 @@
     "oc-db-init": {
       "populate-test-data": "true"
     },
-    "limit-cpu": "0.2",
     "limit-memory": "700M",
-    "reserve-cpu": "0.1",
     "reserve-memory": "300M",
     "oc-service-user-create-override": "true"
   },
   "prod": {
     "replicas": 2,
-    "limit-cpu": "0.4",
     "limit-memory": "2000M"
   }
 }

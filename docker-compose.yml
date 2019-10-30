@@ -9,7 +9,6 @@ services:
      - registrator
      - redis
      - kong
-     - rabbitmq
      - api-registry
     labels:
       SERVICE_NAME: 'peppol-smp'
@@ -21,8 +20,6 @@ services:
       SERVICE_3045_CHECK_HTTP: /api/health/check
       SERVICE_3045_CHECK_INTERVAL: 15s
       SERVICE_3045_CHECK_TIMEOUT: 3s
-      RABBITMQ_USER: ${SECRET_develop_RABBITMQUSER}
-      RABBITMQ_PASS: ${SECRET_develop_RABBITMQPASS}
     ports:
      - '3045:3045'
 
@@ -38,18 +35,6 @@ services:
       MYSQL_DATABASE: ${SERVICE_NAME}
     depends_on:
       - registrator
-
-  rabbitmq:
-    image: rabbitmq:3-management
-    ports:
-      - '4369:4369'
-      - '5671:5671'
-      - '5672:5672'
-      - '15672:15672'
-    environment:
-      RABBITMQ_DEFAULT_USER: ${SECRET_develop_RABBITMQUSER}
-      RABBITMQ_DEFAULT_PASS: ${SECRET_develop_RABBITMQPASS}
-      SERVICE_5672_NAME: 'rabbitmq'
 
   redis:
     image: opuscapita/redis:dev

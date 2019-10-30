@@ -7,7 +7,7 @@ import com.opuscapita.peppol.smp.entity.DocumentType;
 import com.opuscapita.peppol.smp.entity.Participant;
 import com.opuscapita.peppol.smp.entity.Smp;
 import com.opuscapita.peppol.smp.tickstar.TickstarClient;
-import com.opuscapita.peppol.smp.tickstar.dto.TickstarParticipantAddRequest;
+import com.opuscapita.peppol.smp.tickstar.dto.TickstarParticipant;
 import no.difi.elma.smp.webservice.responses.AddParticipantResponse;
 import no.difi.elma.smp.webservice.types.ParticipantType;
 import org.apache.commons.lang3.StringUtils;
@@ -57,7 +57,7 @@ public class ParticipantServiceImpl implements ParticipantService {
             return response.getSuccess().isValue();
         }
 
-        TickstarParticipantAddRequest addRequest = TickstarParticipantAddRequest.of(participant);
+        TickstarParticipant addRequest = TickstarParticipant.of(participant);
         tickstarClient.addParticipant(addRequest);
         return true;
     }

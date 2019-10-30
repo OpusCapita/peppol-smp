@@ -4,13 +4,13 @@ import java.util.List;
 
 public class TickstarParticipantAddAdditionalIdentifiers {
 
-    private List<TickstarParticipantListParticipantIdentifier> additionalIdentifier;
+    private List<TickstarParticipantIdentifier> additionalIdentifier;
 
-    public List<TickstarParticipantListParticipantIdentifier> getAdditionalIdentifier() {
+    public List<TickstarParticipantIdentifier> getAdditionalIdentifier() {
         return additionalIdentifier;
     }
 
-    public void setAdditionalIdentifier(List<TickstarParticipantListParticipantIdentifier> additionalIdentifier) {
+    public void setAdditionalIdentifier(List<TickstarParticipantIdentifier> additionalIdentifier) {
         this.additionalIdentifier = additionalIdentifier;
     }
 }

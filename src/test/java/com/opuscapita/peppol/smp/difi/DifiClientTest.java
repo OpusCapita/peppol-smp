@@ -2,8 +2,10 @@ package com.opuscapita.peppol.smp.difi;
 
 import com.opuscapita.peppol.smp.difi.dto.DifiParticipantBuilder;
 import no.difi.elma.smp.webservice.responses.*;
+import no.difi.elma.smp.webservice.types.ElmaBasicType;
 import no.difi.elma.smp.webservice.types.NameType;
 import no.difi.elma.smp.webservice.types.ParticipantType;
+import org.apache.poi.ss.usermodel.*;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -13,6 +15,12 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.text.DecimalFormat;
+import java.util.stream.Collectors;
+
 @SpringBootTest
 @RunWith(SpringJUnit4ClassRunner.class)
 @EnableAutoConfiguration
@@ -20,6 +28,67 @@ public class DifiClientTest {
 
     @Autowired
     private DifiClient difiClient;
+
+    private DecimalFormat dc = new DecimalFormat("#");
+
+    @Test
+    @Ignore
+    public void readFromExcelAndCreateNew() {
+        String filename = "/test-material/ELMA-registrering-bonitas.xlsx";
+        File file = new File(getClass().getResource(filename).getFile());
+        try (InputStream inputStream = new FileInputStream(file)) {
+
+            Workbook wb = WorkbookFactory.create(inputStream);
+            Sheet sheet = wb.getSheetAt(0);
+
+            for (int i = 2; i < sheet.getPhysicalNumberOfRows(); i++) {
+                Row row = sheet.getRow(i);
+                Cell cell = row.getCell(1);
+
+                if (cell == null) {
+                    continue;
+                }
+
+                String participantId = CellType.NUMERIC.equals(cell.getCellType()) ?
+                        dc.format(cell.getNumericCellValue()) :
+                        cell.getStringCellValue().replaceAll("\\s","");
+
+                GetParticipantResponse getParticipantResponse = difiClient.getParticipant(participantId);
+                if (getParticipantResponse.getParticipant() != null) {
+                    System.out.println(i + ". Participant: " + participantId + " is registered, ignoring...");
+                } else {
+                    System.out.println(i + ". Participant: " + participantId + " is NOT registered, creating...");
+
+                    ParticipantType newParticipant = buildFromRow(row, participantId);
+                    AddParticipantResponse response = difiClient.addParticipant(newParticipant);
+                    if (response.getSuccess().isValue()) {
+                        System.out.println("     Created!");
+                    } else {
+                        System.out.println("     Error occurred: " + response.getErrorMessages().stream().map(ElmaBasicType::getValue).collect(Collectors.joining(", ")));
+                    }
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private ParticipantType buildFromRow(Row row, String participantId) {
+        return new DifiParticipantBuilder()
+                .setOrganizationNumber(participantId)
+                .setName(row.getCell(0).getStringCellValue())
+                .setContactName(row.getCell(2).getStringCellValue())
+                .setContactTelephone(row.getCell(3).getStringCellValue())
+                .setContactEmail(row.getCell(4).getStringCellValue())
+                .addProfile("EHF_CREDITNOTE 2.0")
+                .addProfile("PEPPOLBIS_3_0_BILLING_01_UBL")
+                .addProfile("EHF_INVOICE 2.0")
+                .addProfile("BIS04 V2")
+                .addProfile("EHF_INVOICE_CREDITNOTE 2.0")
+                .addProfile("BIS05 V2")
+                .build();
+    }
 
     @Test
     @Ignore
