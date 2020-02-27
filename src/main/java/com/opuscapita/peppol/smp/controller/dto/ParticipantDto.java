@@ -2,10 +2,12 @@ package com.opuscapita.peppol.smp.controller.dto;
 
 import com.opuscapita.peppol.smp.entity.Participant;
 import com.opuscapita.peppol.smp.repository.EndpointType;
+import com.opuscapita.peppol.smp.repository.SmpName;
+
+import java.util.Set;
 
 public class ParticipantDto {
 
-    private Long id;
     private String icd;
     private String name;
     private String identifier;
@@ -13,15 +15,9 @@ public class ParticipantDto {
     private String contactInfo;
     private String registeredAt;
     private EndpointType endpointType;
-    private String smpName;
+    private Set<DocumentTypeDto> documentTypes;
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
+    private SmpName smpName;
 
     public String getIcd() {
         return icd;
@@ -79,11 +75,19 @@ public class ParticipantDto {
         this.endpointType = endpointType;
     }
 
-    public String getSmpName() {
+    public Set<DocumentTypeDto> getDocumentTypes() {
+        return documentTypes;
+    }
+
+    public void setDocumentTypes(Set<DocumentTypeDto> documentTypes) {
+        this.documentTypes = documentTypes;
+    }
+
+    public SmpName getSmpName() {
         return smpName;
     }
 
-    public void setSmpName(String smpName) {
+    public void setSmpName(SmpName smpName) {
         this.smpName = smpName;
     }
 
@@ -93,7 +97,6 @@ public class ParticipantDto {
         }
 
         ParticipantDto dto = new ParticipantDto();
-        dto.setId(participant.getId());
         dto.setIcd(participant.getIcd());
         dto.setName(participant.getName());
         dto.setIdentifier(participant.getIdentifier());
@@ -101,6 +104,7 @@ public class ParticipantDto {
         dto.setContactInfo(participant.getContactInfo());
         dto.setRegisteredAt(participant.getRegisteredAt());
         dto.setEndpointType(participant.getEndpoint().getType());
+        dto.setDocumentTypes(DocumentTypeDto.of(participant.getDocumentTypes()));
         dto.setSmpName(participant.getEndpoint().getSmp().getName());
         return dto;
     }

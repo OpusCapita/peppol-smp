@@ -1,65 +1,25 @@
 package com.opuscapita.peppol.smp.entity;
 
-import org.hibernate.annotations.DynamicUpdate;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
+import com.opuscapita.peppol.smp.controller.dto.ParticipantDto;
 
-import javax.persistence.*;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
-@Entity
-@DynamicUpdate
-@Table(name = "participants")
 public class Participant {
 
-    @Id
-    @Column(name = "id")
-    @GeneratedValue
-    private Long id;
-
-    @Column(name = "name", nullable = false)
     private String name;
-
-    @Column(name = "icd", nullable = false, length = 10)
     private String icd;
-
-    @Column(name = "identifier", nullable = false, length = 20)
     private String identifier;
-
-    @Column(name = "country", length = 5)
     private String country;
-
-    @Column(name = "contact_info")
     private String contactInfo;
-
-    @Column(name = "registered_at")
     private String registeredAt;
-
-    @Version
-    private Integer version;
-
-    @ManyToMany
-    @JoinTable(name = "participant_document_type",
-            joinColumns = @JoinColumn(name = "participant_id"),
-            inverseJoinColumns = @JoinColumn(name = "document_type_id"))
     private Set<DocumentType> documentTypes;
 
-    @ManyToOne(fetch = FetchType.EAGER, optional = false)
-    @JoinColumn(name = "endpoint_id", nullable = false)
-    @OnDelete(action = OnDeleteAction.CASCADE)
     private Endpoint endpoint;
 
     public Participant() {
         this.documentTypes = new HashSet<>();
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public String getName() {
@@ -110,14 +70,6 @@ public class Participant {
         this.registeredAt = registeredAt;
     }
 
-    public Integer getVersion() {
-        return version;
-    }
-
-    public void setVersion(Integer version) {
-        this.version = version;
-    }
-
     public Set<DocumentType> getDocumentTypes() {
         return documentTypes;
     }
@@ -132,5 +84,32 @@ public class Participant {
 
     public void setEndpoint(Endpoint endpoint) {
         this.endpoint = endpoint;
+    }
+
+    public static Participant of(ParticipantDto participantDto) {
+        Participant participant = new Participant();
+
+        participant.setIcd(participantDto.getIcd());
+        participant.setName(participantDto.getName());
+        participant.setIdentifier(participantDto.getIdentifier());
+        participant.setCountry(participantDto.getCountry());
+        participant.setContactInfo(participantDto.getContactInfo());
+        participant.setRegisteredAt(participantDto.getRegisteredAt());
+        participant.setDocumentTypes(DocumentType.of(participantDto.getDocumentTypes()));
+
+        return participant;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Participant that = (Participant) o;
+        return icd.equals(that.icd) && identifier.equals(that.identifier);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(icd, identifier);
     }
 }

@@ -7,6 +7,10 @@ public class TickstarParticipantAccessPointConfiguration {
     private Integer endpointId;
     private TickstarParticipantAccessPointConfigurationMetadata metadataProfileIds;
 
+    public TickstarParticipantAccessPointConfiguration() {
+        this.metadataProfileIds = new TickstarParticipantAccessPointConfigurationMetadata();
+    }
+
     public Integer getEndpointId() {
         return endpointId;
     }

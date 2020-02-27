@@ -1,5 +1,6 @@
 package com.opuscapita.peppol.smp.entity;
 
+import com.opuscapita.peppol.smp.repository.SmpName;
 import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
@@ -13,8 +14,9 @@ public class Smp {
     @GeneratedValue
     private Long id;
 
-    @Column(name = "name", nullable = false, unique = true)
-    private String name;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "name", nullable = false)
+    private SmpName name;
 
     public Long getId() {
         return id;
@@ -24,11 +26,11 @@ public class Smp {
         this.id = id;
     }
 
-    public String getName() {
+    public SmpName getName() {
         return name;
     }
 
-    public void setName(String name) {
+    public void setName(SmpName name) {
         this.name = name;
     }
 }

@@ -2,14 +2,22 @@ package com.opuscapita.peppol.smp.controller.dto;
 
 import com.opuscapita.peppol.smp.entity.DocumentType;
 
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 public class DocumentTypeDto {
 
-    private Long id;
-    private Integer documentTypeId;
     private String name;
-    private String profileIdentifier;
-    private String documentIdentifier;
-    private String smpName;
+    private Integer internalId;
+    private String externalId;
+
+    public static Set<DocumentTypeDto> of(Set<DocumentType> documentTypes) {
+        if (documentTypes == null || documentTypes.isEmpty()) {
+            return new HashSet<>();
+        }
+        return documentTypes.stream().map(DocumentTypeDto::of).collect(Collectors.toSet());
+    }
 
     public static DocumentTypeDto of(DocumentType documentType) {
         if (documentType == null) {
@@ -17,29 +25,10 @@ public class DocumentTypeDto {
         }
 
         DocumentTypeDto dto = new DocumentTypeDto();
-        dto.setId(documentType.getId());
         dto.setName(documentType.getName());
-        dto.setDocumentTypeId(documentType.getDocumentTypeId());
-        dto.setProfileIdentifier(documentType.getProfileIdentifier());
-        dto.setDocumentIdentifier(documentType.getDocumentIdentifier());
-        dto.setSmpName(documentType.getSmp().getName());
+        dto.setInternalId(documentType.getInternalId());
+        dto.setExternalId(documentType.getExternalId());
         return dto;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Integer getDocumentTypeId() {
-        return documentTypeId;
-    }
-
-    public void setDocumentTypeId(Integer documentTypeId) {
-        this.documentTypeId = documentTypeId;
     }
 
     public String getName() {
@@ -50,27 +39,19 @@ public class DocumentTypeDto {
         this.name = name;
     }
 
-    public String getProfileIdentifier() {
-        return profileIdentifier;
+    public Integer getInternalId() {
+        return internalId;
     }
 
-    public void setProfileIdentifier(String profileIdentifier) {
-        this.profileIdentifier = profileIdentifier;
+    public void setInternalId(Integer internalId) {
+        this.internalId = internalId;
     }
 
-    public String getDocumentIdentifier() {
-        return documentIdentifier;
+    public String getExternalId() {
+        return externalId;
     }
 
-    public void setDocumentIdentifier(String documentIdentifier) {
-        this.documentIdentifier = documentIdentifier;
-    }
-
-    public String getSmpName() {
-        return smpName;
-    }
-
-    public void setSmpName(String smpName) {
-        this.smpName = smpName;
+    public void setExternalId(String externalId) {
+        this.externalId = externalId;
     }
 }

@@ -11,10 +11,8 @@ import java.util.List;
 @Repository
 public interface DocumentTypeRepository extends JpaRepository<DocumentType, Long>, JpaSpecificationExecutor<DocumentType> {
 
-    List<DocumentType> findByDocumentTypeId(Integer documentTypeId);
+    List<DocumentType> findByExternalId(String externalId);
 
-    List<DocumentType> findByName(String name);
-
-    List<DocumentType> findBySmp(Smp smp);
+    List<DocumentType> findByExternalIdAndSmp(String externalId, Smp smp);
 
 }

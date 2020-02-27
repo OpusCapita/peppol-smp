@@ -1,12 +1,15 @@
 package com.opuscapita.peppol.smp.entity;
 
+import com.opuscapita.peppol.smp.controller.dto.DocumentTypeDto;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Entity
 @DynamicUpdate
@@ -18,20 +21,14 @@ public class DocumentType {
     @GeneratedValue
     private Long id;
 
-    @Column(name = "document_type_id")
-    private Integer documentTypeId;
+    @Column(name = "external_id", nullable = false)
+    private String externalId;
 
-    @Column(name = "name", nullable = false)
+    @Column(name = "internal_id")
+    private Integer internalId;
+
+    @Column(name = "name")
     private String name;
-
-    @Column(name = "profile_identifier")
-    private String profileIdentifier;
-
-    @Column(name = "document_identifier")
-    private String documentIdentifier;
-
-    @ManyToMany(mappedBy = "documentTypes")
-    private Set<Participant> participants;
 
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "smp_id", nullable = false)
@@ -39,7 +36,6 @@ public class DocumentType {
     private Smp smp;
 
     public DocumentType() {
-        this.participants = new HashSet<>();
     }
 
     public Long getId() {
@@ -50,12 +46,28 @@ public class DocumentType {
         this.id = id;
     }
 
-    public Integer getDocumentTypeId() {
-        return documentTypeId;
+    public String getExternalId() {
+        return externalId;
     }
 
-    public void setDocumentTypeId(Integer documentTypeId) {
-        this.documentTypeId = documentTypeId;
+    public Integer getExternalIdAsInteger() {
+        return Integer.parseInt(externalId);
+    }
+
+    public void setExternalId(String externalId) {
+        this.externalId = externalId;
+    }
+
+    public void setExternalIdAsInteger(Integer externalId) {
+        this.externalId = String.valueOf(externalId);
+    }
+
+    public Integer getInternalId() {
+        return internalId;
+    }
+
+    public void setInternalId(Integer internalId) {
+        this.internalId = internalId;
     }
 
     public String getName() {
@@ -66,35 +78,41 @@ public class DocumentType {
         this.name = name;
     }
 
-    public String getProfileIdentifier() {
-        return profileIdentifier;
-    }
-
-    public void setProfileIdentifier(String profileIdentifier) {
-        this.profileIdentifier = profileIdentifier;
-    }
-
-    public String getDocumentIdentifier() {
-        return documentIdentifier;
-    }
-
-    public void setDocumentIdentifier(String documentIdentifier) {
-        this.documentIdentifier = documentIdentifier;
-    }
-
-    public Set<Participant> getParticipants() {
-        return participants;
-    }
-
-    public void setParticipants(Set<Participant> participants) {
-        this.participants = participants;
-    }
-
     public Smp getSmp() {
         return smp;
     }
 
     public void setSmp(Smp smp) {
         this.smp = smp;
+    }
+
+    public static Set<DocumentType> of(Set<DocumentTypeDto> documentTypeDtos) {
+        if (documentTypeDtos == null || documentTypeDtos.isEmpty()) {
+            return new HashSet<>();
+        }
+        return documentTypeDtos.stream().map(DocumentType::of).collect(Collectors.toSet());
+    }
+
+    public static DocumentType of(DocumentTypeDto documentTypeDto) {
+        if (documentTypeDto == null) {
+            return null;
+        }
+
+        DocumentType dto = new DocumentType();
+        dto.setInternalId(documentTypeDto.getInternalId());
+        return dto;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        DocumentType that = (DocumentType) o;
+        return Objects.equals(externalId, that.externalId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(externalId);
     }
 }

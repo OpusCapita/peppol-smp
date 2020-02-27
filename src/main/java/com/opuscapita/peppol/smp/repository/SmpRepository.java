@@ -8,6 +8,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface SmpRepository extends JpaRepository<Smp, Long>, JpaSpecificationExecutor<Smp> {
 
-    Smp findByName(String name);
+    Smp findByName(SmpName name);
 
 }

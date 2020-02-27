@@ -2,47 +2,35 @@ package com.opuscapita.peppol.smp.repository;
 
 import com.opuscapita.peppol.smp.entity.DocumentType;
 import com.opuscapita.peppol.smp.entity.Smp;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
 
 @Component
 public class DocumentTypeServiceImpl implements DocumentTypeService {
 
-    private static final Logger logger = LoggerFactory.getLogger(DocumentTypeServiceImpl.class);
-
-    private final DocumentTypeRepository repository;
+    private final SmpService smpService;
+    private final DocumentTypeRepository documentTypeRepository;
 
     @Autowired
-    public DocumentTypeServiceImpl(DocumentTypeRepository repository) {
-        this.repository = repository;
+    public DocumentTypeServiceImpl(SmpService smpService, DocumentTypeRepository documentTypeRepository) {
+        this.smpService = smpService;
+        this.documentTypeRepository = documentTypeRepository;
     }
 
     @Override
-    public void saveDocumentType(DocumentType documentType) {
-        repository.save(documentType);
+    public DocumentType getDocumentType(Integer externalId, SmpName smpName) {
+        return getDocumentType(String.valueOf(externalId), smpName);
     }
 
     @Override
-    public DocumentType getDocumentType(Long id) {
-        return repository.findById(id).orElse(null);
+    public DocumentType getDocumentType(String externalId, SmpName smpName) {
+        Smp smp = smpService.getSmp(smpName);
+        return documentTypeRepository.findByExternalIdAndSmp(externalId, smp).stream().findFirst().orElse(null);
     }
 
     @Override
-    public DocumentType getDocumentType(Integer id, Smp smp) {
-        return repository.findByDocumentTypeId(id).stream().filter(d -> smp.getId().equals(d.getSmp().getId())).findFirst().orElse(null);
-    }
-
-    @Override
-    public DocumentType getDocumentType(String name, Smp smp) {
-        return repository.findByName(name).stream().filter(d -> smp.getId().equals(d.getSmp().getId())).findFirst().orElse(null);
-    }
-
-    @Override
-    public List<DocumentType> getDocumentTypes(Smp smp) {
-        return repository.findBySmp(smp);
+    public void saveDocumentType(DocumentType documentType, SmpName smpName) {
+        documentType.setSmp(smpService.getSmp(smpName));
+        documentTypeRepository.save(documentType);
     }
 }

@@ -20,10 +20,10 @@ class ParticipantList extends Components.ContextComponent {
     ];
 
     state = {
+        init: true,
         loading: false,
         participantList: [],
         searchValues: {},
-        showSearch: true,
         totalCount: -1,
         pagination: {},
     };
@@ -36,31 +36,63 @@ class ParticipantList extends Components.ContextComponent {
 
     async loadParticipantList(tableState) {
         this.setState({loading: true});
-        let {pagination, searchValues} = this.state;
-
         try {
-            if (tableState) {
-                pagination.page = tableState.page;
-                pagination.pageSize = tableState.pageSize;
-                pagination.sorted = tableState.sorted;
-            } else {
-                pagination.page = 0;
-            }
-
-            const response = await this.api.getParticipantList(pagination, searchValues);
-            this.setState({participantList: response.data, totalCount: response.totalCount});
-        }
-        catch (e) {
+            const response = await this.api.getParticipantList();
+            this.setState({participantList: response});
+        } catch (e) {
             this.context.showNotification(e.message, 'error', 10);
-        }
-        finally {
+        } finally {
             this.setState({loading: false});
         }
     }
 
-    showParticipantLookup(participant) {
-        this.context.router.push(`/peppol-smp/?q=${participant}`);
+    getParticipantList(prm) {
+        console.log(prm);
+        return this.state.participantList.filter(this.filterParticipants);
     }
+
+    filterParticipants(participant) {
+        const {searchValues} = this.state;
+
+        if (searchValues.icd && searchValues.icd !== '') {
+            if (participant.icd !== searchValues.icd) {
+                return false;
+            }
+        }
+
+        if (searchValues.identifier && searchValues.identifier !== '') {
+            if (participant.identifier !== searchValues.identifier) {
+                return false;
+            }
+        }
+
+        if (searchValues.name && searchValues.name !== '') {
+            if (!participant.name.toLowerCase().includes(searchValues.name.toLowerCase())) {
+                return false;
+            }
+        }
+
+        if (searchValues.countries && searchValues.countries.length) {
+            if (!searchValues.countries.includes(participant.country)) {
+                return false;
+            }
+        }
+
+        if (searchValues.smpNames && searchValues.smpNames.length) {
+            if (!searchValues.smpNames.includes(participant.smpName)) {
+                return false;
+            }
+        }
+
+        if (searchValues.endpointTypes && searchValues.endpointTypes.length) {
+            if (!searchValues.endpointTypes.includes(participant.endpointType)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
 
     mapSmpsSelect() {
         return ParticipantList.smpNames.map(value => {
@@ -105,12 +137,12 @@ class ParticipantList extends Components.ContextComponent {
     }
 
     showAddParticipantPage() {
-        this.context.router.push('/peppol-smp/newParticipant');
+        this.context.router.push('/peppol-smp/create');
     }
 
     render() {
         const {i18n} = this.context;
-        const {loading, participantList, pagination, totalCount, searchValues, showSearch} = this.state;
+        const {loading, participantList, pagination, totalCount, searchValues} = this.state;
 
         return (
             <div>
@@ -119,111 +151,104 @@ class ParticipantList extends Components.ContextComponent {
                         New Participant
                     </button>
                 </h3>
-                {
-                    showSearch &&
-                    <div>
-                        <div className="form-horizontal participant-search">
-                            <div className="row">
-                                <div className="col-md-6">
-                                    <div className="form-group">
-                                        <div className="col-sm-3">
-                                            <label className="control-label">ICD Number</label>
-                                        </div>
-                                        <div className="offset-md-1 col-md-8">
-                                            <input type="text" className="form-control" value={searchValues.icd}
-                                                   onChange={e => this.handleSearchFormChange('icd', e.target.value)}
-                                            />
-                                        </div>
+                <div>
+                    <div className="form-horizontal participant-search">
+                        <div className="row">
+                            <div className="col-md-6">
+                                <div className="form-group">
+                                    <div className="col-sm-3">
+                                        <label className="control-label">ICD Number</label>
                                     </div>
-                                    <div className="form-group">
-                                        <div className="col-sm-3">
-                                            <label className="control-label">Name</label>
-                                        </div>
-                                        <div className="offset-md-1 col-md-8">
-                                            <input type="text" className="form-control" value={searchValues.name}
-                                                   onChange={e => this.handleSearchFormChange('name', e.target.value)}
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="form-group">
-                                        <div className="col-sm-3">
-                                            <label className="control-label">SMP</label>
-                                        </div>
-                                        <div className="offset-md-1 col-md-8">
-                                            <Select className="react-select" isMulti={true}
-                                                    options={this.mapSmpsSelect()}
-                                                    onChange={value => this.handleSearchFormChange('smpNames', value)}
-                                                    value={searchValues.smpNames && searchValues.smpNames.map(cts => ({
-                                                        label: cts,
-                                                        value: cts
-                                                    }))}
-                                            />
-                                        </div>
+                                    <div className="offset-md-1 col-md-8">
+                                        <input type="text" className="form-control" value={searchValues.icd}
+                                               onChange={e => this.handleSearchFormChange('icd', e.target.value)}
+                                        />
                                     </div>
                                 </div>
-                                <div className="col-md-6">
-                                    <div className="form-group">
-                                        <div className="col-sm-3">
-                                            <label className="control-label">Participant ID</label>
-                                        </div>
-                                        <div className="offset-md-1 col-md-8">
-                                            <input type="text" className="form-control" value={searchValues.identifier}
-                                                   onChange={e => this.handleSearchFormChange('identifier', e.target.value)}
-                                            />
-                                        </div>
+                                <div className="form-group">
+                                    <div className="col-sm-3">
+                                        <label className="control-label">Name</label>
                                     </div>
-                                    <div className="form-group">
-                                        <div className="col-sm-3">
-                                            <label className="control-label">Country</label>
-                                        </div>
-                                        <div className="offset-md-1 col-md-8">
-                                            <Select className="react-select" isMulti={true}
-                                                    options={this.mapCountriesSelect()}
-                                                    onChange={value => this.handleSearchFormChange('countries', value)}
-                                                    value={searchValues.countries && searchValues.countries.map(cts => ({
-                                                        label: cts,
-                                                        value: cts
-                                                    }))}
-                                            />
-                                        </div>
+                                    <div className="offset-md-1 col-md-8">
+                                        <input type="text" className="form-control" value={searchValues.name}
+                                               onChange={e => this.handleSearchFormChange('name', e.target.value)}
+                                        />
                                     </div>
-                                    <div className="form-group">
-                                        <div className="col-sm-3">
-                                            <label className="control-label">Type</label>
-                                        </div>
-                                        <div className="offset-md-1 col-md-8">
-                                            <Select className="react-select" isMulti={true}
-                                                    options={this.mapTypesSelect()}
-                                                    onChange={value => this.handleSearchFormChange('endpointTypes', value)}
-                                                    value={searchValues.endpointTypes && searchValues.endpointTypes.map(cts => ({
-                                                        label: cts,
-                                                        value: cts
-                                                    }))}
-                                            />
-                                        </div>
+                                </div>
+                                <div className="form-group">
+                                    <div className="col-sm-3">
+                                        <label className="control-label">SMP</label>
+                                    </div>
+                                    <div className="offset-md-1 col-md-8">
+                                        <Select className="react-select" isMulti={true}
+                                                options={this.mapSmpsSelect()}
+                                                onChange={value => this.handleSearchFormChange('smpNames', value)}
+                                                value={searchValues.smpNames && searchValues.smpNames.map(cts => ({
+                                                    label: cts,
+                                                    value: cts
+                                                }))}
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="col-md-6">
+                                <div className="form-group">
+                                    <div className="col-sm-3">
+                                        <label className="control-label">Participant ID</label>
+                                    </div>
+                                    <div className="offset-md-1 col-md-8">
+                                        <input type="text" className="form-control" value={searchValues.identifier}
+                                               onChange={e => this.handleSearchFormChange('identifier', e.target.value)}
+                                        />
+                                    </div>
+                                </div>
+                                <div className="form-group">
+                                    <div className="col-sm-3">
+                                        <label className="control-label">Country</label>
+                                    </div>
+                                    <div className="offset-md-1 col-md-8">
+                                        <Select className="react-select" isMulti={true}
+                                                options={this.mapCountriesSelect()}
+                                                onChange={value => this.handleSearchFormChange('countries', value)}
+                                                value={searchValues.countries && searchValues.countries.map(cts => ({
+                                                    label: cts,
+                                                    value: cts
+                                                }))}
+                                        />
+                                    </div>
+                                </div>
+                                <div className="form-group">
+                                    <div className="col-sm-3">
+                                        <label className="control-label">Type</label>
+                                    </div>
+                                    <div className="offset-md-1 col-md-8">
+                                        <Select className="react-select" isMulti={true}
+                                                options={this.mapTypesSelect()}
+                                                onChange={value => this.handleSearchFormChange('endpointTypes', value)}
+                                                value={searchValues.endpointTypes && searchValues.endpointTypes.map(cts => ({
+                                                    label: cts,
+                                                    value: cts
+                                                }))}
+                                        />
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div className="form-submit text-right">
-                            <button className="btn btn-link" onClick={() => this.resetSearch()}>Reset</button>
-                            <button className="btn btn-primary" onClick={() => this.loadParticipantList()}>Filter</button>
-                        </div>
-                        <hr/>
                     </div>
-                }
+                    <div className="form-submit text-right">
+                        <button className="btn btn-link" onClick={() => this.resetSearch()}>Reset</button>
+                        <button className="btn btn-primary" onClick={() => this.loadParticipantList()}>Filter</button>
+                    </div>
+                    <hr/>
+                </div>
 
                 <ReactTable
                     className="participant-list-table"
                     loading={loading}
-                    data={participantList}
-                    onFetchData={(state) => this.loadParticipantList(state)}
-
-                    manual
+                    data={this.getParticipantList(prm)}
+                    onFetchData={() => this.loadParticipantList()}
                     minRows={10}
-                    pages={Math.ceil(totalCount / (pagination.pageSize || 10))}
                     defaultPageSize={10}
-                    pageSizeOptions={[5, 10, 20, 50, 100, 1000]}
                     defaultSorted={[{id: 'registeredAt', desc: true}]}
 
                     columns={[
@@ -249,7 +274,8 @@ class ParticipantList extends Components.ContextComponent {
                             accessor: 'endpointType',
                             Header: 'Type',
                             Cell: ({value}) =>
-                                <span className={`label label-${value === 'PROD' ? 'success' : 'info'}`}>{value.toLowerCase()}</span>
+                                <span
+                                    className={`label label-${value === 'PROD' ? 'success' : 'info'}`}>{value.toLowerCase()}</span>
                         },
                         {
                             id: 'registeredAt',

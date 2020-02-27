@@ -1,13 +1,13 @@
 package com.opuscapita.peppol.smp.tickstar;
 
-import com.opuscapita.peppol.smp.tickstar.dto.*;
+import com.opuscapita.peppol.smp.tickstar.dto.TickstarLookupParticipant;
+import com.opuscapita.peppol.smp.tickstar.dto.TickstarMetadataListResponse;
+import com.opuscapita.peppol.smp.tickstar.dto.TickstarParticipant;
+import com.opuscapita.peppol.smp.tickstar.dto.TickstarParticipantListResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
+import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
@@ -37,9 +37,9 @@ public class TickstarClient {
         return response.getParticipant().get(0);
     }
 
-    public String addParticipant(TickstarParticipant request) {
+    public HttpStatus addParticipant(TickstarParticipant request) {
         HttpEntity<TickstarParticipant> entity = new HttpEntity<>(request, getCommonHeaders());
-        return exchange("/participant", HttpMethod.POST, entity, String.class);
+        return restTemplate.exchange(getApiUrl("/participant"), HttpMethod.POST, entity, String.class).getStatusCode();
     }
 
     public String editParticipant(TickstarParticipant request) {
@@ -65,16 +65,12 @@ public class TickstarClient {
         return exchange(url, method, entity, responseType);
     }
 
-    private <T> T exchange(String url, HttpMethod method, HttpEntity<?> entity, Class<T> responseType) {
-        String endpoint = String.format("https://api.galaxygw.com/2.0/smp%s", url);
+    private <T> T exchange(String uri, HttpMethod method, HttpEntity<?> entity, Class<T> responseType) {
+        return restTemplate.exchange(getApiUrl(uri), method, entity, responseType).getBody();
+    }
 
-        try {
-            return restTemplate.exchange(endpoint, method, entity, responseType).getBody();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return null;
+    private String getApiUrl(String uri) {
+        return String.format("https://api.galaxygw.com/2.0/smp%s", uri);
     }
 
     private HttpHeaders getCommonHeaders() {

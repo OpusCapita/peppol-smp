@@ -25,7 +25,7 @@ public class TickstarParticipantAccessPointConfigurationMetadata {
 
     public static TickstarParticipantAccessPointConfigurationMetadata of(Participant participant) {
         TickstarParticipantAccessPointConfigurationMetadata documentTypeIds = new TickstarParticipantAccessPointConfigurationMetadata();
-        documentTypeIds.setProfileId(participant.getDocumentTypes().stream().map(DocumentType::getDocumentTypeId).collect(Collectors.toList()));
+        documentTypeIds.setProfileId(participant.getDocumentTypes().stream().map(DocumentType::getExternalIdAsInteger).collect(Collectors.toList()));
         return documentTypeIds;
     }
 }

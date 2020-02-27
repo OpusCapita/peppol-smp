@@ -8,8 +8,8 @@ import org.springframework.ws.client.core.support.WebServiceGatewaySupport;
 
 public class DifiClient extends WebServiceGatewaySupport {
 
-    public static final String ICD_9908 = "9908";
-    public static final String ICD_0192 = "0192";
+    private static final String ICD_9908 = "9908";
+    private static final String ICD_0192 = "0192";
 
     private final Difi elmaPort;
     private final String username;
@@ -73,6 +73,18 @@ public class DifiClient extends WebServiceGatewaySupport {
     public ProfilesSupportedResponse getSupportedProfiles() {
         ProfilesSupportedType profilesSupportedType = new ProfilesSupportedType();
         return elmaPort.profilesSupported(profilesSupportedType);
+    }
+
+//    elmaPort.addProfileToAllParticipants();
+
+//    elmaPort.removeProfileFromAllParticipants();
+
+    public static String getDifiIcd() {
+        return DifiClient.ICD_9908;
+    }
+
+    public static Boolean isDifiIcd(String icd) {
+        return DifiClient.ICD_9908.equals(icd) || DifiClient.ICD_0192.equals(icd);
     }
 
     private UserType getAuthUser() {
