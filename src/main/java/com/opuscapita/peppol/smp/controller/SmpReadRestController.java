@@ -25,4 +25,6 @@ public class SmpReadRestController {
     public List<ParticipantDto> getParticipants() {
         return participantService.getAllParticipants().stream().map(ParticipantDto::of).collect(Collectors.toList());
     }
+
+
 }
