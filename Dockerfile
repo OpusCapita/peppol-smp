@@ -23,10 +23,10 @@ RUN npm run build
 
 # building backend
 RUN chmod +x ./gradlew
-RUN ./gradlew build || return 0
+RUN ./gradlew -q build || return 0
 
 ## actual container
-FROM openjdk:8u191-jre-alpine3.9
+FROM openjdk:8
 LABEL author="Ibrahim Bilge <Ibrahim.Bilge@opuscapita.com>"
 
 ## setting heap size automatically to the container memory limits
