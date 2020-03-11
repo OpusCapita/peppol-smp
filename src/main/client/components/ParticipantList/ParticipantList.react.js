@@ -1,8 +1,7 @@
 import React from 'react';
 import {Components} from '@opuscapita/service-base-ui';
 import ReactTable from 'react-table';
-import ReactTooltip from 'react-tooltip';
-import {ApiBase, Countries} from '../../api';
+import {ApiBase} from '../../api';
 import Select from '@opuscapita/react-select';
 import 'react-table/react-table.css';
 import './ParticipantList.css';
@@ -20,22 +19,18 @@ class ParticipantList extends Components.ContextComponent {
     ];
 
     state = {
-        init: true,
         loading: false,
         participantList: [],
-        searchValues: {},
-        totalCount: -1,
-        pagination: {},
     };
 
     constructor(props, context) {
         super(props);
-
         this.api = new ApiBase();
     }
 
     async loadParticipantList(tableState) {
         this.setState({loading: true});
+
         try {
             const response = await this.api.getParticipantList();
             this.setState({participantList: response});
@@ -45,54 +40,6 @@ class ParticipantList extends Components.ContextComponent {
             this.setState({loading: false});
         }
     }
-
-    getParticipantList(prm) {
-        console.log(prm);
-        return this.state.participantList.filter(this.filterParticipants);
-    }
-
-    filterParticipants(participant) {
-        const {searchValues} = this.state;
-
-        if (searchValues.icd && searchValues.icd !== '') {
-            if (participant.icd !== searchValues.icd) {
-                return false;
-            }
-        }
-
-        if (searchValues.identifier && searchValues.identifier !== '') {
-            if (participant.identifier !== searchValues.identifier) {
-                return false;
-            }
-        }
-
-        if (searchValues.name && searchValues.name !== '') {
-            if (!participant.name.toLowerCase().includes(searchValues.name.toLowerCase())) {
-                return false;
-            }
-        }
-
-        if (searchValues.countries && searchValues.countries.length) {
-            if (!searchValues.countries.includes(participant.country)) {
-                return false;
-            }
-        }
-
-        if (searchValues.smpNames && searchValues.smpNames.length) {
-            if (!searchValues.smpNames.includes(participant.smpName)) {
-                return false;
-            }
-        }
-
-        if (searchValues.endpointTypes && searchValues.endpointTypes.length) {
-            if (!searchValues.endpointTypes.includes(participant.endpointType)) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
 
     mapSmpsSelect() {
         return ParticipantList.smpNames.map(value => {
@@ -106,43 +53,13 @@ class ParticipantList extends Components.ContextComponent {
         });
     }
 
-    mapCountriesSelect() {
-        return Countries.map(value => {
-            return {value: value.code, label: value.name};
-        });
-    }
-
-    handleSearchFormChange(field, value) {
-        const {searchValues} = this.state;
-
-        if (Array.isArray(value))
-            searchValues[field] = value.map(val => val.value);
-        else
-            searchValues[field] = value;
-
-        this.setState({searchValues});
-    }
-
-    resetSearch() {
-        const searchValues = {
-            icd: '',
-            name: '',
-            identifier: '',
-            smpNames: [],
-            countries: [],
-            endpointTypes: []
-        };
-
-        this.setState({searchValues}, () => this.loadParticipantList());
-    }
-
     showAddParticipantPage() {
         this.context.router.push('/peppol-smp/create');
     }
 
     render() {
         const {i18n} = this.context;
-        const {loading, participantList, pagination, totalCount, searchValues} = this.state;
+        const {loading, participantList} = this.state;
 
         return (
             <div>
@@ -151,6 +68,7 @@ class ParticipantList extends Components.ContextComponent {
                         New Participant
                     </button>
                 </h3>
+                <!--
                 <div>
                     <div className="form-horizontal participant-search">
                         <div className="row">
@@ -241,32 +159,42 @@ class ParticipantList extends Components.ContextComponent {
                     </div>
                     <hr/>
                 </div>
-
+                -->
                 <ReactTable
                     className="participant-list-table"
                     loading={loading}
-                    data={this.getParticipantList(prm)}
+                    data={participantList}
+                    filterable={true}
                     onFetchData={() => this.loadParticipantList()}
                     minRows={10}
                     defaultPageSize={10}
                     defaultSorted={[{id: 'registeredAt', desc: true}]}
+                    defaultFilterMethod={(filter, row) => String(row[filter.id]) === filter.value}
 
                     columns={[
                         {
                             id: 'identifier',
                             accessor: row => row,
                             Header: 'ID',
-                            Cell: ({value}) => <span>{`${value.icd}:${value.identifier}`}</span>
+                            Cell: ({value}) => <span>{`${value.icd}:${value.identifier}`}</span>,
+                            filterMethod: (filter, row) => {
+                                const rowVal = row[filter.id];
+                                if (filter.value.includes(":")) {
+                                    return rowVal === filter.value;
+                                }
+                                for (let part of rowVal.split(":")) {
+                                    if (part === filter.value) {
+                                        return true;
+                                    }
+                                }
+                                return false;
+                            }
                         },
                         {
                             id: 'name',
                             accessor: 'name',
-                            Header: 'Name'
-                        },
-                        {
-                            width: 100,
-                            accessor: 'smpName',
-                            Header: 'SMP'
+                            Header: 'Name',
+                            filterMethod: (filter, row) => row[filter.id].includes(filter.value)
                         },
                         {
                             id: 'endpointType',
@@ -274,8 +202,23 @@ class ParticipantList extends Components.ContextComponent {
                             accessor: 'endpointType',
                             Header: 'Type',
                             Cell: ({value}) =>
-                                <span
-                                    className={`label label-${value === 'PROD' ? 'success' : 'info'}`}>{value.toLowerCase()}</span>
+                                <span className={`label label-${value === 'PROD' ? 'success' : 'info'}`}>{value.toLowerCase()}</span>,
+                            filterMethod: (filter, row) => {
+                                if (filter.value === "ALL") {
+                                    return true;
+                                }
+                                return row[filter.id] === filter.value;
+                            },
+                            Filter: ({ filter, onChange }) =>
+                                <select
+                                    onChange={event => onChange(event.target.value)}
+                                    style={{ width: "100%" }}
+                                    value={filter ? filter.value : "PROD"}
+                                >
+                                    <option value="ALL">ALL</option>
+                                    <option value="TEST">TEST</option>
+                                    <option value="PROD">PROD</option>
+                                </select>
                         },
                         {
                             id: 'registeredAt',
@@ -287,7 +230,7 @@ class ParticipantList extends Components.ContextComponent {
                     ]}
                 />
                 <div className="text-center media">
-                    <p>{`${pagination.page * pagination.pageSize} to ${Math.min((pagination.page * pagination.pageSize + pagination.pageSize), totalCount)} of ${totalCount} participants`}</p>
+                    <p>{`Total ${participantList.length} participants`}</p>
                 </div>
             </div>
         );
