@@ -7,6 +7,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class SmpHomeController {
 
+    @RequestMapping(value = "/")
+    public String index() {
+        return "index";
+    }
+
     @RequestMapping("/api/health/check")
     public CommonRestResponse health() {
         return new CommonRestResponse("Yes, I'm alive!");
