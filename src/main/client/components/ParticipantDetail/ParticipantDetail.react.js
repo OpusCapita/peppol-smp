@@ -45,7 +45,13 @@ class ParticipantDetail extends Components.ContextComponent {
     }
 
     getDocumentTypes(documentTypes) {
-        console.log(documentTypes);
+        const {participant} = this.state;
+        return participant.documentTypes.map(ext => {
+            if (ext.internalId != null) {
+                ext.name = documentTypes.filter(int => int.id === ext.internalId)[0].description;
+            }
+            return ext;
+        });
     }
 
     render() {
