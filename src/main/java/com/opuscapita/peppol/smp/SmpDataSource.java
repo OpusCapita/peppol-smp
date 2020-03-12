@@ -11,10 +11,10 @@ import javax.sql.DataSource;
 @Component
 public class SmpDataSource {
 
-    @Value("${db-init.host:localhost}")
+    @Value("${db-init.host:mysql}")
     private String host;
 
-    @Value("${db-init.port:23306}")
+    @Value("${db-init.port:3306}")
     private String port;
 
     @Value("${db-init.user:root}")
