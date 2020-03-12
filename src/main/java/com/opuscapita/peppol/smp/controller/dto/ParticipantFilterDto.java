@@ -1,6 +1,7 @@
 package com.opuscapita.peppol.smp.controller.dto;
 
 import com.opuscapita.peppol.smp.repository.EndpointType;
+import com.opuscapita.peppol.smp.repository.SmpName;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.util.List;
@@ -10,8 +11,8 @@ public class ParticipantFilterDto {
     private String icd;
     private String name;
     private String identifier;
-    private List<String> smpNames;
     private List<String> countries;
+    private List<SmpName> smpNames;
     private List<EndpointType> endpointTypes;
 
     public String getIcd() {
@@ -38,11 +39,11 @@ public class ParticipantFilterDto {
         this.identifier = identifier;
     }
 
-    public List<String> getSmpNames() {
+    public List<SmpName> getSmpNames() {
         return smpNames;
     }
 
-    public void setSmpNames(List<String> smpNames) {
+    public void setSmpNames(List<SmpName> smpNames) {
         this.smpNames = smpNames;
     }
 

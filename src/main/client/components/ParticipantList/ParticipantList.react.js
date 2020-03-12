@@ -103,6 +103,11 @@ class ParticipantList extends Components.ContextComponent {
         this.context.router.push('/peppol-smp/create');
     }
 
+    showParticipantDetail(e, participant) {
+        e && e.preventDefault();
+        this.context.router.push(`/peppol-smp/detail/${participant.icd}/${participant.identifier}`);
+    }
+
     render() {
         const {i18n} = this.context;
         const {loading, participantList, pagination, totalCount, searchValues, showSearch} = this.state;
@@ -227,7 +232,15 @@ class ParticipantList extends Components.ContextComponent {
                             accessor: row => row,
                             Header: 'ID',
                             width: 200,
-                            Cell: ({value}) => <span>{`${value.icd}:${value.identifier}`}</span>
+                            Cell: ({value}) =>
+                                <span>
+                                    <a href={`/peppol-smp?r=detail/${value.icd}/${value.identifier}`}
+                                       onClick={(e) => this.showParticipantDetail(e, value)}
+                                       className="btn btn-link detail-link">
+                                        <span>{`${value.icd}:${value.identifier}`}</span>
+                                    </a>
+                                </span>
+
                         },
                         {
                             id: 'name',

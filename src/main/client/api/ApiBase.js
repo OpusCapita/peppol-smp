@@ -16,6 +16,10 @@ class ApiBase {
     addParticipant(participant) {
         return this.ajax.post(`/peppol-smp/api/add-participant`).send(participant).then(res => res.body).catch(ApiError.getErrorFromResponse);
     }
+
+    getParticipantDetail(icd, identifier) {
+        return this.ajax.get(`/peppol-smp/api/get-participant/${icd}/${identifier}`).then(res => res.body).catch(ApiError.getErrorFromResponse);
+    }
 }
 
 export default ApiBase;

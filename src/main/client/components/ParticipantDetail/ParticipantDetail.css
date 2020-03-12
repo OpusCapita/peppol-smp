@@ -1,0 +1,33 @@
+.participant-detail .form-group {
+	margin-bottom: 0;
+}
+
+.participant-detail .label.label-none {
+	border: none;
+	background: transparent;
+	color: #666;
+}
+
+.participant-detail .right-arrow {
+	margin: 0 10px 2px;
+}
+
+.participant-detail-actions {
+	margin-top: 10px;
+}
+
+.participant-detail-actions .btn {
+	margin-left: 5px;
+}
+
+.participant-detail-actions [hidden] {
+	display: none !important;
+}
+
+.participant-detail-actions .btn-passive {
+	opacity: 0.5;
+}
+
+textarea {
+	width: 100%;
+}

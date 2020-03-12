@@ -2,9 +2,9 @@ import React from 'react';
 import {ApiBase, Countries} from '../../api';
 import {Components} from '@opuscapita/service-base-ui';
 import Select from '@opuscapita/react-select';
-import './CreateParticipantForm.css';
+import './CreateParticipant.css';
 
-class CreateParticipantForm extends Components.ContextComponent {
+class CreateParticipant extends Components.ContextComponent {
 
     state = {
         participant: {},
@@ -161,4 +161,4 @@ class CreateParticipantForm extends Components.ContextComponent {
     }
 }
 
-export default CreateParticipantForm;
+export default CreateParticipant;
