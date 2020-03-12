@@ -11,7 +11,7 @@ class ParticipantDetail extends Components.ContextComponent {
 
     state = {
         loading: false,
-        participant: {}
+        participant: {documentTypes:[]}
     };
 
     static propTypes = {
@@ -60,18 +60,10 @@ class ParticipantDetail extends Components.ContextComponent {
 
         return (
             <div>
-                <h3>Participant Detail</h3>
+                <h3>{participant.icd}:{participant.identifier}</h3>
                 <div className="form-horizontal participant-detail">
                     <div className="row">
                         <div className="col-md-12">
-                            <div className="form-group">
-                                <div className="col-sm-3">
-                                    <label className="control-label btn-link">PEPPOL ID</label>
-                                </div>
-                                <div className="offset-md-1 col-md-8">
-                                    <label className="control-label">{participant.icd}:{participant.identifier}</label>
-                                </div>
-                            </div>
                             <div className="form-group">
                                 <div className="col-sm-3">
                                     <label className="control-label btn-link">Name</label>
@@ -94,7 +86,7 @@ class ParticipantDetail extends Components.ContextComponent {
                                 </div>
                                 <div className="offset-md-1 col-md-8">
                                     <label
-                                        className="control-label">{participant.smpName}-{participant.endpointType}</label>
+                                        className="control-label">{participant.smpName}-{participant.endpointType} at {i18n.formatDateTime(participant.registeredAt)}</label>
                                 </div>
                             </div>
                         </div>
@@ -117,10 +109,10 @@ class ParticipantDetail extends Components.ContextComponent {
                                             loading={loading}
                                             columns={[
                                                 {
-                                                    id: 'internalId',
+                                                    id: 'id',
                                                     width: 185,
                                                     Header: 'ID',
-                                                    accessor: 'internalId',
+                                                    accessor: 'id',
                                                 },
                                                 {
                                                     id: 'name',
