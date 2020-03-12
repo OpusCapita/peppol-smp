@@ -104,30 +104,32 @@ class ParticipantDetail extends Components.ContextComponent {
                         <div className="row">
                             <div className="col-md-12">
                                 <Consumer>
-                                    <ReactTable
-                                        className="message-detail-history-table"
-                                        data={this.getDocumentTypes(documentTypes)}
-                                        loading={loading}
-                                        columns={[
-                                            {
-                                                id: 'internalId',
-                                                width: 185,
-                                                Header: 'ID',
-                                                accessor: 'internalId',
-                                            },
-                                            {
+                                    {({ documentTypes }) => (
+                                        <ReactTable
+                                            className="message-detail-history-table"
+                                            data={this.getDocumentTypes(documentTypes)}
+                                            loading={loading}
+                                            columns={[
+                                                {
+                                                    id: 'internalId',
+                                                    width: 185,
+                                                    Header: 'ID',
+                                                    accessor: 'internalId',
+                                                },
+                                                {
+                                                    id: 'name',
+                                                    Header: 'Name',
+                                                    accessor: 'name',
+                                                }
+                                            ]}
+                                            sorted={[{
                                                 id: 'name',
-                                                Header: 'Name',
-                                                accessor: 'name',
-                                            }
-                                        ]}
-                                        sorted={[{
-                                            id: 'name',
-                                            desc: false
-                                        }]}
-                                        minRows={5}
-                                        defaultPageSize={100}
-                                    />
+                                                desc: false
+                                            }]}
+                                            minRows={5}
+                                            defaultPageSize={100}
+                                        />
+                                    )}
                                 </Consumer>
                             </div>
                         </div>
