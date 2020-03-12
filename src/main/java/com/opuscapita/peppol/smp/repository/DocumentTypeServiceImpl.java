@@ -18,19 +18,43 @@ public class DocumentTypeServiceImpl implements DocumentTypeService {
     }
 
     @Override
+    public DocumentType getDocumentType(Integer externalId, Smp smp) {
+        return getDocumentType(String.valueOf(externalId), smp);
+    }
+
+    @Override
     public DocumentType getDocumentType(Integer externalId, SmpName smpName) {
         return getDocumentType(String.valueOf(externalId), smpName);
     }
 
     @Override
-    public DocumentType getDocumentType(String externalId, SmpName smpName) {
-        Smp smp = smpService.getSmp(smpName);
+    public DocumentType getDocumentType(String externalId, Smp smp) {
         return documentTypeRepository.findByExternalIdAndSmp(externalId, smp).stream().findFirst().orElse(null);
     }
 
     @Override
-    public void saveDocumentType(DocumentType documentType, SmpName smpName) {
-        documentType.setSmp(smpService.getSmp(smpName));
+    public DocumentType getDocumentType(String externalId, SmpName smpName) {
+        return getDocumentType(externalId, smpService.getSmp(smpName));
+    }
+
+    @Override
+    public DocumentType getDocumentTypeByInternalId(Integer internalId, Smp smp) {
+        return documentTypeRepository.findByInternalIdAndSmp(internalId, smp).stream().findFirst().orElse(null);
+    }
+
+    @Override
+    public DocumentType getDocumentTypeByInternalId(Integer internalId, SmpName smpName) {
+        return getDocumentTypeByInternalId(internalId, smpService.getSmp(smpName));
+    }
+
+    @Override
+    public void saveDocumentType(DocumentType documentType, Smp smp) {
+        documentType.setSmp(smp);
         documentTypeRepository.save(documentType);
+    }
+
+    @Override
+    public void saveDocumentType(DocumentType documentType, SmpName smpName) {
+        saveDocumentType(documentType, smpService.getSmp(smpName));
     }
 }

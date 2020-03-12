@@ -51,7 +51,7 @@ public class DifiClientTest {
 
                 String participantId = CellType.NUMERIC.equals(cell.getCellType()) ?
                         dc.format(cell.getNumericCellValue()) :
-                        cell.getStringCellValue().replaceAll("\\s","");
+                        cell.getStringCellValue().replaceAll("\\s", "");
 
                 GetParticipantResponse getParticipantResponse = difiClient.getParticipant(participantId);
                 if (getParticipantResponse.getParticipant() != null) {

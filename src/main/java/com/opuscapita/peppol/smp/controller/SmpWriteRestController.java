@@ -1,12 +1,16 @@
 package com.opuscapita.peppol.smp.controller;
 
+import com.opuscapita.peppol.smp.controller.dto.DocumentTypeDto;
 import com.opuscapita.peppol.smp.controller.dto.ParticipantDto;
+import com.opuscapita.peppol.smp.entity.DocumentType;
 import com.opuscapita.peppol.smp.entity.Participant;
 import com.opuscapita.peppol.smp.entity.Smp;
+import com.opuscapita.peppol.smp.repository.DocumentTypeService;
 import com.opuscapita.peppol.smp.repository.EndpointService;
 import com.opuscapita.peppol.smp.repository.ParticipantService;
 import com.opuscapita.peppol.smp.repository.SmpService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,24 +27,37 @@ public class SmpWriteRestController {
     private final SimpleDateFormat dateFormat;
     private final EndpointService endpointService;
     private final ParticipantService participantService;
+    private final DocumentTypeService documentTypeService;
 
     @Autowired
-    public SmpWriteRestController(SmpService smpService, EndpointService endpointService, ParticipantService participantService) {
+    public SmpWriteRestController(SmpService smpService, EndpointService endpointService,
+                                  ParticipantService participantService, DocumentTypeService documentTypeService) {
         this.smpService = smpService;
         this.endpointService = endpointService;
         this.participantService = participantService;
+        this.documentTypeService = documentTypeService;
         this.dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
     }
 
     @PostMapping("/add-participant")
-    public boolean addParticipant(@RequestBody ParticipantDto participantDto) {
+    public ResponseEntity<?> addParticipant(@RequestBody ParticipantDto participantDto) {
         participantDto.setRegisteredAt(dateFormat.format(new Date()));
         Participant participant = Participant.of(participantDto);
 
         Smp smp = smpService.getSmpByIcd(participant.getIcd());
         participant.setEndpoint(endpointService.getEndpoint(smp.getName(), participantDto.getEndpointType()));
 
-        return participantService.saveParticipant(participant);
+        for (DocumentTypeDto documentTypeDto : participantDto.getDocumentTypes()) {
+            DocumentType documentType = documentTypeService.getDocumentTypeByInternalId(documentTypeDto.getInternalId(), smp.getName());
+            if (documentType != null) {
+                participant.getDocumentTypes().add(documentType);
+            }
+        }
+
+        if (participantService.saveParticipantRemote(participant)) {
+            participantService.saveParticipant(participant);
+        }
+        return ResponseEntity.ok().build();
     }
 
 }

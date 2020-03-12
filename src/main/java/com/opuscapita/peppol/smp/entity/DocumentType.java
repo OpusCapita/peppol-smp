@@ -1,15 +1,11 @@
 package com.opuscapita.peppol.smp.entity;
 
-import com.opuscapita.peppol.smp.controller.dto.DocumentTypeDto;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
-import java.util.HashSet;
 import java.util.Objects;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Entity
 @DynamicUpdate
@@ -84,23 +80,6 @@ public class DocumentType {
 
     public void setSmp(Smp smp) {
         this.smp = smp;
-    }
-
-    public static Set<DocumentType> of(Set<DocumentTypeDto> documentTypeDtos) {
-        if (documentTypeDtos == null || documentTypeDtos.isEmpty()) {
-            return new HashSet<>();
-        }
-        return documentTypeDtos.stream().map(DocumentType::of).collect(Collectors.toSet());
-    }
-
-    public static DocumentType of(DocumentTypeDto documentTypeDto) {
-        if (documentTypeDto == null) {
-            return null;
-        }
-
-        DocumentType dto = new DocumentType();
-        dto.setInternalId(documentTypeDto.getInternalId());
-        return dto;
     }
 
     @Override

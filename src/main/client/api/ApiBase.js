@@ -5,8 +5,8 @@ class ApiBase {
 
     ajax = request;
 
-    getParticipantList() {
-        return this.ajax.post(`/peppol-smp/api/get-participants`).then(res => res.body).catch(ApiError.getErrorFromResponse);
+    getParticipantList(pagination, filter) {
+        return this.ajax.post(`/peppol-smp/api/get-participants`).send({pagination, filter}).then(res => res.body).catch(ApiError.getErrorFromResponse);
     }
 
     getDocumentTypes() {

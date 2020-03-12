@@ -15,4 +15,6 @@ public interface DocumentTypeRepository extends JpaRepository<DocumentType, Long
 
     List<DocumentType> findByExternalIdAndSmp(String externalId, Smp smp);
 
+    List<DocumentType> findByInternalIdAndSmp(Integer internalId, Smp smp);
+
 }

@@ -13,7 +13,6 @@ class CreateParticipantForm extends Components.ContextComponent {
 
     constructor(props, context) {
         super(props);
-
         this.api = new ApiBase();
     }
 
