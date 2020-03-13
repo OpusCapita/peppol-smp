@@ -24,13 +24,11 @@ class CreateParticipant extends Components.ContextComponent {
     async fetchDocumentTypesFromValidator() {
         try {
             const documentTypes = await this.api.getDocumentTypes();
-            const filteredTypes = documentTypes.filter(d => {
-                return ["PEPPOL_BIS30", "EHF", "SVE", "BEAst"].includes(d.archetype);
-            }).forEach(d => {
+            documentTypes.forEach(d => {
                 d.value = d.id;
                 d.label = "[" + d.id + "] " + d.description;
             });
-            this.setState({documentTypes: filteredTypes});
+            this.setState({documentTypes: documentTypes});
         } catch (e) {
             this.setState({documentTypes: []});
             this.context.showNotification(e.message, 'error', 10);
