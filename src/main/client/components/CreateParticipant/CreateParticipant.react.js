@@ -156,27 +156,27 @@ class CreateParticipant extends Components.ContextComponent {
                                 </div>
                                 <div className="offset-md-1 col-md-8">
                                     <label className="container">PEPPOL BIS Billing v3.0 (Invoice and CreditNote)
-                                        <input type="checkbox" name="bis3" onChange={this.handleProfileChange}/>
+                                        <input type="checkbox" name="bis3" onChange={e => this.handleProfileChange(e)}/>
                                         <span className="checkmark"/>
                                     </label>
                                     <label className="container">PEPPOL BIS Poacc Upgrade v3.1 (Order, Catalogue, Order Response, Invoice Response...)
-                                        <input type="checkbox" name="bis3-1" onChange={this.handleProfileChange}/>
+                                        <input type="checkbox" name="bis3-1" onChange={e => this.handleProfileChange(e)}/>
                                         <span className="checkmark"/>
                                     </label>
                                     <label className="container">EHF v2 (Invoice, CreditNote, Catalogue, Order, OrderResponse...)
-                                        <input type="checkbox" name="ehf" onChange={this.handleProfileChange}/>
+                                        <input type="checkbox" name="ehf" onChange={e => this.handleProfileChange(e)}/>
                                         <span className="checkmark"/>
                                     </label>
                                     <label className="container">SVEFaktura (Svefaktura v1 Invoice, Invoice+Envelope, SFTI Svekatalog v2, SVE Order)
-                                        <input type="checkbox" name="sve" onChange={this.handleProfileChange}/>
+                                        <input type="checkbox" name="sve" onChange={e => this.handleProfileChange(e)}/>
                                         <span className="checkmark"/>
                                     </label>
                                     <label className="container">BEAst v3.0.1 (Invoic, Order, OrderChange, OrderResponse, DespatchAdvice)
-                                        <input type="checkbox" name="beast" onChange={this.handleProfileChange}/>
+                                        <input type="checkbox" name="beast" onChange={e => this.handleProfileChange(e)}/>
                                         <span className="checkmark"/>
                                     </label>
                                     <label className="container">Custom...
-                                        <input type="checkbox" name="other" onChange={this.handleProfileChange}/>
+                                        <input type="checkbox" name="other" onChange={e => this.handleProfileChange(e)}/>
                                         <span className="checkmark"/>
                                     </label>
                                 </div>
