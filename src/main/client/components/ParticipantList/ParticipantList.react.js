@@ -212,13 +212,13 @@ class ParticipantList extends Components.ContextComponent {
                         <button className="btn btn-link" onClick={() => this.resetSearch()}>Reset</button>
                         <button className="btn btn-primary" onClick={() => this.loadParticipantList()}>Filter</button>
                         <div className="btn-group float-left" role="group">
-                            <button id="btnGroupDrop1" type="button" className="btn btn-secondary dropdown-toggle"
+                            <button id="btnGroupDrop1" type="button" className="btn btn-default dropdown-toggle"
                                     data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 Bulk Operations
                             </button>
                             <div className="dropdown-menu" aria-labelledby="btnGroupDrop1">
-                                <a className="dropdown-item" onClick={() => this.bulkRegister()}>Register</a>
-                                <a className="dropdown-item" onClick={() => this.bulkUpdate()}>Update</a>
+                                <a className="dropdown-item" onClick={() => this.bulkRegister()}>Bulk Register</a>
+                                <a className="dropdown-item" onClick={() => this.bulkUpdate()}>Bulk Update</a>
                             </div>
                         </div>
                     </div>

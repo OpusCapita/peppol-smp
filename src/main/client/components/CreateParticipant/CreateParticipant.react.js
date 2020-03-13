@@ -8,7 +8,8 @@ class CreateParticipant extends Components.ContextComponent {
 
     state = {
         participant: {},
-        documentTypes: []
+        documentTypes: [],
+        showOther: false,
     };
 
     constructor(props, context) {
@@ -63,6 +64,10 @@ class CreateParticipant extends Components.ContextComponent {
         const isChecked = e.target.checked;
 
         console.log(item + " " + isChecked);
+
+        if (item === 'other') {
+            this.setState({showOther: isChecked});
+        }
     }
 
     handleCancel(event) {
@@ -89,7 +94,7 @@ class CreateParticipant extends Components.ContextComponent {
     }
 
     render() {
-        const {participant, documentTypes} = this.state;
+        const {participant, documentTypes, showOther} = this.state;
         return (
             <div>
                 <h3>Register New Participant</h3>
@@ -150,24 +155,46 @@ class CreateParticipant extends Components.ContextComponent {
                                     <label className="control-label btn-link">Supported Profiles</label>
                                 </div>
                                 <div className="offset-md-1 col-md-8">
-                                    <label key="bis3">PEPPOL BIS v3.0 <input type="checkbox" name="bis3" checked="false" onChange={this.handleProfileChange} /></label>
-                                    <label key="sve">SVEFaktura <input type="checkbox" name="sve" checked="false" onChange={this.handleProfileChange} /></label>
-                                    <label key="ehf">EHF <input type="checkbox" name="ehf" checked="false" onChange={this.handleProfileChange} /></label>
-                                    <label key="beast">BEAst <input type="checkbox" name="beast" checked="false" onChange={this.handleProfileChange} /></label>
+                                    <label className="container">PEPPOL BIS Billing v3.0 (Invoice and CreditNote)
+                                        <input type="checkbox" name="bis3" onChange={this.handleProfileChange}/>
+                                        <span className="checkmark"/>
+                                    </label>
+                                    <label className="container">PEPPOL BIS Poacc Upgrade v3.1 (Order, Catalogue, Order Response, Invoice Response...)
+                                        <input type="checkbox" name="bis3-1" onChange={this.handleProfileChange}/>
+                                        <span className="checkmark"/>
+                                    </label>
+                                    <label className="container">EHF v2 (Invoice, CreditNote, Catalogue, Order, OrderResponse...)
+                                        <input type="checkbox" name="ehf" onChange={this.handleProfileChange}/>
+                                        <span className="checkmark"/>
+                                    </label>
+                                    <label className="container">SVEFaktura (Svefaktura v1 Invoice, Invoice+Envelope, SFTI Svekatalog v2, SVE Order)
+                                        <input type="checkbox" name="sve" onChange={this.handleProfileChange}/>
+                                        <span className="checkmark"/>
+                                    </label>
+                                    <label className="container">BEAst v3.0.1 (Invoic, Order, OrderChange, OrderResponse, DespatchAdvice)
+                                        <input type="checkbox" name="beast" onChange={this.handleProfileChange}/>
+                                        <span className="checkmark"/>
+                                    </label>
+                                    <label className="container">Custom...
+                                        <input type="checkbox" name="other" onChange={this.handleProfileChange}/>
+                                        <span className="checkmark"/>
+                                    </label>
                                 </div>
                             </div>
-                            <div className="form-group">
-                                <div className="col-sm-3">
-                                    <label className="control-label btn-link">Supported Documents</label>
+                            { showOther &&
+                                <div className="form-group">
+                                    <div className="col-sm-3">
+                                        <label className="control-label btn-link">Supported Documents</label>
+                                    </div>
+                                    <div className="offset-md-1 col-md-8">
+                                        <Select className="react-select" isMulti={true}
+                                                options={documentTypes}
+                                                onChange={value => this.handleFormChange('documentTypes', value)}
+                                                value={participant.documentTypes}
+                                        />
+                                    </div>
                                 </div>
-                                <div className="offset-md-1 col-md-8">
-                                    <Select className="react-select" isMulti={true}
-                                            options={documentTypes}
-                                            onChange={value => this.handleFormChange('documentTypes', value)}
-                                            value={participant.documentTypes}
-                                    />
-                                </div>
-                            </div>
+                            }
                         </div>
                     </div>
 

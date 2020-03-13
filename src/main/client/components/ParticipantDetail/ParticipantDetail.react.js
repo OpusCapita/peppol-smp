@@ -122,7 +122,7 @@ class ParticipantDetail extends Components.ContextComponent {
                                                 }
                                             ]}
                                             sorted={[{
-                                                id: 'name',
+                                                id: 'id',
                                                 desc: false
                                             }]}
                                             minRows={5}
