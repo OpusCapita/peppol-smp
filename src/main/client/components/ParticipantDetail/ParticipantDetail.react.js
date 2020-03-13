@@ -46,7 +46,8 @@ class ParticipantDetail extends Components.ContextComponent {
 
     getDocumentTypes(documentTypes) {
         const {participant} = this.state;
-        return participant.documentTypes.map(ext => {
+        return participant.documentTypes.map((ext, inx) => {
+            ext.id = inx + 1;
             if (ext.internalId != null) {
                 ext.name = documentTypes.filter(int => int.id === ext.internalId)[0].description;
             }
@@ -86,7 +87,7 @@ class ParticipantDetail extends Components.ContextComponent {
                                 </div>
                                 <div className="offset-md-1 col-md-8">
                                     <label
-                                        className="control-label">{participant.smpName}-{participant.endpointType} at {i18n.formatDateTime(participant.registeredAt)}</label>
+                                        className="control-label">{participant.smpName}-{participant.endpointType} {`at ${i18n.formatDateTime(participant.registeredAt)}`}</label>
                                 </div>
                             </div>
                         </div>
@@ -97,7 +98,7 @@ class ParticipantDetail extends Components.ContextComponent {
                     <button className="btn btn-default" onClick={e => this.editParticipant(e)}>Edit</button>
                 </div>
                 <div>
-                    <h3>Document Types</h3>
+                    <h4>Document Types</h4>
                     <div className="form-horizontal participant-detail">
                         <div className="row">
                             <div className="col-md-12">

@@ -1,7 +1,6 @@
 import React from 'react';
 import {Components} from '@opuscapita/service-base-ui';
 import ReactTable from 'react-table';
-import ReactTooltip from 'react-tooltip';
 import {ApiBase, Countries} from '../../api';
 import Select from '@opuscapita/react-select';
 import 'react-table/react-table.css';
@@ -23,7 +22,6 @@ class ParticipantList extends Components.ContextComponent {
         loading: false,
         participantList: [],
         searchValues: {},
-        showSearch: true,
         totalCount: -1,
         pagination: {},
     };
@@ -108,9 +106,15 @@ class ParticipantList extends Components.ContextComponent {
         this.context.router.push(`/peppol-smp/detail/${participant.icd}/${participant.identifier}`);
     }
 
+    bulkRegister() {
+    }
+
+    bulkUpdate() {
+    }
+
     render() {
         const {i18n} = this.context;
-        const {loading, participantList, pagination, totalCount, searchValues, showSearch} = this.state;
+        const {loading, participantList, pagination, totalCount, searchValues} = this.state;
 
         return (
             <div>
@@ -119,99 +123,107 @@ class ParticipantList extends Components.ContextComponent {
                         New Participant
                     </button>
                 </h3>
-                {
-                    showSearch &&
-                    <div>
-                        <div className="form-horizontal participant-search">
-                            <div className="row">
-                                <div className="col-md-6">
-                                    <div className="form-group">
-                                        <div className="col-sm-3">
-                                            <label className="control-label">ICD Number</label>
-                                        </div>
-                                        <div className="offset-md-1 col-md-8">
-                                            <input type="text" className="form-control" value={searchValues.icd}
-                                                   onChange={e => this.handleSearchFormChange('icd', e.target.value)}
-                                            />
-                                        </div>
+
+                <div>
+                    <div className="form-horizontal participant-search">
+                        <div className="row">
+                            <div className="col-md-6">
+                                <div className="form-group">
+                                    <div className="col-sm-3">
+                                        <label className="control-label">ICD Number</label>
                                     </div>
-                                    <div className="form-group">
-                                        <div className="col-sm-3">
-                                            <label className="control-label">Name</label>
-                                        </div>
-                                        <div className="offset-md-1 col-md-8">
-                                            <input type="text" className="form-control" value={searchValues.name}
-                                                   onChange={e => this.handleSearchFormChange('name', e.target.value)}
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="form-group">
-                                        <div className="col-sm-3">
-                                            <label className="control-label">SMP</label>
-                                        </div>
-                                        <div className="offset-md-1 col-md-8">
-                                            <Select className="react-select" isMulti={true}
-                                                    options={this.mapSmpsSelect()}
-                                                    onChange={value => this.handleSearchFormChange('smpNames', value)}
-                                                    value={searchValues.smpNames && searchValues.smpNames.map(cts => ({
-                                                        label: cts,
-                                                        value: cts
-                                                    }))}
-                                            />
-                                        </div>
+                                    <div className="offset-md-1 col-md-8">
+                                        <input type="text" className="form-control" value={searchValues.icd}
+                                               onChange={e => this.handleSearchFormChange('icd', e.target.value)}
+                                        />
                                     </div>
                                 </div>
-                                <div className="col-md-6">
-                                    <div className="form-group">
-                                        <div className="col-sm-3">
-                                            <label className="control-label">Participant ID</label>
-                                        </div>
-                                        <div className="offset-md-1 col-md-8">
-                                            <input type="text" className="form-control" value={searchValues.identifier}
-                                                   onChange={e => this.handleSearchFormChange('identifier', e.target.value)}
-                                            />
-                                        </div>
+                                <div className="form-group">
+                                    <div className="col-sm-3">
+                                        <label className="control-label">Name</label>
                                     </div>
-                                    <div className="form-group">
-                                        <div className="col-sm-3">
-                                            <label className="control-label">Country</label>
-                                        </div>
-                                        <div className="offset-md-1 col-md-8">
-                                            <Select className="react-select" isMulti={true}
-                                                    options={this.mapCountriesSelect()}
-                                                    onChange={value => this.handleSearchFormChange('countries', value)}
-                                                    value={searchValues.countries && searchValues.countries.map(cts => ({
-                                                        label: cts,
-                                                        value: cts
-                                                    }))}
-                                            />
-                                        </div>
+                                    <div className="offset-md-1 col-md-8">
+                                        <input type="text" className="form-control" value={searchValues.name}
+                                               onChange={e => this.handleSearchFormChange('name', e.target.value)}
+                                        />
                                     </div>
-                                    <div className="form-group">
-                                        <div className="col-sm-3">
-                                            <label className="control-label">Type</label>
-                                        </div>
-                                        <div className="offset-md-1 col-md-8">
-                                            <Select className="react-select" isMulti={true}
-                                                    options={this.mapTypesSelect()}
-                                                    onChange={value => this.handleSearchFormChange('endpointTypes', value)}
-                                                    value={searchValues.endpointTypes && searchValues.endpointTypes.map(cts => ({
-                                                        label: cts,
-                                                        value: cts
-                                                    }))}
-                                            />
-                                        </div>
+                                </div>
+                                <div className="form-group">
+                                    <div className="col-sm-3">
+                                        <label className="control-label">SMP</label>
+                                    </div>
+                                    <div className="offset-md-1 col-md-8">
+                                        <Select className="react-select" isMulti={true}
+                                                options={this.mapSmpsSelect()}
+                                                onChange={value => this.handleSearchFormChange('smpNames', value)}
+                                                value={searchValues.smpNames && searchValues.smpNames.map(cts => ({
+                                                    label: cts,
+                                                    value: cts
+                                                }))}
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="col-md-6">
+                                <div className="form-group">
+                                    <div className="col-sm-3">
+                                        <label className="control-label">Participant ID</label>
+                                    </div>
+                                    <div className="offset-md-1 col-md-8">
+                                        <input type="text" className="form-control" value={searchValues.identifier}
+                                               onChange={e => this.handleSearchFormChange('identifier', e.target.value)}
+                                        />
+                                    </div>
+                                </div>
+                                <div className="form-group">
+                                    <div className="col-sm-3">
+                                        <label className="control-label">Country</label>
+                                    </div>
+                                    <div className="offset-md-1 col-md-8">
+                                        <Select className="react-select" isMulti={true}
+                                                options={this.mapCountriesSelect()}
+                                                onChange={value => this.handleSearchFormChange('countries', value)}
+                                                value={searchValues.countries && searchValues.countries.map(cts => ({
+                                                    label: cts,
+                                                    value: cts
+                                                }))}
+                                        />
+                                    </div>
+                                </div>
+                                <div className="form-group">
+                                    <div className="col-sm-3">
+                                        <label className="control-label">Type</label>
+                                    </div>
+                                    <div className="offset-md-1 col-md-8">
+                                        <Select className="react-select" isMulti={true}
+                                                options={this.mapTypesSelect()}
+                                                onChange={value => this.handleSearchFormChange('endpointTypes', value)}
+                                                value={searchValues.endpointTypes && searchValues.endpointTypes.map(cts => ({
+                                                    label: cts,
+                                                    value: cts
+                                                }))}
+                                        />
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div className="form-submit text-right">
-                            <button className="btn btn-link" onClick={() => this.resetSearch()}>Reset</button>
-                            <button className="btn btn-primary" onClick={() => this.loadParticipantList()}>Filter</button>
-                        </div>
-                        <hr/>
                     </div>
-                }
+                    <div className="form-submit text-right">
+                        <button className="btn btn-link" onClick={() => this.resetSearch()}>Reset</button>
+                        <button className="btn btn-primary" onClick={() => this.loadParticipantList()}>Filter</button>
+                        <div className="btn-group float-left" role="group">
+                            <button id="btnGroupDrop1" type="button" className="btn btn-secondary dropdown-toggle"
+                                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Bulk Operations
+                            </button>
+                            <div className="dropdown-menu" aria-labelledby="btnGroupDrop1">
+                                <a className="dropdown-item" onClick={() => this.bulkRegister()}>Register</a>
+                                <a className="dropdown-item" onClick={() => this.bulkUpdate()}>Update</a>
+                            </div>
+                        </div>
+                    </div>
+                    <hr/>
+                </div>
 
                 <ReactTable
                     className="participant-list-table"
@@ -258,7 +270,8 @@ class ParticipantList extends Components.ContextComponent {
                             accessor: 'endpointType',
                             Header: 'Type',
                             Cell: ({value}) =>
-                                <span className={`label label-${value === 'PROD' ? 'success' : 'info'}`}>{value.toLowerCase()}</span>
+                                <span
+                                    className={`label label-${value === 'PROD' ? 'success' : 'info'}`}>{value.toLowerCase()}</span>
                         },
                         {
                             id: 'registeredAt',

@@ -23,7 +23,9 @@ class CreateParticipant extends Components.ContextComponent {
     async fetchDocumentTypesFromValidator() {
         try {
             const documentTypes = await this.api.getDocumentTypes();
-            documentTypes.forEach(d => {
+            documentTypes.filter(d => {
+                return ["PEPPOL_BIS30", "EHF", "SVE", "BEAst"].includes(d.archetype);
+            }).forEach(d => {
                 d.value = d.id;
                 d.label = "[" + d.id + "] " + d.description;
             });
@@ -56,9 +58,16 @@ class CreateParticipant extends Components.ContextComponent {
         this.setState({participant: {}, documentTypes: []});
     }
 
+    handleProfileChange(e) {
+        const item = e.target.name;
+        const isChecked = e.target.checked;
+
+        console.log(item + " " + isChecked);
+    }
+
     handleCancel(event) {
         event && event.preventDefault();
-        this.context.router.push(`/peppol-smp/participants`);
+        this.context.router.push(`/peppol-smp`);
     }
 
     handleSubmit(event) {
@@ -83,7 +92,7 @@ class CreateParticipant extends Components.ContextComponent {
         const {participant, documentTypes} = this.state;
         return (
             <div>
-                <h3>Create New Participant</h3>
+                <h3>Register New Participant</h3>
                 <div className="form-horizontal participant-form">
                     <div className="row">
                         <div className="col-md-12">
@@ -134,6 +143,17 @@ class CreateParticipant extends Components.ContextComponent {
                                     <input type="text" className="form-control" value={participant.contactInfo}
                                            onChange={e => this.handleFormChange('contactInfo', e.target.value)}
                                     />
+                                </div>
+                            </div>
+                            <div className="form-group">
+                                <div className="col-sm-3">
+                                    <label className="control-label btn-link">Supported Profiles</label>
+                                </div>
+                                <div className="offset-md-1 col-md-8">
+                                    <label key="bis3">PEPPOL BIS v3.0 <input type="checkbox" name="bis3" checked="false" onChange={this.handleProfileChange} /></label>
+                                    <label key="sve">SVEFaktura <input type="checkbox" name="sve" checked="false" onChange={this.handleProfileChange} /></label>
+                                    <label key="ehf">EHF <input type="checkbox" name="ehf" checked="false" onChange={this.handleProfileChange} /></label>
+                                    <label key="beast">BEAst <input type="checkbox" name="beast" checked="false" onChange={this.handleProfileChange} /></label>
                                 </div>
                             </div>
                             <div className="form-group">

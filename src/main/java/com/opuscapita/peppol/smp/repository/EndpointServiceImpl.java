@@ -26,8 +26,9 @@ public class EndpointServiceImpl implements EndpointService {
 
     @Override
     public Endpoint getEndpoint(SmpName smpName, EndpointType endpointType) {
+        final EndpointType eType = endpointType != null ? endpointType : defaultType;
         Smp smp = smpService.getSmp(smpName);
-        return repository.findBySmp(smp).stream().filter(e -> endpointType.equals(e.getType())).findFirst().orElse(null);
+        return repository.findBySmp(smp).stream().filter(e -> eType.equals(e.getType())).findFirst().orElse(null);
     }
 
     @Override
