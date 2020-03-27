@@ -50,25 +50,59 @@ class CreateParticipant extends Components.ContextComponent {
         });
     }
 
-    mapDocumentTypesSelect() {
-        return this.state.documentTypes.map(value => {
-            return {value: value.id, label: value.name};
-        });
-    }
-
-    resetState() {
-        this.setState({participant: {}, documentTypes: []});
-    }
-
     handleProfileChange(e) {
         const item = e.target.name;
         const isChecked = e.target.checked;
+        const documentTypes = this.state.documentTypes;
+        const preDocumentTypes = this.state.participant.documentTypes || [];
 
-        console.log(item + " " + isChecked);
+        const pushIfNotExist = function (arr, items) {
+            for (let i = 0; i < items.length; i++) {
+                let item = items[i];
+                if (!arr.some(d => d.id === item.id)) {
+                    arr.push(item);
+                }
+            }
+            return arr;
+        };
 
-        if (item === 'other') {
+        let finalDocumentTypes;
+        if (item === "bis3") {
+            if (isChecked) {
+                finalDocumentTypes = pushIfNotExist(preDocumentTypes, documentTypes.filter(d => [158, 160].includes(d.id)));
+            } else {
+                finalDocumentTypes = preDocumentTypes.filter(d => ![158, 160].includes(d.id))
+            }
+        } else if (item === "bis3-1") {
+            if (isChecked) {
+                finalDocumentTypes = pushIfNotExist(preDocumentTypes, documentTypes.filter(d => d.archetype === 'PEPPOL_BIS30' && ![158, 160].includes(d.id)));
+            } else {
+                finalDocumentTypes = preDocumentTypes.filter(d => d.archetype !== 'PEPPOL_BIS30' || [158, 160].includes(d.id));
+            }
+        } else if (item === "ehf") {
+            if (isChecked) {
+                finalDocumentTypes = pushIfNotExist(preDocumentTypes, documentTypes.filter(d => d.archetype === 'EHF'));
+            } else {
+                finalDocumentTypes = preDocumentTypes.filter(d => d.archetype !== 'EHF');
+            }
+        } else if (item === "sve") {
+            if (isChecked) {
+                finalDocumentTypes = pushIfNotExist(preDocumentTypes, documentTypes.filter(d => d.archetype === 'SVE'));
+            } else {
+                finalDocumentTypes = preDocumentTypes.filter(d => d.archetype !== 'SVE');
+            }
+        } else if (item === "beast") {
+            if (isChecked) {
+                finalDocumentTypes = pushIfNotExist(preDocumentTypes, documentTypes.filter(d => d.archetype === 'BEAst'));
+            } else {
+                finalDocumentTypes = preDocumentTypes.filter(d => d.archetype !== 'BEAst');
+            }
+        } else if (item === "other") {
             this.setState({showOther: isChecked});
+            return;
         }
+
+        this.handleFormChange('documentTypes', finalDocumentTypes);
     }
 
     handleCancel(event) {
@@ -80,6 +114,11 @@ class CreateParticipant extends Components.ContextComponent {
         this.context.showSpinner();
 
         const {participant} = this.state;
+
+        console.log(participant);
+
+        return;
+
         participant.country = participant.country.value;
         participant.documentTypes = participant.documentTypes.map(d => d.value);
 
@@ -160,41 +199,48 @@ class CreateParticipant extends Components.ContextComponent {
                                         <input type="checkbox" name="bis3" onChange={e => this.handleProfileChange(e)}/>
                                         <span className="checkmark"/>
                                     </label>
-                                    <label className="container">PEPPOL BIS Poacc Upgrade v3.1 (Order, Catalogue, Order Response, Invoice Response...)
-                                        <input type="checkbox" name="bis3-1" onChange={e => this.handleProfileChange(e)}/>
+                                    <label className="container">PEPPOL BIS Poacc Upgrade v3.1 (Order, Catalogue, Order
+                                        Response, Invoice Response...)
+                                        <input type="checkbox" name="bis3-1"
+                                               onChange={e => this.handleProfileChange(e)}/>
                                         <span className="checkmark"/>
                                     </label>
-                                    <label className="container">EHF v2 (Invoice, CreditNote, Catalogue, Order, OrderResponse...)
+                                    <label className="container">EHF v2 (Invoice, CreditNote, Catalogue, Order,
+                                        OrderResponse...)
                                         <input type="checkbox" name="ehf" onChange={e => this.handleProfileChange(e)}/>
                                         <span className="checkmark"/>
                                     </label>
-                                    <label className="container">SVEFaktura (Svefaktura v1 Invoice, Invoice+Envelope, SFTI Svekatalog v2, SVE Order)
+                                    <label className="container">SVEFaktura (Svefaktura v1 Invoice, Invoice+Envelope,
+                                        SFTI Svekatalog v2, SVE Order)
                                         <input type="checkbox" name="sve" onChange={e => this.handleProfileChange(e)}/>
                                         <span className="checkmark"/>
                                     </label>
-                                    <label className="container">BEAst v3.0.1 (Invoic, Order, OrderChange, OrderResponse, DespatchAdvice)
-                                        <input type="checkbox" name="beast" onChange={e => this.handleProfileChange(e)}/>
+                                    <label className="container">BEAst v3.0.1 (Invoic, Order, OrderChange,
+                                        OrderResponse, DespatchAdvice)
+                                        <input type="checkbox" name="beast"
+                                               onChange={e => this.handleProfileChange(e)}/>
                                         <span className="checkmark"/>
                                     </label>
                                     <label className="container">Custom...
-                                        <input type="checkbox" name="other" onChange={e => this.handleProfileChange(e)}/>
+                                        <input type="checkbox" name="other"
+                                               onChange={e => this.handleProfileChange(e)}/>
                                         <span className="checkmark"/>
                                     </label>
                                 </div>
                             </div>
-                            { showOther &&
-                                <div className="form-group">
-                                    <div className="col-sm-3">
-                                        <label className="control-label btn-link">Supported Documents</label>
-                                    </div>
-                                    <div className="offset-md-1 col-md-8">
-                                        <Select className="react-select" isMulti={true}
-                                                options={documentTypes}
-                                                onChange={value => this.handleFormChange('documentTypes', value)}
-                                                value={participant.documentTypes}
-                                        />
-                                    </div>
+                            {showOther &&
+                            <div className="form-group">
+                                <div className="col-sm-3">
+                                    <label className="control-label btn-link">Supported Documents</label>
                                 </div>
+                                <div className="offset-md-1 col-md-8">
+                                    <Select className="react-select" isMulti={true}
+                                            options={documentTypes}
+                                            onChange={value => this.handleFormChange('documentTypes', value)}
+                                            value={participant.documentTypes}
+                                    />
+                                </div>
+                            </div>
                             }
                         </div>
                     </div>
