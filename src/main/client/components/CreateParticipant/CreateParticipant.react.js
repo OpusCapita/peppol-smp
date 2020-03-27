@@ -1,5 +1,5 @@
 import React from 'react';
-import {ApiBase, Countries} from '../../api';
+import {ApiBase, Countries, IcdValues} from '../../api';
 import {Components} from '@opuscapita/service-base-ui';
 import Select from '@opuscapita/react-select';
 import './CreateParticipant.css';
@@ -42,6 +42,12 @@ class CreateParticipant extends Components.ContextComponent {
         const {participant} = this.state;
         participant[field] = value;
         this.setState({participant});
+    }
+
+    mapIcdValuesSelect() {
+        return IcdValues.map(value => {
+            return {value: value.icd, label: `${value.icd} - ${value.code} | ${value.name}`};
+        });
     }
 
     mapCountriesSelect() {
@@ -146,9 +152,10 @@ class CreateParticipant extends Components.ContextComponent {
                                     <label className="control-label btn-link">Organization Identifier</label>
                                 </div>
                                 <div className="offset-md-1 col-md-3">
-                                    <input type="text" className="form-control" value={participant.icd}
-                                           onChange={e => this.handleFormChange('icd', e.target.value)}
-                                           placeholder="ISO 6523 Identifier"
+                                    <Select className="react-select" isMulti={false}
+                                            value={participant.icd}
+                                            options={this.mapIcdValuesSelect()}
+                                            onChange={value => this.handleFormChange('icd', e.target.value)}
                                     />
                                 </div>
                                 <div className="offset-md-1 col-md-5">
