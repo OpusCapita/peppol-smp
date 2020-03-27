@@ -7,7 +7,14 @@ import './CreateParticipant.css';
 class CreateParticipant extends Components.ContextComponent {
 
     state = {
-        participant: {},
+        participant: {
+            icd: IcdValues[5],
+            identifier: "999666333",
+            name: "Test Org",
+            country: Countries[5],
+            contactInfo: "Test Contactinf",
+            documentTypes: []
+        },
         documentTypes: [],
         showOther: false,
     };
@@ -15,6 +22,9 @@ class CreateParticipant extends Components.ContextComponent {
     constructor(props, context) {
         super(props);
         this.api = new ApiBase();
+
+        this.handleFormChange = this.handleFormChange.bind(this);
+        this.handleProfileChange = this.handleProfileChange.bind(this);
     }
 
     async componentDidMount() {
@@ -46,7 +56,7 @@ class CreateParticipant extends Components.ContextComponent {
 
     mapIcdValuesSelect() {
         return IcdValues.map(value => {
-            return {value: value.icd, label: `${value.icd} - ${value.code} | ${value.name}`};
+            return {value: value.icd, label: `${value.icd} - ${value.code} (${value.name})`};
         });
     }
 
@@ -117,16 +127,18 @@ class CreateParticipant extends Components.ContextComponent {
     }
 
     handleSubmit(event) {
-        this.context.showSpinner();
+        //this.context.showSpinner();
 
         const {participant} = this.state;
-
-        console.log(participant);
-
-        return;
-
+        participant.icd = participant.icd.value;
         participant.country = participant.country.value;
-        participant.documentTypes = participant.documentTypes.map(d => d.value);
+        participant.documentTypes = participant.documentTypes.map(d => {
+            const temp = {};
+            temp.internalId = d.id;
+            return temp;
+        });
+
+        console.log(participant); return;
 
         this.api.addParticipant(this.state.participant).then(response => {
             this.context.hideSpinner();
@@ -151,14 +163,14 @@ class CreateParticipant extends Components.ContextComponent {
                                 <div className="col-sm-3">
                                     <label className="control-label btn-link">Organization Identifier</label>
                                 </div>
-                                <div className="offset-md-1 col-md-3">
+                                <div className="offset-md-1 col-md-4">
                                     <Select className="react-select" isMulti={false}
                                             value={participant.icd}
                                             options={this.mapIcdValuesSelect()}
-                                            onChange={value => this.handleFormChange('icd', e.target.value)}
+                                            onChange={value => this.handleFormChange('icd', value)}
                                     />
                                 </div>
-                                <div className="offset-md-1 col-md-5">
+                                <div className="offset-md-1 col-md-4">
                                     <input type="text" className="form-control" value={participant.identifier}
                                            onChange={e => this.handleFormChange('identifier', e.target.value)}
                                            placeholder="Participant Identifier"
@@ -235,19 +247,20 @@ class CreateParticipant extends Components.ContextComponent {
                                     </label>
                                 </div>
                             </div>
-                            {showOther &&
-                            <div className="form-group">
-                                <div className="col-sm-3">
-                                    <label className="control-label btn-link">Supported Documents</label>
+                            {
+                                showOther &&
+                                <div className="form-group">
+                                    <div className="col-sm-3">
+                                        <label className="control-label btn-link">Supported Documents</label>
+                                    </div>
+                                    <div className="offset-md-1 col-md-8">
+                                        <Select className="react-select" isMulti={true}
+                                                options={documentTypes}
+                                                value={participant.documentTypes}
+                                                onChange={value => this.handleFormChange('documentTypes', value)}
+                                        />
+                                    </div>
                                 </div>
-                                <div className="offset-md-1 col-md-8">
-                                    <Select className="react-select" isMulti={true}
-                                            options={documentTypes}
-                                            onChange={value => this.handleFormChange('documentTypes', value)}
-                                            value={participant.documentTypes}
-                                    />
-                                </div>
-                            </div>
                             }
                         </div>
                     </div>
