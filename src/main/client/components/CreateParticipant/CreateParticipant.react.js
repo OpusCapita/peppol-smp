@@ -8,15 +8,15 @@ class CreateParticipant extends Components.ContextComponent {
 
     state = {
         participant: {
-            icd: IcdValues[5],
+            icd: {value: IcdValues[5].icd, label: `${IcdValues[5].icd} - ${IcdValues[5].code} (${IcdValues[5].name})`},
             identifier: "999666333",
             name: "Test Org",
-            country: Countries[5],
+            country: {value: Countries[5].code, label: Countries[5].name},
             contactInfo: "Test Contactinf",
             documentTypes: []
         },
         documentTypes: [],
-        showOther: false,
+        showOther: true,
     };
 
     constructor(props, context) {
@@ -41,6 +41,7 @@ class CreateParticipant extends Components.ContextComponent {
                 d.value = d.id;
                 d.label = "[" + d.id + "] " + d.description;
             });
+            this.state.participant.documentTypes.push(filteredDocumentTypes[1]);
             this.setState({documentTypes: filteredDocumentTypes});
         } catch (e) {
             this.setState({documentTypes: []});
@@ -241,7 +242,7 @@ class CreateParticipant extends Components.ContextComponent {
                                         <span className="checkmark"/>
                                     </label>
                                     <label className="container">Custom...
-                                        <input type="checkbox" name="other"
+                                        <input type="checkbox" name="other" checked={showOther}
                                                onChange={e => this.handleProfileChange(e)}/>
                                         <span className="checkmark"/>
                                     </label>
