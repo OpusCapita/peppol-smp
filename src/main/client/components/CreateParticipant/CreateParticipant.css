@@ -60,8 +60,20 @@
     background-color: #eee;
 }
 
+/* Create a custom radio */
+.participant-form .radiomark {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 23px;
+    width: 23px;
+    border-radius: 23px;
+    background-color: #eee;
+}
+
 /* On mouse-over, add a grey background color */
-.participant-form .container:hover input ~ .checkmark {
+.participant-form .container:hover input ~ .checkmark,
+.participant-form .container:hover input ~ .radiomark {
     background-color: #ccc;
 }
 
@@ -70,20 +82,27 @@
     background-color: #2196F3;
 }
 
+.participant-form .container input:checked ~ .radiomark {
+    background-color: #F39621;
+}
+
 /* Create the checkmark/indicator (hidden when not checked) */
-.participant-form .checkmark:after {
+.participant-form .checkmark:after,
+.participant-form .radiomark:after {
     content: "";
     position: absolute;
     display: none;
 }
 
 /* Show the checkmark when checked */
-.participant-form .container input:checked ~ .checkmark:after {
+.participant-form .container input:checked ~ .checkmark:after,
+.participant-form .container input:checked ~ .radiomark:after {
     display: block;
 }
 
 /* Style the checkmark/indicator */
-.participant-form .container .checkmark:after {
+.participant-form .container .checkmark:after,
+.participant-form .container .radiomark:after {
     left: 9px;
     top: 5px;
     width: 5px;

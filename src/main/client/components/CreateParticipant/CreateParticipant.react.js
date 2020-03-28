@@ -8,11 +8,12 @@ class CreateParticipant extends Components.ContextComponent {
 
     state = {
         participant: {
-            icd: {value: IcdValues[5].icd, label: `${IcdValues[5].icd} - ${IcdValues[5].code} (${IcdValues[5].name})`},
-            identifier: "999666333",
-            name: "Test Org",
-            country: {value: Countries[5].code, label: Countries[5].name},
-            contactInfo: "Test Contactinf",
+            // icd: {value: IcdValues[5].icd, label: `${IcdValues[5].icd} - ${IcdValues[5].code} (${IcdValues[5].name})`},
+            // identifier: "999666333",
+            // name: "Test Org",
+            // country: {value: Countries[5].code, label: Countries[5].name},
+            // contactInfo: "Test Contactinf",
+            endpointType: "TEST",
             documentTypes: []
         },
         documentTypes: [],
@@ -41,18 +42,11 @@ class CreateParticipant extends Components.ContextComponent {
                 d.value = d.id;
                 d.label = "[" + d.id + "] " + d.description;
             });
-            this.state.participant.documentTypes.push(filteredDocumentTypes[1]);
+            // this.state.participant.documentTypes.push(filteredDocumentTypes[1]);
             this.setState({documentTypes: filteredDocumentTypes});
         } catch (e) {
-            this.setState({documentTypes: []});
             this.context.showNotification(e.message, 'error', 10);
         }
-    }
-
-    handleFormChange(field, value) {
-        const {participant} = this.state;
-        participant[field] = value;
-        this.setState({participant});
     }
 
     mapIcdValuesSelect() {
@@ -67,6 +61,12 @@ class CreateParticipant extends Components.ContextComponent {
         });
     }
 
+    handleFormChange(field, value) {
+        const {participant} = this.state;
+        participant[field] = value;
+        this.setState({participant});
+    }
+
     handleProfileChange(e) {
         const item = e.target.name;
         const isChecked = e.target.checked;
@@ -74,13 +74,13 @@ class CreateParticipant extends Components.ContextComponent {
         const preDocumentTypes = this.state.participant.documentTypes || [];
 
         const pushIfNotExist = function (arr, items) {
+            const temp = arr.slice();
             for (let i = 0; i < items.length; i++) {
-                let item = items[i];
-                if (!arr.some(d => d.id === item.id)) {
-                    arr.push(item);
+                if (!temp.some(d => d.id === items[i].id)) {
+                    temp.push(items[i]);
                 }
             }
-            return arr;
+            return temp;
         };
 
         let finalDocumentTypes;
@@ -122,13 +122,17 @@ class CreateParticipant extends Components.ContextComponent {
         this.handleFormChange('documentTypes', finalDocumentTypes);
     }
 
+    handleReset() {
+        this.setState({participant: {endpointType: this.state.participant.endpointType, documentTypes: []}});
+    }
+
     handleCancel(event) {
         event && event.preventDefault();
         this.context.router.push(`/peppol-smp`);
     }
 
     handleSubmit(event) {
-        //this.context.showSpinner();
+        this.context.showSpinner();
 
         const {participant} = this.state;
         participant.icd = participant.icd.value;
@@ -139,16 +143,13 @@ class CreateParticipant extends Components.ContextComponent {
             return temp;
         });
 
-        console.log(participant); return;
-
-        this.api.addParticipant(this.state.participant).then(response => {
-            this.context.hideSpinner();
-            this.setState({documentTypes: []});
+        this.api.addParticipant(participant).then(response => {
+            this.handleReset();
             this.context.showNotification('The participant is registered successfully', 'success', 10);
-
         }).catch(e => {
-            this.context.hideSpinner();
             this.context.showNotification(e.message, 'error', 10);
+        }).finally(() => {
+            this.context.hideSpinner();
         });
     }
 
@@ -160,6 +161,27 @@ class CreateParticipant extends Components.ContextComponent {
                 <div className="form-horizontal participant-form">
                     <div className="row">
                         <div className="col-md-12">
+                            <div className="form-group">
+                                <div className="col-sm-3">
+                                    <label className="control-label btn-link">Target Environment</label>
+                                </div>
+                                <div className="offset-md-1 col-md-4">
+                                    <label className="container">TEST
+                                        <input type="radio" name="environment" value="TEST"
+                                               checked={participant.endpointType === "TEST"}
+                                               onChange={e => this.handleFormChange('endpointType', e.target.value)}/>
+                                        <span className="radiomark"/>
+                                    </label>
+                                </div>
+                                <div className="offset-md-1 col-md-4">
+                                    <label className="container">PROD
+                                        <input type="radio" name="environment" value="PROD"
+                                               checked={participant.endpointType === "PROD"}
+                                               onChange={e => this.handleFormChange('endpointType', e.target.value)}/>
+                                        <span className="radiomark"/>
+                                    </label>
+                                </div>
+                            </div>
                             <div className="form-group">
                                 <div className="col-sm-3">
                                     <label className="control-label btn-link">Organization Identifier</label>
