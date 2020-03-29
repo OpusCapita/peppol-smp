@@ -106,10 +106,9 @@ class ParticipantList extends Components.ContextComponent {
         this.context.router.push(`/peppol-smp/detail/${participant.icd}/${participant.identifier}`);
     }
 
-    bulkRegister() {
-    }
-
-    bulkUpdate() {
+    bulkRegister(e) {
+        e && e.preventDefault();
+        this.context.router.push(`/peppol-smp/bulkRegister`);
     }
 
     render() {
@@ -217,8 +216,8 @@ class ParticipantList extends Components.ContextComponent {
                                 Bulk Operations
                             </button>
                             <div className="dropdown-menu" aria-labelledby="btnGroupDrop1">
-                                <a className="dropdown-item" onClick={() => this.bulkRegister()}>Bulk Register</a>
-                                <a className="dropdown-item" onClick={() => this.bulkUpdate()}>Bulk Update</a>
+                                <a className="dropdown-item" onClick={(e) => this.bulkRegister(e)}>Bulk Register</a>
+                                {/*<a className="dropdown-item" onClick={() => this.bulkUpdate()}>Bulk Update</a>*/}
                             </div>
                         </div>
                     </div>

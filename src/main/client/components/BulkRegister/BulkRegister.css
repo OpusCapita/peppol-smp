@@ -1,0 +1,125 @@
+.form-submit.advanced-actions {
+    margin: 30px 0;
+}
+
+.upload-btn .upload-btn-explanation {
+    font-size: 13px;
+    padding-top: 5px;
+    font-style: oblique;
+}
+
+.participant-form .flex-box {
+    display: flex;
+    margin: 40px 10px;
+}
+
+.participant-form .flex-box .flex-item-5 {
+    flex-grow: 5;
+    padding-right: 10px;
+}
+
+.participant-form .flex-box .flex-item-2 {
+    flex-grow: 2;
+}
+
+.participant-form .flex-box .flex-item-2 .btn {
+    margin: 0;
+    width: 100%;
+    vertical-align: top;
+}
+
+.participant-form-actions {
+    margin-top: 10px;
+}
+
+.participant-form-actions .btn {
+    margin-left: 5px;
+}
+
+/* The container */
+.participant-form .container {
+    display: block;
+    position: relative;
+    padding-left: 30px;
+    margin-bottom: 7px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: normal;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+/* Hide the browser's default checkbox */
+.participant-form .container input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+}
+
+/* Create a custom checkbox */
+.participant-form .checkmark {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 23px;
+    width: 23px;
+    background-color: #eee;
+}
+
+/* Create a custom radio */
+.participant-form .radiomark {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 23px;
+    width: 23px;
+    border-radius: 23px;
+    background-color: #eee;
+}
+
+/* On mouse-over, add a grey background color */
+.participant-form .container:hover input ~ .checkmark,
+.participant-form .container:hover input ~ .radiomark {
+    background-color: #ccc;
+}
+
+/* When the checkbox is checked, add a blue background */
+.participant-form .container input:checked ~ .checkmark {
+    background-color: #2196F3;
+}
+
+.participant-form .container input:checked ~ .radiomark {
+    background-color: #F39621;
+}
+
+/* Create the checkmark/indicator (hidden when not checked) */
+.participant-form .checkmark:after,
+.participant-form .radiomark:after {
+    content: "";
+    position: absolute;
+    display: none;
+}
+
+/* Show the checkmark when checked */
+.participant-form .container input:checked ~ .checkmark:after,
+.participant-form .container input:checked ~ .radiomark:after {
+    display: block;
+}
+
+/* Style the checkmark/indicator */
+.participant-form .container .checkmark:after,
+.participant-form .container .radiomark:after {
+    left: 9px;
+    top: 5px;
+    width: 5px;
+    height: 10px;
+    border: solid white;
+    border-width: 0 3px 3px 0;
+    -webkit-transform: rotate(45deg);
+    -ms-transform: rotate(45deg);
+    transform: rotate(45deg);
+}

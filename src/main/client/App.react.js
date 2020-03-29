@@ -3,6 +3,7 @@ import {Route} from 'react-router';
 import {ApiBase} from './api';
 import {Provider} from './api/DocumentTypes';
 import {Containers} from '@opuscapita/service-base-ui';
+import BulkRegister from "./components/BulkRegister";
 import ParticipantList from './components/ParticipantList';
 import ParticipantDetail from "./components/ParticipantDetail";
 import CreateParticipant from './components/CreateParticipant';
@@ -17,6 +18,10 @@ const create = (props) => (
 
 const edit = (props) => (
     <CreateParticipant id={props.params.id}/>
+);
+
+const bulkRegister = (props) => (
+    <BulkRegister/>
 );
 
 const detail = (props) => (
@@ -49,6 +54,7 @@ class App extends React.Component {
                     <Route path="/" component={home}/>
                     <Route path="/create" component={create}/>
                     <Route path="/edit/:id" component={edit}/>
+                    <Route path="/bulkRegister" component={bulkRegister}/>
                     <Route path="/detail/:icd/:identifier" component={detail}/>
                 </Containers.ServiceLayout>
             </Provider>
