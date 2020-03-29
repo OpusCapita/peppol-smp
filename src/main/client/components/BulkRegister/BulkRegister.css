@@ -51,6 +51,12 @@ label.upload-btn [hidden] {
     margin-left: 5px;
 }
 
+.participant-form .label-explanation {
+    font-size: 18px;
+    font-style: oblique;
+    font-weight: normal;
+}
+
 /* The container */
 .participant-form .container {
     display: block;

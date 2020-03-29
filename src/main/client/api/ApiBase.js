@@ -13,6 +13,10 @@ class ApiBase {
         return this.ajax.get(`/peppol-validator/api/public/get-document-types`).then(res => res.body).catch(ApiError.getErrorFromResponse);
     }
 
+    bulkRegister(request) {
+        return this.ajax.post(`/peppol-smp/api/bulk-register`).send(request).then(res => res.body).catch(ApiError.getErrorFromResponse);
+    }
+
     addParticipant(participant) {
         return this.ajax.post(`/peppol-smp/api/add-participant`).send(participant).then(res => res.body).catch(ApiError.getErrorFromResponse);
     }

@@ -1,6 +1,7 @@
 import React from 'react';
 import {Components} from '@opuscapita/service-base-ui';
 import {ApiBase} from '../../api';
+import Select from '@opuscapita/react-select';
 import './BulkRegister.css';
 
 class BulkRegister extends Components.ContextComponent {
@@ -119,6 +120,7 @@ class BulkRegister extends Components.ContextComponent {
                     participant.icd = columns[1].split(":")[0];
                     participant.identifier = columns[1].split(":")[1];
                     participant.contactInfo = columns[2];
+                    participant.endpointType = "TEST";
                     participantList.push(participant);
                 }
                 this.setState({participantList, showDocumentTypes: true});
@@ -146,20 +148,26 @@ class BulkRegister extends Components.ContextComponent {
                 console.log("selectedDocumentTypes: ");
                 console.log(selectedDocumentTypes);
 
-                // this.context.showSpinner();
-                //
-                // setTimeout(() => {
-                //     this.api.reprocessMessagesAdvanced(transmissionList, userData.id).then(() => {
-                //         this.context.showNotification('Reprocessing of the messages has been started', 'info', 3);
-                //
-                //     }).catch(e => {
-                //         this.context.showNotification(e.message, 'error', 10);
-                //
-                //     }).finally(() => {
-                //         this.context.hideSpinner();
-                //     });
-                //
-                // }, 500);
+                const selectedDocumentTypeInternalIds = selectedDocumentTypes.map(d => {
+                    const temp = {};
+                    temp.internalId = d.id;
+                    return temp;
+                });
+
+                this.context.showSpinner();
+
+                setTimeout(() => {
+                    this.api.bulkRegister({participants: participantList, documentTypes: selectedDocumentTypes.map(d => { return {internalId: d.id}; })}).then(() => {
+                        this.context.showNotification('Bulk register operation has been successfully initialized', 'info', 3);
+
+                    }).catch(e => {
+                        this.context.showNotification(e.message, 'error', 10);
+
+                    }).finally(() => {
+                        this.context.hideSpinner();
+                    });
+
+                }, 500);
             }
         };
 
@@ -171,7 +179,7 @@ class BulkRegister extends Components.ContextComponent {
     }
 
     render() {
-        const {documentTypes, selectedDocumentTypes, showDocumentTypes, showOther} = this.state;
+        const {participantList, documentTypes, selectedDocumentTypes, showDocumentTypes, showOther} = this.state;
         return (
             <div>
                 <h2>Bulk Register</h2>
@@ -189,9 +197,15 @@ class BulkRegister extends Components.ContextComponent {
                         <div className="row">
                             <div className="col-md-12">
                                 <div className="form-group">
-                                    <div className="col-sm-3">
-                                        <label className="control-label btn-link">Supported Profiles</label>
+                                    <div className="col-sm-3">&nbsp;</div>
+                                    <div className="offset-md-1 col-md-8">
+                                        <label className="label-explanation">
+                                            <strong>{participantList.length}</strong> participants loaded, now select their supported document types.
+                                        </label>
                                     </div>
+                                </div>
+                                <div className="form-group">
+                                    <div className="col-sm-3">&nbsp;</div>
                                     <div className="offset-md-1 col-md-8">
                                         <label className="container">PEPPOL BIS Billing v3.0 (Invoice and CreditNote)
                                             <input type="checkbox" name="bis3"
@@ -234,9 +248,7 @@ class BulkRegister extends Components.ContextComponent {
                                 {
                                     showOther &&
                                     <div className="form-group">
-                                        <div className="col-sm-3">
-                                            <label className="control-label btn-link">Supported Documents</label>
-                                        </div>
+                                        <div className="col-sm-3">&nbsp;</div>
                                         <div className="offset-md-1 col-md-8">
                                             <Select className="react-select" isMulti={true}
                                                     options={documentTypes}
