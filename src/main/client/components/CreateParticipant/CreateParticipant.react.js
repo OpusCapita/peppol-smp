@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import {ApiBase, Countries, IcdValues} from '../../api';
 import {Components} from '@opuscapita/service-base-ui';
 import Select from '@opuscapita/react-select';
