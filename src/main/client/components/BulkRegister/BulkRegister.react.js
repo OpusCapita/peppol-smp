@@ -7,7 +7,6 @@ class BulkRegister extends Components.ContextComponent {
 
     state = {
         loading: false,
-        rawFile: null,
         showOther: false,
         showDocumentTypes: false,
         documentTypes: [],
@@ -21,7 +20,6 @@ class BulkRegister extends Components.ContextComponent {
     }
 
     async componentDidMount() {
-        await this.fetchParticipantToEdit();
         await this.fetchDocumentTypesFromValidator();
     }
 
@@ -110,12 +108,29 @@ class BulkRegister extends Components.ContextComponent {
         reader.onload = (e) => {
             const raw = e.target.result;
             if (raw) {
-                this.setState({rawFile: file});
-                this.setState({participantList: raw.split("\n")});
-                this.context.showNotification(this.state.participantList.length + ' participants loaded', 'info', 3);
+                const participantList = [];
+
+                const rows = raw.split("\n");
+                for (let i = 1; i < rows.length; i++) {
+                    const columns = rows[i].split(",");
+
+                    const participant = {};
+                    participant.name = columns[0];
+                    participant.icd = columns[1].split(":")[0];
+                    participant.identifier = columns[1].split(":")[1];
+                    participant.contactInfo = columns[2];
+                    participantList.push(participant);
+                }
+                this.setState({participantList, showDocumentTypes: true});
+                this.context.showNotification(participantList.length + ' participants loaded', 'info', 3);
             }
         };
         reader.readAsText(file);
+    }
+
+    handleCancel(event) {
+        event && event.preventDefault();
+        this.context.router.push(`/peppol-smp`);
     }
 
     async bulkRegister() {
@@ -237,7 +252,11 @@ class BulkRegister extends Components.ContextComponent {
                 }
 
                 <div className="form-submit text-right advanced-actions">
-                    <button className="btn btn-default" onClick={() => this.bulkRegister()}>Register</button>
+                    <button className="btn btn-link" onClick={e => this.handleCancel(e)}>Cancel</button>
+                    <button className="btn btn-success" onClick={(e) => this.bulkRegister(e)}>Register</button>
+                    <button className="btn btn-info float-left" onClick={() => window.open("https://github.com/OpusCapita/peppol-smp/wiki/Bulk-Register", "_blank")}>
+                        Help?
+                    </button>
                 </div>
             </div>
         );
