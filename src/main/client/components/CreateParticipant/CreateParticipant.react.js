@@ -8,28 +8,50 @@ class CreateParticipant extends Components.ContextComponent {
 
     state = {
         participant: {
-            // icd: {value: IcdValues[5].icd, label: `${IcdValues[5].icd} - ${IcdValues[5].code} (${IcdValues[5].name})`},
-            // identifier: "999666333",
-            // name: "Test Org",
-            // country: {value: Countries[5].code, label: Countries[5].name},
-            // contactInfo: "Test Contactinf",
             endpointType: "TEST",
             documentTypes: []
         },
         documentTypes: [],
-        showOther: true,
+        showOther: false,
+        editMode: false,
+    };
+
+    static propTypes = {
+        id: PropTypes.number
     };
 
     constructor(props, context) {
         super(props);
         this.api = new ApiBase();
 
+        this.handleCancel = this.handleCancel.bind(this);
+        this.handleSubmit = this.handleSubmit.bind(this);
         this.handleFormChange = this.handleFormChange.bind(this);
         this.handleProfileChange = this.handleProfileChange.bind(this);
     }
 
     async componentDidMount() {
+        await this.fetchParticipantToEdit();
         await this.fetchDocumentTypesFromValidator();
+    }
+
+    async fetchParticipantToEdit() {
+        if (!this.props.id) {
+            return;
+        }
+
+        const participant = await this.api.getParticipantDetailById(this.props.id);
+
+        const icdValue = IcdValues.findByIcd(participant.icd);
+        participant.icd = {value: icdValue.icd, label: `${icdValue.icd} - ${icdValue.code} (${icdValue.name})`};
+        const countryValue = Countries.findByCode(participant.country);
+        participant.country = !!countryValue ?  {value: countryValue.code, label: countryValue.name} : countryValue;
+
+        const documentTypes = this.state.documentTypes;
+        if (documentTypes && documentTypes.length) {
+            participant.documentTypes = participant.documentTypes.map(d => documentTypes.find(i => i.id === d.internalId)).filter(d => !!d);
+        }
+        this.setState({participant, editMode: true, showOther: true});
     }
 
     async fetchDocumentTypesFromValidator() {
@@ -42,7 +64,6 @@ class CreateParticipant extends Components.ContextComponent {
                 d.value = d.id;
                 d.label = "[" + d.id + "] " + d.description;
             });
-            // this.state.participant.documentTypes.push(filteredDocumentTypes[1]);
             this.setState({documentTypes: filteredDocumentTypes});
         } catch (e) {
             this.context.showNotification(e.message, 'error', 10);
@@ -154,7 +175,7 @@ class CreateParticipant extends Components.ContextComponent {
     }
 
     render() {
-        const {participant, documentTypes, showOther} = this.state;
+        const {participant, documentTypes, showOther, editMode} = this.state;
         return (
             <div>
                 <h3>Register New Participant</h3>
@@ -291,7 +312,7 @@ class CreateParticipant extends Components.ContextComponent {
                 </div>
                 <div className="form-submit text-right participant-form-actions">
                     <button className="btn btn-link" onClick={e => this.handleCancel(e)}>Cancel</button>
-                    <button className="btn btn-success" onClick={e => this.handleSubmit(e)}>Register</button>
+                    <button className="btn btn-success" onClick={e => this.handleSubmit(e)}>{editMode ? "Update" : "Register"}</button>
                 </div>
             </div>
         );

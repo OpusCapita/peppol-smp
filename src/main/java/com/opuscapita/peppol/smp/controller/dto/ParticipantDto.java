@@ -8,6 +8,7 @@ import java.util.Set;
 
 public class ParticipantDto {
 
+    private Long id;
     private String icd;
     private String name;
     private String identifier;
@@ -18,6 +19,14 @@ public class ParticipantDto {
     private Set<DocumentTypeDto> documentTypes;
 
     private SmpName smpName;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public String getIcd() {
         return icd;
@@ -97,6 +106,7 @@ public class ParticipantDto {
         }
 
         ParticipantDto dto = new ParticipantDto();
+        dto.setId(participant.getId());
         dto.setIcd(participant.getIcd());
         dto.setName(participant.getName());
         dto.setIdentifier(participant.getIdentifier());

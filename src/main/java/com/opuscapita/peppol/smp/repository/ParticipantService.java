@@ -19,4 +19,8 @@ public interface ParticipantService {
     void saveParticipant(Participant participant);
 
     boolean saveParticipantRemote(Participant participant);
+
+    void deleteParticipant(Participant participant);
+
+    boolean deleteParticipantRemote(Participant participant);
 }

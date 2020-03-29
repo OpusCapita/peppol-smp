@@ -15,10 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -63,9 +60,18 @@ public class SmpWriteRestController {
         Gson gson = new GsonBuilder().serializeSpecialFloatingPointValues().serializeNulls().create();
         logger.info(gson.toJson(participant));
 
-//        if (participantService.saveParticipantRemote(participant)) {
-//            participantService.saveParticipant(participant);
-//        }
+        if (participantService.saveParticipantRemote(participant)) {
+            participantService.saveParticipant(participant);
+        }
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/delete-participant/{id}")
+    public ResponseEntity<?> deleteParticipant(@PathVariable Long id) {
+        Participant participant = participantService.getParticipant(id);
+        if (participantService.deleteParticipantRemote(participant)) {
+            participantService.deleteParticipant(participant);
+        }
         return ResponseEntity.ok().build();
     }
 

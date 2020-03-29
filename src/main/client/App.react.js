@@ -15,6 +15,10 @@ const create = (props) => (
     <CreateParticipant/>
 );
 
+const edit = (props) => (
+    <CreateParticipant id={props.params.id}/>
+);
+
 const detail = (props) => (
     <ParticipantDetail icd={props.params.icd} identifier={props.params.identifier}/>
 );
@@ -44,6 +48,7 @@ class App extends React.Component {
                 <Containers.ServiceLayout serviceName="peppol-smp">
                     <Route path="/" component={home}/>
                     <Route path="/create" component={create}/>
+                    <Route path="/edit/:id" component={edit}/>
                     <Route path="/detail/:icd/:identifier" component={detail}/>
                 </Containers.ServiceLayout>
             </Provider>

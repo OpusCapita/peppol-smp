@@ -31,4 +31,10 @@ public class SmpReadRestController {
         Participant participant = participantService.getParticipant(icd, identifier);
         return ParticipantDto.of(participant);
     }
+
+    @GetMapping("/get-participant-by-id/{id}")
+    public ParticipantDto getParticipantById(@PathVariable Long id) {
+        Participant participant = participantService.getParticipant(id);
+        return ParticipantDto.of(participant);
+    }
 }

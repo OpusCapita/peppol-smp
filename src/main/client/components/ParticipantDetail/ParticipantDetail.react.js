@@ -36,12 +36,25 @@ class ParticipantDetail extends Components.ContextComponent {
         });
     }
 
-    deleteParticipant() {
+    deleteParticipant(e) {
+        e && e.preventDefault();
+        this.setState({loading: true});
 
+        this.api.deleteParticipant(this.state.participant.id).then(() => {
+            this.context.showNotification('The participant is deleted successfully', 'success', 10);
+
+        }).catch(e => {
+            this.context.showNotification(e.message, 'error', 10);
+
+        }).finally(() => {
+            this.setState({loading: false});
+            this.context.router.push('/peppol-smp');
+        });
     }
 
-    editParticipant() {
-
+    editParticipant(e) {
+        e && e.preventDefault();
+        this.context.router.push(`/peppol-smp/edit/${this.state.participant.id}`);
     }
 
     getDocumentTypes(documentTypes) {

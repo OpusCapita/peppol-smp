@@ -84,4 +84,8 @@ const IcdValues = [
     {icd: "9953", code: "VA:VAT", name: "Holy See (Vatican City State) VAT number"},
 ];
 
+IcdValues.findByIcd = function (icd) {
+    return IcdValues.find(x => x.icd === icd);
+};
+
 export default IcdValues;

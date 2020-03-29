@@ -71,6 +71,11 @@ public class ParticipantServiceImpl implements ParticipantService {
     }
 
     @Override
+    public void deleteParticipant(Participant participant) {
+        repository.delete(participant);
+    }
+
+    @Override
     public boolean saveParticipantRemote(Participant participant) {
         return SmpName.DIFI.equals(participant.getEndpoint().getSmp().getName()) ?
                 saveDifiParticipant(participant) : saveTickstarParticipant(participant);
@@ -91,6 +96,22 @@ public class ParticipantServiceImpl implements ParticipantService {
     private boolean saveTickstarParticipant(Participant participant) {
         TickstarParticipant addRequest = TickstarParticipant.of(participant);
         HttpStatus responseStatus = tickstarClient.addParticipant(addRequest);
+        return responseStatus.is2xxSuccessful();
+    }
+
+    @Override
+    public boolean deleteParticipantRemote(Participant participant) {
+        return SmpName.DIFI.equals(participant.getEndpoint().getSmp().getName()) ?
+                deleteDifiParticipant(participant) : deleteTickstarParticipant(participant);
+    }
+
+    private boolean deleteDifiParticipant(Participant participant) {
+        DeleteParticipantResponse response = difiClient.deleteParticipant(participant.getIdentifier());
+        return response.getSuccess().isValue();
+    }
+
+    private boolean deleteTickstarParticipant(Participant participant) {
+        HttpStatus responseStatus = tickstarClient.deleteParticipant(participant.getIcd(), participant.getIdentifier());
         return responseStatus.is2xxSuccessful();
     }
 

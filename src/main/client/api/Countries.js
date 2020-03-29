@@ -1,3 +1,5 @@
+import IcdValues from "./IcdValues";
+
 const Countries = [
     {name: "Andorra", code: "AD"},
     {name: "Albania", code: "AL"},
@@ -50,6 +52,10 @@ const Countries = [
     {name: "Ukraine", code: "UA"},
     {name: "Holy See (Vatican City State)", code: "VA"}
 ];
+
+Countries.findByCode = function (code) {
+    return Countries.find(x => x.code === code);
+};
 
 export default Countries;
 

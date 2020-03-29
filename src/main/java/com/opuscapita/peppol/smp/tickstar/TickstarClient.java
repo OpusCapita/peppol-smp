@@ -47,9 +47,10 @@ public class TickstarClient {
         return exchange("/participant", HttpMethod.PUT, entity, String.class);
     }
 
-    public String deleteParticipant(String icd, String identifier) {
+    public HttpStatus deleteParticipant(String icd, String identifier) {
         String participantId = TickstarLookupParticipant.formParticipantId(icd, identifier);
-        return exchange("/participant?pid=" + participantId, HttpMethod.DELETE, String.class);
+        HttpEntity<String> entity = new HttpEntity<>("", getCommonHeaders());
+        return restTemplate.exchange(getApiUrl("/participant?pid=" + participantId), HttpMethod.DELETE, entity, String.class).getStatusCode();
     }
 
     public TickstarMetadataListResponse getMetadataList() {

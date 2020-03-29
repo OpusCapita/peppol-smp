@@ -131,6 +131,7 @@ public class Participant {
     public static Participant of(ParticipantDto participantDto) {
         Participant participant = new Participant();
 
+        participant.setId(participantDto.getId());
         participant.setIcd(participantDto.getIcd());
         participant.setName(participantDto.getName());
         participant.setIdentifier(participantDto.getIdentifier());
