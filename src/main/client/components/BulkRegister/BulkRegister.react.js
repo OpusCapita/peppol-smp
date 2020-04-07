@@ -119,7 +119,9 @@ class BulkRegister extends Components.ContextComponent {
                     participant.name = columns[0];
                     participant.icd = columns[1].split(":")[0];
                     participant.identifier = columns[1].split(":")[1];
-                    participant.contactInfo = columns[2];
+                    participant.contactName = columns[2];
+                    participant.contactEmail = columns[3];
+                    participant.contactPhone = columns[4];
                     participant.endpointType = "TEST";
                     participantList.push(participant);
                 }
@@ -238,7 +240,7 @@ class BulkRegister extends Components.ContextComponent {
                                                    onChange={e => this.handleProfileChange(e)}/>
                                             <span className="checkmark"/>
                                         </label>
-                                        <label className="container">Custom...
+                                        <label className="container">Add document types one by one...
                                             <input type="checkbox" name="other" checked={showOther}
                                                    onChange={e => this.handleProfileChange(e)}/>
                                             <span className="checkmark"/>

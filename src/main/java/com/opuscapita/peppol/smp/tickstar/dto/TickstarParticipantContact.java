@@ -43,7 +43,9 @@ public class TickstarParticipantContact {
 
     public static TickstarParticipantContact of(Participant participant) {
         TickstarParticipantContact businessContact = new TickstarParticipantContact();
-        businessContact.setName(participant.getContactInfo());
+        businessContact.setName(participant.getContactName());
+        businessContact.setEmail(participant.getContactEmail());
+        businessContact.setPhoneNumber(participant.getContactPhone());
         return businessContact;
     }
 }

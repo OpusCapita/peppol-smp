@@ -26,6 +26,7 @@ public class TickstarParticipantBusinessEntityName {
     public static TickstarParticipantBusinessEntityName of(Participant participant) {
         TickstarParticipantBusinessEntityName businessName = new TickstarParticipantBusinessEntityName();
         businessName.setName(participant.getName());
+        businessName.setLanguage("EN");
         return businessName;
     }
 }

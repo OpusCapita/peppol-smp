@@ -84,8 +84,11 @@ public class ParticipantServiceImpl implements ParticipantService {
     private boolean saveDifiParticipant(Participant participant) {
         ParticipantType participantType = new DifiParticipantBuilder()
                 .setName(participant.getName())
-                .setOrganizationNumber(participant.getIdentifier())
-                .setContactName(participant.getContactInfo())
+                .setOrganizationNumber(participant.getIcd() + ":" +participant.getIdentifier())
+                .setContactName(participant.getContactName())
+                .setContactEmail(participant.getContactEmail())
+                .setContactTelephone(participant.getContactPhone())
+                .setWebsite("http://www.opuscapita.com")
                 .addAllProfiles(participant.getDocumentTypes().stream().map(DocumentType::getExternalId).collect(Collectors.toList()))
                 .build();
 

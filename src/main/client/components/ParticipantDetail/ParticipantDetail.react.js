@@ -88,10 +88,26 @@ class ParticipantDetail extends Components.ContextComponent {
                             </div>
                             <div className="form-group">
                                 <div className="col-sm-3">
-                                    <label className="control-label btn-link">Contact Info</label>
+                                    <label className="control-label btn-link">Contact Name</label>
                                 </div>
                                 <div className="offset-md-1 col-md-8">
-                                    <label className="control-label">{participant.contactInfo}</label>
+                                    <label className="control-label">{participant.contactName}</label>
+                                </div>
+                            </div>
+                            <div className="form-group">
+                                <div className="col-sm-3">
+                                    <label className="control-label btn-link">Contact Email</label>
+                                </div>
+                                <div className="offset-md-1 col-md-8">
+                                    <label className="control-label">{participant.contactEmail}</label>
+                                </div>
+                            </div>
+                            <div className="form-group">
+                                <div className="col-sm-3">
+                                    <label className="control-label btn-link">Contact Phone</label>
+                                </div>
+                                <div className="offset-md-1 col-md-8">
+                                    <label className="control-label">{participant.contactPhone}</label>
                                 </div>
                             </div>
                             <div className="form-group">

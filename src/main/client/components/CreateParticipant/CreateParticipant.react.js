@@ -267,11 +267,31 @@ class CreateParticipant extends Components.ContextComponent {
                             </div>
                             <div className="form-group">
                                 <div className="col-sm-3">
-                                    <label className="control-label btn-link">Contact Info</label>
+                                    <label className="control-label btn-link">Contact Name</label>
                                 </div>
                                 <div className="offset-md-1 col-md-8">
-                                    <input type="text" className="form-control" value={participant.contactInfo}
-                                           onChange={e => this.handleFormChange('contactInfo', e.target.value)}
+                                    <input type="text" className="form-control" value={participant.contactName}
+                                           onChange={e => this.handleFormChange('contactName', e.target.value)}
+                                    />
+                                </div>
+                            </div>
+                            <div className="form-group">
+                                <div className="col-sm-3">
+                                    <label className="control-label btn-link">Contact E-Mail</label>
+                                </div>
+                                <div className="offset-md-1 col-md-8">
+                                    <input type="text" className="form-control" value={participant.contactEmail}
+                                           onChange={e => this.handleFormChange('contactEmail', e.target.value)}
+                                    />
+                                </div>
+                            </div>
+                            <div className="form-group">
+                                <div className="col-sm-3">
+                                    <label className="control-label btn-link">Contact Phone</label>
+                                </div>
+                                <div className="offset-md-1 col-md-8">
+                                    <input type="text" className="form-control" value={participant.contactPhone}
+                                           onChange={e => this.handleFormChange('contactPhone', e.target.value)}
                                     />
                                 </div>
                             </div>
@@ -306,7 +326,7 @@ class CreateParticipant extends Components.ContextComponent {
                                                onChange={e => this.handleProfileChange(e)}/>
                                         <span className="checkmark"/>
                                     </label>
-                                    <label className="container">Custom...
+                                    <label className="container">Add document types one by one...
                                         <input type="checkbox" name="other" checked={showOther}
                                                onChange={e => this.handleProfileChange(e)}/>
                                         <span className="checkmark"/>

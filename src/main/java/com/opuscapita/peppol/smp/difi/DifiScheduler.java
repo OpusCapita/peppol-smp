@@ -11,7 +11,9 @@ import no.difi.elma.smp.webservice.responses.GetAllParticipantsResponse;
 import no.difi.elma.smp.webservice.responses.GetParticipantResponse;
 import no.difi.elma.smp.webservice.responses.ProfilesSupportedResponse;
 import no.difi.elma.smp.webservice.types.CenbiiProfileType;
+import no.difi.elma.smp.webservice.types.ContactType;
 import no.difi.elma.smp.webservice.types.OrganizationNumberType;
+import no.difi.elma.smp.webservice.types.OrganizationType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,24 +73,36 @@ public class DifiScheduler {
 
             Participant persistedParticipant = participantService.getParticipant(DifiClient.getDifiIcd(), difiParticipantIdentifier.getValue());
             try {
-                convertParticipant(persistedParticipant, queriedParticipant, endpoint);
+                convertParticipant(difiParticipantIdentifier.getValue(), persistedParticipant, queriedParticipant, endpoint);
             } catch (Exception e) {
                 logger.error("Failed to convert the participant: " + difiParticipantIdentifier.getValue(), e);
             }
         }
     }
 
-    private void convertParticipant(Participant persistedParticipant, GetParticipantResponse queriedParticipant, Endpoint endpoint) {
+    private void convertParticipant(String identifier, Participant persistedParticipant, GetParticipantResponse queriedParticipant, Endpoint endpoint) {
         if (persistedParticipant == null) {
-            logger.warn("......DifiScheduler found a new participant: " + queriedParticipant.getParticipant().getOrganization().getName().getValue() + ", saving");
+            logger.warn("......DifiScheduler found a new participant: " + identifier + ", saving");
             persistedParticipant = new Participant();
         }
 
-        persistedParticipant.setName(queriedParticipant.getParticipant().getOrganization().getName().getValue());
+        if (queriedParticipant == null || queriedParticipant.getParticipant() == null || queriedParticipant.getParticipant().getOrganization() == null || queriedParticipant.getParticipant().getOrganization().getName() == null) {
+            logger.info("........Failed to save the participant: " + identifier + ", no organization info");
+            return;
+        }
+
+        OrganizationType organization = queriedParticipant.getParticipant().getOrganization();
+        persistedParticipant.setName(organization.getName().getValue());
         persistedParticipant.setCountry("NO");
         persistedParticipant.setIcd(DifiClient.getDifiIcd());
-        persistedParticipant.setIdentifier(queriedParticipant.getParticipant().getOrganization().getOrganizationNumber().getValue());
-        persistedParticipant.setContactInfo(queriedParticipant.getParticipant().getOrganization().getContact().getName().getValue());
+        persistedParticipant.setIdentifier(identifier);
+
+        ContactType contact = organization.getContact();
+        if (contact != null) {
+            persistedParticipant.setContactName(contact.getName() != null ? contact.getName().getValue() : null);
+            persistedParticipant.setContactEmail(contact.getEmail() != null ? contact.getEmail().getValue() : null);
+            persistedParticipant.setContactPhone(contact.getTelephone() != null ? contact.getTelephone().getValue() : null);
+        }
 
         persistedParticipant.setEndpoint(endpoint);
         persistedParticipant.setDocumentTypes(convertDocumentTypeForParticipant(queriedParticipant, endpoint));
