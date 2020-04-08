@@ -89,7 +89,8 @@ public class SmpStandaloneTask implements CommandLineRunner {
     }
 
     private void updateOrganizationWithBISv3TypeDifi(String organizationNumber, String profileToAdd, List<String> logs) {
-        GetParticipantResponse getParticipantResponse = difiClient.getParticipant(DifiClient.getDifiIcd() + ":" + organizationNumber);
+        String icd = "9908";
+        GetParticipantResponse getParticipantResponse = difiClient.getParticipant(icd + ":" + organizationNumber);
 
         if (getParticipantResponse.getParticipant() != null) {
             return; // skip...
@@ -97,10 +98,10 @@ public class SmpStandaloneTask implements CommandLineRunner {
 
         logs.add("Running for " + organizationNumber);
         System.out.println("Running for " + organizationNumber);
-        getParticipantResponse = difiClient.getParticipant(DifiClient.getDifiIcd() + ":" + organizationNumber);
+        getParticipantResponse = difiClient.getParticipant(icd + ":" + organizationNumber);
 
         ParticipantType updatedParticipant = new DifiParticipantBuilder()
-                .setOrganizationNumber(DifiClient.getDifiIcd() + ":" + organizationNumber)
+                .setOrganizationNumber(icd + ":" + organizationNumber)
                 .setOrganization(getParticipantResponse.getParticipant().getOrganization())
                 .addAllProfileTypes(getParticipantResponse.getParticipant().getProfiles())
                 .addProfile(profileToAdd)
