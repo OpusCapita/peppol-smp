@@ -44,7 +44,7 @@ class CreateParticipant extends Components.ContextComponent {
         const participant = await this.api.getParticipantDetailById(this.props.id);
 
         const icdValue = IcdValues.findByIcd(participant.icd);
-        participant.icd = {value: icdValue.icd, label: `${icdValue.icd} - ${icdValue.code} (${icdValue.name})`};
+        participant.icd = {value: icdValue.icd, label: `${icdValue.icd} - ${icdValue.code}`};
         const countryValue = Countries.findByCode(participant.country);
         participant.country = !!countryValue ?  {value: countryValue.code, label: countryValue.name} : countryValue;
 
@@ -80,7 +80,7 @@ class CreateParticipant extends Components.ContextComponent {
 
     mapIcdValuesSelect() {
         return IcdValues.map(value => {
-            return {value: value.icd, label: `${value.icd} - ${value.code} (${value.name})`};
+            return {value: value.icd, label: `${value.icd} - ${value.code}`};
         });
     }
 

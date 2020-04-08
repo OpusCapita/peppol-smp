@@ -61,9 +61,6 @@ public class SmpWriteRestController {
             }
         }
 
-        Gson gson = new GsonBuilder().serializeSpecialFloatingPointValues().serializeNulls().create();
-        logger.info(gson.toJson(participant));
-
         if (participantService.saveParticipantRemote(participant)) {
             participantService.saveParticipant(participant);
         }
@@ -102,9 +99,6 @@ public class SmpWriteRestController {
 
             return participant;
         }).collect(Collectors.toSet());
-
-        Gson gson = new GsonBuilder().serializeSpecialFloatingPointValues().serializeNulls().create();
-        logger.info(gson.toJson(participants));
 
         ExecutorService executor = Executors.newFixedThreadPool(10);
         Set<Callable<Boolean>> asyncTasks = participants.stream().map(participant -> new SaveParticipantAsyncTask(participant, participantService)).collect(Collectors.toSet());
