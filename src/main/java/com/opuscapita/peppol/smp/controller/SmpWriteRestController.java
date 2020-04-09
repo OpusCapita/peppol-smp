@@ -1,7 +1,5 @@
 package com.opuscapita.peppol.smp.controller;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.opuscapita.peppol.smp.controller.dto.DocumentTypeDto;
 import com.opuscapita.peppol.smp.controller.dto.ParticipantBulkRegisterRequestDto;
 import com.opuscapita.peppol.smp.controller.dto.ParticipantDto;
@@ -17,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Objects;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
@@ -55,10 +53,8 @@ public class SmpWriteRestController {
         participant.setEndpoint(endpointService.getEndpoint(smp.getName(), participantDto.getEndpointType()));
 
         for (DocumentTypeDto documentTypeDto : participantDto.getDocumentTypes()) {
-            DocumentType documentType = documentTypeService.getDocumentTypeByInternalId(documentTypeDto.getInternalId(), smp.getName());
-            if (documentType != null) {
-                participant.getDocumentTypes().add(documentType);
-            }
+            List<DocumentType> documentTypes = documentTypeService.getDocumentTypeByInternalId(documentTypeDto.getInternalId(), smp.getName());
+            participant.getDocumentTypes().addAll(documentTypes);
         }
 
         if (participantService.saveParticipantRemote(participant)) {
@@ -80,12 +76,12 @@ public class SmpWriteRestController {
     public ResponseEntity<?> bulkRegister(@PathVariable String userId, @RequestBody ParticipantBulkRegisterRequestDto requestDto) {
         Set<DocumentType> difiDocumentTypes = requestDto.getDocumentTypes().stream()
                 .map(documentTypeDto -> documentTypeService.getDocumentTypeByInternalId(documentTypeDto.getInternalId(), SmpName.DIFI))
-                .filter(Objects::nonNull)
+                .flatMap(List::stream)
                 .collect(Collectors.toSet());
 
         Set<DocumentType> tickstarDocumentTypes = requestDto.getDocumentTypes().stream()
                 .map(documentTypeDto -> documentTypeService.getDocumentTypeByInternalId(documentTypeDto.getInternalId(), SmpName.TICKSTAR))
-                .filter(Objects::nonNull)
+                .flatMap(List::stream)
                 .collect(Collectors.toSet());
 
         String registerDate = dateFormat.format(new Date());

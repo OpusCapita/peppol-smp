@@ -5,6 +5,8 @@ import com.opuscapita.peppol.smp.entity.Smp;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
 public class DocumentTypeServiceImpl implements DocumentTypeService {
 
@@ -38,12 +40,12 @@ public class DocumentTypeServiceImpl implements DocumentTypeService {
     }
 
     @Override
-    public DocumentType getDocumentTypeByInternalId(Integer internalId, Smp smp) {
-        return documentTypeRepository.findByInternalIdAndSmp(internalId, smp).stream().findFirst().orElse(null);
+    public List<DocumentType> getDocumentTypeByInternalId(Integer internalId, Smp smp) {
+        return documentTypeRepository.findByInternalIdAndSmp(internalId, smp);
     }
 
     @Override
-    public DocumentType getDocumentTypeByInternalId(Integer internalId, SmpName smpName) {
+    public List<DocumentType> getDocumentTypeByInternalId(Integer internalId, SmpName smpName) {
         return getDocumentTypeByInternalId(internalId, smpService.getSmp(smpName));
     }
 
