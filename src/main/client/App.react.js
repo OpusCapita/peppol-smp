@@ -5,6 +5,7 @@ import {Provider} from './api/DocumentTypes';
 import {Containers} from '@opuscapita/service-base-ui';
 import BulkRegister from "./components/BulkRegister";
 import ParticipantList from './components/ParticipantList';
+import OperationHistory from "./components/OperationHistory";
 import ParticipantDetail from "./components/ParticipantDetail";
 import CreateParticipant from './components/CreateParticipant';
 
@@ -22,6 +23,10 @@ const edit = (props) => (
 
 const bulkRegister = (props) => (
     <BulkRegister/>
+);
+
+const operationHistory = (props) => (
+    <OperationHistory/>
 );
 
 const detail = (props) => (
@@ -56,6 +61,7 @@ class App extends React.Component {
                     <Route path="/edit/:id" component={edit}/>
                     <Route path="/bulkRegister" component={bulkRegister}/>
                     <Route path="/detail/:icd/:identifier" component={detail}/>
+                    <Route path="/operationHistory" component={operationHistory}/>
                 </Containers.ServiceLayout>
             </Provider>
         );

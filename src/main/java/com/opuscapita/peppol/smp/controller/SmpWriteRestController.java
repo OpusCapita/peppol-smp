@@ -1,7 +1,5 @@
 package com.opuscapita.peppol.smp.controller;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.opuscapita.peppol.smp.controller.dto.DocumentTypeDto;
 import com.opuscapita.peppol.smp.controller.dto.ParticipantBulkRegisterRequestDto;
 import com.opuscapita.peppol.smp.controller.dto.ParticipantDto;
@@ -17,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Objects;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
@@ -46,8 +44,8 @@ public class SmpWriteRestController {
         this.dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
     }
 
-    @PostMapping("/add-participant")
-    public ResponseEntity<?> addParticipant(@RequestBody ParticipantDto participantDto) {
+    @PostMapping("/add-participant/{userId}")
+    public ResponseEntity<?> addParticipant(@PathVariable String userId, @RequestBody ParticipantDto participantDto) {
         participantDto.setRegisteredAt(dateFormat.format(new Date()));
         Participant participant = Participant.of(participantDto);
 
@@ -55,40 +53,35 @@ public class SmpWriteRestController {
         participant.setEndpoint(endpointService.getEndpoint(smp.getName(), participantDto.getEndpointType()));
 
         for (DocumentTypeDto documentTypeDto : participantDto.getDocumentTypes()) {
-            DocumentType documentType = documentTypeService.getDocumentTypeByInternalId(documentTypeDto.getInternalId(), smp.getName());
-            if (documentType != null) {
-                participant.getDocumentTypes().add(documentType);
-            }
+            List<DocumentType> documentTypes = documentTypeService.getDocumentTypeByInternalId(documentTypeDto.getInternalId(), smp.getName());
+            participant.getDocumentTypes().addAll(documentTypes);
         }
-
-        Gson gson = new GsonBuilder().serializeSpecialFloatingPointValues().serializeNulls().create();
-        logger.info(gson.toJson(participant));
 
         if (participantService.saveParticipantRemote(participant)) {
-            participantService.saveParticipant(participant);
+            participantService.saveParticipant(participant, userId);
         }
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/delete-participant/{id}")
-    public ResponseEntity<?> deleteParticipant(@PathVariable Long id) {
+    @PostMapping("/delete-participant/{userId}/{id}")
+    public ResponseEntity<?> deleteParticipant(@PathVariable String userId, @PathVariable Long id) {
         Participant participant = participantService.getParticipant(id);
         if (participantService.deleteParticipantRemote(participant)) {
-            participantService.deleteParticipant(participant);
+            participantService.deleteParticipant(participant, userId);
         }
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/bulk-register")
-    public ResponseEntity<?> bulkRegister(@RequestBody ParticipantBulkRegisterRequestDto requestDto) {
+    @PostMapping("/bulk-register/{userId}")
+    public ResponseEntity<?> bulkRegister(@PathVariable String userId, @RequestBody ParticipantBulkRegisterRequestDto requestDto) {
         Set<DocumentType> difiDocumentTypes = requestDto.getDocumentTypes().stream()
                 .map(documentTypeDto -> documentTypeService.getDocumentTypeByInternalId(documentTypeDto.getInternalId(), SmpName.DIFI))
-                .filter(Objects::nonNull)
+                .flatMap(List::stream)
                 .collect(Collectors.toSet());
 
         Set<DocumentType> tickstarDocumentTypes = requestDto.getDocumentTypes().stream()
                 .map(documentTypeDto -> documentTypeService.getDocumentTypeByInternalId(documentTypeDto.getInternalId(), SmpName.TICKSTAR))
-                .filter(Objects::nonNull)
+                .flatMap(List::stream)
                 .collect(Collectors.toSet());
 
         String registerDate = dateFormat.format(new Date());
@@ -103,11 +96,8 @@ public class SmpWriteRestController {
             return participant;
         }).collect(Collectors.toSet());
 
-        Gson gson = new GsonBuilder().serializeSpecialFloatingPointValues().serializeNulls().create();
-        logger.info(gson.toJson(participants));
-
         ExecutorService executor = Executors.newFixedThreadPool(10);
-        Set<Callable<Boolean>> asyncTasks = participants.stream().map(participant -> new SaveParticipantAsyncTask(participant, participantService)).collect(Collectors.toSet());
+        Set<Callable<Boolean>> asyncTasks = participants.stream().map(participant -> new SaveParticipantAsyncTask(userId, participant, participantService)).collect(Collectors.toSet());
 
         try {
             executor.invokeAll(asyncTasks);
@@ -124,10 +114,12 @@ class SaveParticipantAsyncTask implements Callable<Boolean> {
 
     private static final Logger logger = LoggerFactory.getLogger(SaveParticipantAsyncTask.class);
 
+    private final String userId;
     private final Participant participant;
     private final ParticipantService participantService;
 
-    public SaveParticipantAsyncTask(Participant participant, ParticipantService participantService) {
+    public SaveParticipantAsyncTask(String userId, Participant participant, ParticipantService participantService) {
+        this.userId = userId;
         this.participant = participant;
         this.participantService = participantService;
     }
@@ -136,7 +128,7 @@ class SaveParticipantAsyncTask implements Callable<Boolean> {
     public Boolean call() {
         try {
             if (participantService.saveParticipantRemote(participant)) {
-                participantService.saveParticipant(participant);
+                participantService.saveParticipant(participant, userId);
                 return true;
             } else {
                 logger.error(getErrorMessage());

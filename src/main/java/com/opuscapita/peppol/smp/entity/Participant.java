@@ -32,8 +32,14 @@ public class Participant {
     @Column(name = "country", length = 5)
     private String country;
 
-    @Column(name = "contact_info")
-    private String contactInfo;
+    @Column(name = "contact_name")
+    private String contactName;
+
+    @Column(name = "contact_email")
+    private String contactEmail;
+
+    @Column(name = "contact_phone")
+    private String contactPhone;
 
     @Column(name = "registered_at")
     private String registeredAt;
@@ -88,6 +94,10 @@ public class Participant {
         this.identifier = identifier;
     }
 
+    public String getIcdIdentifier() {
+        return this.icd + ":" + this.identifier;
+    }
+
     public String getCountry() {
         return country;
     }
@@ -96,12 +106,28 @@ public class Participant {
         this.country = country;
     }
 
-    public String getContactInfo() {
-        return contactInfo;
+    public String getContactName() {
+        return contactName;
     }
 
-    public void setContactInfo(String contactInfo) {
-        this.contactInfo = contactInfo;
+    public void setContactName(String contactName) {
+        this.contactName = contactName;
+    }
+
+    public String getContactEmail() {
+        return contactEmail;
+    }
+
+    public void setContactEmail(String contactEmail) {
+        this.contactEmail = contactEmail;
+    }
+
+    public String getContactPhone() {
+        return contactPhone;
+    }
+
+    public void setContactPhone(String contactPhone) {
+        this.contactPhone = contactPhone;
     }
 
     public String getRegisteredAt() {
@@ -136,7 +162,9 @@ public class Participant {
         participant.setName(participantDto.getName());
         participant.setIdentifier(participantDto.getIdentifier());
         participant.setCountry(participantDto.getCountry());
-        participant.setContactInfo(participantDto.getContactInfo());
+        participant.setContactName(participantDto.getContactName());
+        participant.setContactEmail(participantDto.getContactEmail());
+        participant.setContactPhone(participantDto.getContactPhone());
         participant.setRegisteredAt(participantDto.getRegisteredAt());
 
         return participant;

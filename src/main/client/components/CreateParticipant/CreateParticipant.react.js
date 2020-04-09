@@ -44,7 +44,7 @@ class CreateParticipant extends Components.ContextComponent {
         const participant = await this.api.getParticipantDetailById(this.props.id);
 
         const icdValue = IcdValues.findByIcd(participant.icd);
-        participant.icd = {value: icdValue.icd, label: `${icdValue.icd} - ${icdValue.code} (${icdValue.name})`};
+        participant.icd = {value: icdValue.icd, label: `${icdValue.icd} - ${icdValue.code}`};
         const countryValue = Countries.findByCode(participant.country);
         participant.country = !!countryValue ?  {value: countryValue.code, label: countryValue.name} : countryValue;
 
@@ -59,7 +59,7 @@ class CreateParticipant extends Components.ContextComponent {
         try {
             const documentTypes = await this.api.getDocumentTypes();
             const filteredDocumentTypes = documentTypes.filter(d => {
-                return ["PEPPOL_BIS30", "EHF", "SVE", "BEAst"].includes(d.archetype);
+                return ["PEPPOL_BIS30", "SVE", "BEAst"].includes(d.archetype);
             });
             filteredDocumentTypes.forEach(d => {
                 d.value = d.id;
@@ -80,7 +80,7 @@ class CreateParticipant extends Components.ContextComponent {
 
     mapIcdValuesSelect() {
         return IcdValues.map(value => {
-            return {value: value.icd, label: `${value.icd} - ${value.code} (${value.name})`};
+            return {value: value.icd, label: `${value.icd} - ${value.code}`};
         });
     }
 
@@ -125,12 +125,6 @@ class CreateParticipant extends Components.ContextComponent {
             } else {
                 finalDocumentTypes = preDocumentTypes.filter(d => d.archetype !== 'PEPPOL_BIS30' || [158, 160].includes(d.id));
             }
-        } else if (item === "ehf") {
-            if (isChecked) {
-                finalDocumentTypes = pushIfNotExist(preDocumentTypes, documentTypes.filter(d => d.archetype === 'EHF'));
-            } else {
-                finalDocumentTypes = preDocumentTypes.filter(d => d.archetype !== 'EHF');
-            }
         } else if (item === "sve") {
             if (isChecked) {
                 finalDocumentTypes = pushIfNotExist(preDocumentTypes, documentTypes.filter(d => d.archetype === 'SVE'));
@@ -172,7 +166,7 @@ class CreateParticipant extends Components.ContextComponent {
             return temp;
         });
 
-        this.api.addParticipant(participant).then(response => {
+        this.api.addParticipant(participant, this.context.userData.id).then(response => {
             this.handleReset();
             this.context.showNotification('The participant is registered successfully', 'success', 10);
         }).catch(e => {
@@ -267,11 +261,31 @@ class CreateParticipant extends Components.ContextComponent {
                             </div>
                             <div className="form-group">
                                 <div className="col-sm-3">
-                                    <label className="control-label btn-link">Contact Info</label>
+                                    <label className="control-label btn-link">Contact Name</label>
                                 </div>
                                 <div className="offset-md-1 col-md-8">
-                                    <input type="text" className="form-control" value={participant.contactInfo}
-                                           onChange={e => this.handleFormChange('contactInfo', e.target.value)}
+                                    <input type="text" className="form-control" value={participant.contactName}
+                                           onChange={e => this.handleFormChange('contactName', e.target.value)}
+                                    />
+                                </div>
+                            </div>
+                            <div className="form-group">
+                                <div className="col-sm-3">
+                                    <label className="control-label btn-link">Contact E-Mail</label>
+                                </div>
+                                <div className="offset-md-1 col-md-8">
+                                    <input type="text" className="form-control" value={participant.contactEmail}
+                                           onChange={e => this.handleFormChange('contactEmail', e.target.value)}
+                                    />
+                                </div>
+                            </div>
+                            <div className="form-group">
+                                <div className="col-sm-3">
+                                    <label className="control-label btn-link">Contact Phone</label>
+                                </div>
+                                <div className="offset-md-1 col-md-8">
+                                    <input type="text" className="form-control" value={participant.contactPhone}
+                                           onChange={e => this.handleFormChange('contactPhone', e.target.value)}
                                     />
                                 </div>
                             </div>
@@ -290,11 +304,6 @@ class CreateParticipant extends Components.ContextComponent {
                                                onChange={e => this.handleProfileChange(e)}/>
                                         <span className="checkmark"/>
                                     </label>
-                                    <label className="container">EHF v2 (Invoice, CreditNote, Catalogue, Order,
-                                        OrderResponse...)
-                                        <input type="checkbox" name="ehf" onChange={e => this.handleProfileChange(e)}/>
-                                        <span className="checkmark"/>
-                                    </label>
                                     <label className="container">SVEFaktura (Svefaktura v1 Invoice, Invoice+Envelope,
                                         SFTI Svekatalog v2, SVE Order)
                                         <input type="checkbox" name="sve" onChange={e => this.handleProfileChange(e)}/>
@@ -306,7 +315,7 @@ class CreateParticipant extends Components.ContextComponent {
                                                onChange={e => this.handleProfileChange(e)}/>
                                         <span className="checkmark"/>
                                     </label>
-                                    <label className="container">Custom...
+                                    <label className="container">Add document types one by one...
                                         <input type="checkbox" name="other" checked={showOther}
                                                onChange={e => this.handleProfileChange(e)}/>
                                         <span className="checkmark"/>

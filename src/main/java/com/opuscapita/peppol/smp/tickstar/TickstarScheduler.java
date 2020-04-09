@@ -63,8 +63,11 @@ public class TickstarScheduler {
 
         TickstarParticipantListResponse response = client.getAllParticipants();
         for (TickstarParticipant queriedParticipant : response.getParticipant()) {
-            TickstarParticipantIdentifier identifier = queriedParticipant.getMeta().getParticipantIdentifier();
+            if (!checkEnvironment(queriedParticipant, endpoint)) {
+                continue;
+            }
 
+            TickstarParticipantIdentifier identifier = queriedParticipant.getMeta().getParticipantIdentifier();
             Participant persistedParticipant = participantService.getParticipant(identifier.getIdentifierCode(), identifier.getIdentifierValue());
             try {
                 convertParticipant(persistedParticipant, queriedParticipant, endpoint);
@@ -89,7 +92,7 @@ public class TickstarScheduler {
         persistedParticipant.setEndpoint(endpoint);
         persistedParticipant.setDocumentTypes(convertDocumentTypeForParticipant(queriedParticipant, endpoint));
 
-        participantService.saveParticipant(persistedParticipant);
+        participantService.saveParticipant(persistedParticipant, "system");
     }
 
     private Set<DocumentType> convertDocumentTypeForParticipant(TickstarParticipant queriedParticipant, Endpoint endpoint) {
@@ -120,5 +123,11 @@ public class TickstarScheduler {
         newDocumentType.setName(queriedDocumentType.getCommonName());
 
         documentTypeService.saveDocumentType(newDocumentType, endpoint.getSmp());
+    }
+
+    // participant has any document-type registered in this environment
+    private boolean checkEnvironment(TickstarParticipant queriedParticipant, Endpoint endpoint) {
+        TickstarParticipantAccessPointConfigurationMetadata metadata = getTickstarMetadataProfileIds(queriedParticipant, endpoint);
+        return metadata.getProfileId() != null && !metadata.getProfileId().isEmpty();
     }
 }

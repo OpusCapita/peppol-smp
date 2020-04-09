@@ -13,7 +13,9 @@ public class ParticipantDto {
     private String name;
     private String identifier;
     private String country;
-    private String contactInfo;
+    private String contactName;
+    private String contactEmail;
+    private String contactPhone;
     private String registeredAt;
     private EndpointType endpointType;
     private Set<DocumentTypeDto> documentTypes;
@@ -60,12 +62,28 @@ public class ParticipantDto {
         this.country = country;
     }
 
-    public String getContactInfo() {
-        return contactInfo;
+    public String getContactName() {
+        return contactName;
     }
 
-    public void setContactInfo(String contactInfo) {
-        this.contactInfo = contactInfo;
+    public void setContactName(String contactName) {
+        this.contactName = contactName;
+    }
+
+    public String getContactEmail() {
+        return contactEmail;
+    }
+
+    public void setContactEmail(String contactEmail) {
+        this.contactEmail = contactEmail;
+    }
+
+    public String getContactPhone() {
+        return contactPhone;
+    }
+
+    public void setContactPhone(String contactPhone) {
+        this.contactPhone = contactPhone;
     }
 
     public String getRegisteredAt() {
@@ -111,7 +129,9 @@ public class ParticipantDto {
         dto.setName(participant.getName());
         dto.setIdentifier(participant.getIdentifier());
         dto.setCountry(participant.getCountry());
-        dto.setContactInfo(participant.getContactInfo());
+        dto.setContactName(participant.getContactName());
+        dto.setContactEmail(participant.getContactEmail());
+        dto.setContactPhone(participant.getContactPhone());
         dto.setRegisteredAt(participant.getRegisteredAt());
         dto.setEndpointType(participant.getEndpoint().getType());
         dto.setDocumentTypes(DocumentTypeDto.of(participant.getDocumentTypes()));

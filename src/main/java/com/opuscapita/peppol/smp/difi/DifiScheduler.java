@@ -10,8 +10,7 @@ import com.opuscapita.peppol.smp.repository.SmpName;
 import no.difi.elma.smp.webservice.responses.GetAllParticipantsResponse;
 import no.difi.elma.smp.webservice.responses.GetParticipantResponse;
 import no.difi.elma.smp.webservice.responses.ProfilesSupportedResponse;
-import no.difi.elma.smp.webservice.types.CenbiiProfileType;
-import no.difi.elma.smp.webservice.types.OrganizationNumberType;
+import no.difi.elma.smp.webservice.types.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,37 +66,52 @@ public class DifiScheduler {
 
         GetAllParticipantsResponse response = client.getAllParticipants();
         for (OrganizationNumberType difiParticipantIdentifier : response.getOrganizationNumber()) {
-            GetParticipantResponse queriedParticipant = client.getParticipant(difiParticipantIdentifier.getValue());
+            String identifier = difiParticipantIdentifier.getValue();
+            for (String icd : DifiClient.getDifiIcd()) {
+                GetParticipantResponse getResponse = client.getParticipant(icd + ":" + identifier);
 
-            Participant persistedParticipant = participantService.getParticipant(DifiClient.getDifiIcd(), difiParticipantIdentifier.getValue());
-            try {
-                convertParticipant(persistedParticipant, queriedParticipant, endpoint);
-            } catch (Exception e) {
-                logger.error("Failed to convert the participant: " + difiParticipantIdentifier.getValue(), e);
+                if (getResponse == null || getResponse.getParticipant() == null || getResponse.getParticipant().getOrganization() == null ||
+                        getResponse.getParticipant().getOrganization().getName() == null) {
+                    return;
+                }
+
+                Participant persistedParticipant = participantService.getParticipant(icd, identifier);
+                try {
+                    convertParticipant(icd, identifier, persistedParticipant, getResponse.getParticipant(), endpoint);
+                } catch (Exception e) {
+                    logger.error("Failed to convert the participant: " + icd + ":" + identifier, e);
+                }
             }
         }
     }
 
-    private void convertParticipant(Participant persistedParticipant, GetParticipantResponse queriedParticipant, Endpoint endpoint) {
+    private void convertParticipant(String icd, String identifier, Participant persistedParticipant, ParticipantType queriedParticipant, Endpoint endpoint) {
         if (persistedParticipant == null) {
-            logger.warn("......DifiScheduler found a new participant: " + queriedParticipant.getParticipant().getOrganization().getName().getValue() + ", saving");
+            logger.warn("......DifiScheduler found a new participant: " + icd + ":" + identifier + ", saving");
             persistedParticipant = new Participant();
         }
 
-        persistedParticipant.setName(queriedParticipant.getParticipant().getOrganization().getName().getValue());
+        OrganizationType organization = queriedParticipant.getOrganization();
+        persistedParticipant.setName(organization.getName().getValue());
         persistedParticipant.setCountry("NO");
-        persistedParticipant.setIcd(DifiClient.getDifiIcd());
-        persistedParticipant.setIdentifier(queriedParticipant.getParticipant().getOrganization().getOrganizationNumber().getValue());
-        persistedParticipant.setContactInfo(queriedParticipant.getParticipant().getOrganization().getContact().getName().getValue());
+        persistedParticipant.setIcd(icd);
+        persistedParticipant.setIdentifier(identifier);
+
+        ContactType contact = organization.getContact();
+        if (contact != null) {
+            persistedParticipant.setContactName(contact.getName() != null ? contact.getName().getValue() : null);
+            persistedParticipant.setContactEmail(contact.getEmail() != null ? contact.getEmail().getValue() : null);
+            persistedParticipant.setContactPhone(contact.getTelephone() != null ? contact.getTelephone().getValue() : null);
+        }
 
         persistedParticipant.setEndpoint(endpoint);
         persistedParticipant.setDocumentTypes(convertDocumentTypeForParticipant(queriedParticipant, endpoint));
 
-        participantService.saveParticipant(persistedParticipant);
+        participantService.saveParticipant(persistedParticipant, "system");
     }
 
-    private Set<DocumentType> convertDocumentTypeForParticipant(GetParticipantResponse queriedParticipant, Endpoint endpoint) {
-        return queriedParticipant.getParticipant().getProfiles().stream()
+    private Set<DocumentType> convertDocumentTypeForParticipant(ParticipantType queriedParticipant, Endpoint endpoint) {
+        return queriedParticipant.getProfiles().stream()
                 .map(profile -> documentTypeService.getDocumentType(profile.getValue(), endpoint.getSmp()))
                 .filter(Objects::nonNull).collect(Collectors.toSet());
     }

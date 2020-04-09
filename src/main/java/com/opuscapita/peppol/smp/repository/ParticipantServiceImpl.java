@@ -4,6 +4,8 @@ import com.opuscapita.peppol.smp.controller.dto.ParticipantRequestDto;
 import com.opuscapita.peppol.smp.difi.DifiClient;
 import com.opuscapita.peppol.smp.difi.dto.DifiParticipantBuilder;
 import com.opuscapita.peppol.smp.entity.DocumentType;
+import com.opuscapita.peppol.smp.entity.OperationHistory;
+import com.opuscapita.peppol.smp.entity.OperationType;
 import com.opuscapita.peppol.smp.entity.Participant;
 import com.opuscapita.peppol.smp.tickstar.TickstarClient;
 import com.opuscapita.peppol.smp.tickstar.dto.TickstarParticipant;
@@ -26,12 +28,15 @@ public class ParticipantServiceImpl implements ParticipantService {
     private final DifiClient difiClient;
     private final TickstarClient tickstarClient;
     private final ParticipantRepository repository;
+    private final OperationHistoryService operationHistoryService;
 
     @Autowired
-    public ParticipantServiceImpl(DifiClient difiClient, TickstarClient tickstarClient, ParticipantRepository repository) {
+    public ParticipantServiceImpl(DifiClient difiClient, TickstarClient tickstarClient,
+                                  ParticipantRepository repository, OperationHistoryService operationHistoryService) {
         this.difiClient = difiClient;
         this.tickstarClient = tickstarClient;
         this.repository = repository;
+        this.operationHistoryService = operationHistoryService;
     }
 
     @Override
@@ -66,12 +71,14 @@ public class ParticipantServiceImpl implements ParticipantService {
     }
 
     @Override
-    public void saveParticipant(Participant participant) {
+    public void saveParticipant(Participant participant, String userId) {
+        operationHistoryService.saveLog(participant, userId);
         repository.save(participant);
     }
 
     @Override
-    public void deleteParticipant(Participant participant) {
+    public void deleteParticipant(Participant participant, String userId) {
+        operationHistoryService.saveLog(participant, userId, OperationType.DELETE);
         repository.delete(participant);
     }
 
@@ -84,8 +91,11 @@ public class ParticipantServiceImpl implements ParticipantService {
     private boolean saveDifiParticipant(Participant participant) {
         ParticipantType participantType = new DifiParticipantBuilder()
                 .setName(participant.getName())
-                .setOrganizationNumber(participant.getIdentifier())
-                .setContactName(participant.getContactInfo())
+                .setOrganizationNumber(participant.getIcd() + ":" +participant.getIdentifier())
+                .setContactName(participant.getContactName())
+                .setContactEmail(participant.getContactEmail())
+                .setContactTelephone(participant.getContactPhone())
+                .setWebsite("http://www.opuscapita.com")
                 .addAllProfiles(participant.getDocumentTypes().stream().map(DocumentType::getExternalId).collect(Collectors.toList()))
                 .build();
 

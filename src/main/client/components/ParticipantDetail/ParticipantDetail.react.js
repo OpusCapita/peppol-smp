@@ -40,7 +40,7 @@ class ParticipantDetail extends Components.ContextComponent {
         e && e.preventDefault();
         this.setState({loading: true});
 
-        this.api.deleteParticipant(this.state.participant.id).then(() => {
+        this.api.deleteParticipant(this.state.participant.id, this.context.userData.id).then(() => {
             this.context.showNotification('The participant is deleted successfully', 'success', 10);
 
         }).catch(e => {
@@ -88,10 +88,26 @@ class ParticipantDetail extends Components.ContextComponent {
                             </div>
                             <div className="form-group">
                                 <div className="col-sm-3">
-                                    <label className="control-label btn-link">Contact Info</label>
+                                    <label className="control-label btn-link">Contact Name</label>
                                 </div>
                                 <div className="offset-md-1 col-md-8">
-                                    <label className="control-label">{participant.contactInfo}</label>
+                                    <label className="control-label">{participant.contactName}</label>
+                                </div>
+                            </div>
+                            <div className="form-group">
+                                <div className="col-sm-3">
+                                    <label className="control-label btn-link">Contact Email</label>
+                                </div>
+                                <div className="offset-md-1 col-md-8">
+                                    <label className="control-label">{participant.contactEmail}</label>
+                                </div>
+                            </div>
+                            <div className="form-group">
+                                <div className="col-sm-3">
+                                    <label className="control-label btn-link">Contact Phone</label>
+                                </div>
+                                <div className="offset-md-1 col-md-8">
+                                    <label className="control-label">{participant.contactPhone}</label>
                                 </div>
                             </div>
                             <div className="form-group">

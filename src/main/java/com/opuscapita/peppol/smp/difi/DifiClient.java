@@ -6,6 +6,9 @@ import no.difi.elma.smp.webservice.responses.*;
 import no.difi.elma.smp.webservice.types.*;
 import org.springframework.ws.client.core.support.WebServiceGatewaySupport;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class DifiClient extends WebServiceGatewaySupport {
 
     private static final String ICD_9908 = "9908";
@@ -79,8 +82,11 @@ public class DifiClient extends WebServiceGatewaySupport {
 
 //    elmaPort.removeProfileFromAllParticipants();
 
-    public static String getDifiIcd() {
-        return DifiClient.ICD_9908;
+    public static List<String> getDifiIcd() {
+        List<String> icd = new ArrayList<>();
+        icd.add(DifiClient.ICD_9908);
+        icd.add(DifiClient.ICD_0192);
+        return icd;
     }
 
     public static Boolean isDifiIcd(String icd) {

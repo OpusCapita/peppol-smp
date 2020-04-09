@@ -9,20 +9,24 @@ class ApiBase {
         return this.ajax.post(`/peppol-smp/api/get-participants`).send({pagination, filter}).then(res => res.body).catch(ApiError.getErrorFromResponse);
     }
 
+    getOperationHistory(pagination, filter) {
+        return this.ajax.post(`/peppol-smp/api/get-operation-history`).send({pagination, filter}).then(res => res.body).catch(ApiError.getErrorFromResponse);
+    }
+
     getDocumentTypes() {
         return this.ajax.get(`/peppol-validator/api/public/get-document-types`).then(res => res.body).catch(ApiError.getErrorFromResponse);
     }
 
-    bulkRegister(request) {
-        return this.ajax.post(`/peppol-smp/api/bulk-register`).send(request).then(res => res.body).catch(ApiError.getErrorFromResponse);
+    bulkRegister(request, userId) {
+        return this.ajax.post(`/peppol-smp/api/bulk-register/${userId}`).send(request).then(res => res.body).catch(ApiError.getErrorFromResponse);
     }
 
-    addParticipant(participant) {
-        return this.ajax.post(`/peppol-smp/api/add-participant`).send(participant).then(res => res.body).catch(ApiError.getErrorFromResponse);
+    addParticipant(participant, userId) {
+        return this.ajax.post(`/peppol-smp/api/add-participant/${userId}`).send(participant).then(res => res.body).catch(ApiError.getErrorFromResponse);
     }
 
-    deleteParticipant(id) {
-        return this.ajax.post(`/peppol-smp/api/delete-participant/${id}`).then(res => res.body).catch(ApiError.getErrorFromResponse);
+    deleteParticipant(id, userId) {
+        return this.ajax.post(`/peppol-smp/api/delete-participant/${userId}/${id}`).then(res => res.body).catch(ApiError.getErrorFromResponse);
     }
 
     getParticipantDetail(icd, identifier) {
