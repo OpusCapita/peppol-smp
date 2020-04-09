@@ -31,6 +31,19 @@ class ParticipantList extends Components.ContextComponent {
         this.api = new ApiBase();
     }
 
+    componentDidMount() {
+        const page = this.context.router.location.query.r;
+
+        if (page) {
+            this.showPage(page)
+        }
+    }
+
+    showPage(page, event) {
+        event && event.preventDefault();
+        this.context.router.push(`/peppol-smp/${page}`);
+    }
+
     async loadParticipantList(tableState) {
         this.setState({loading: true});
         let {pagination, searchValues} = this.state;
@@ -97,20 +110,6 @@ class ParticipantList extends Components.ContextComponent {
         this.setState({searchValues}, () => this.loadParticipantList());
     }
 
-    showAddParticipantPage() {
-        this.context.router.push('/peppol-smp/create');
-    }
-
-    showParticipantDetail(e, participant) {
-        e && e.preventDefault();
-        this.context.router.push(`/peppol-smp/detail/${participant.icd}/${participant.identifier}`);
-    }
-
-    bulkRegister(e) {
-        e && e.preventDefault();
-        this.context.router.push(`/peppol-smp/bulkRegister`);
-    }
-
     render() {
         const {i18n} = this.context;
         const {loading, participantList, pagination, totalCount, searchValues} = this.state;
@@ -118,7 +117,7 @@ class ParticipantList extends Components.ContextComponent {
         return (
             <div>
                 <h3>Participant List
-                    <button className="btn btn-info participant-add-btn" onClick={() => this.showAddParticipantPage()}>
+                    <button className="btn btn-info participant-add-btn" onClick={(e) => this.showPage('create', e)}>
                         New Participant
                     </button>
                 </h3>
@@ -210,7 +209,7 @@ class ParticipantList extends Components.ContextComponent {
                     <div className="form-submit text-right">
                         <button className="btn btn-link" onClick={() => this.resetSearch()}>Reset</button>
                         <button className="btn btn-primary" onClick={() => this.loadParticipantList()}>Filter</button>
-                        <button className="btn btn-default float-left" onClick={(e) => this.bulkRegister(e)}>
+                        <button className="btn btn-default float-left" onClick={e => this.showPage('bulkRegister', e)}>
                             Bulk Register
                         </button>
                     </div>
@@ -239,7 +238,7 @@ class ParticipantList extends Components.ContextComponent {
                             Cell: ({value}) =>
                                 <span>
                                     <a href={`/peppol-smp?r=detail/${value.icd}/${value.identifier}`}
-                                       onClick={(e) => this.showParticipantDetail(e, value)}
+                                       onClick={e => this.showPage(`detail/${value.icd}/${value.identifier}`, e)}
                                        className="btn btn-link detail-link">
                                         <span>{`${value.icd}:${value.identifier}`}</span>
                                     </a>
@@ -279,8 +278,10 @@ class ParticipantList extends Components.ContextComponent {
                 </div>
 
                 <div className="footer-wrapper">
-                    <a className='btn btn-outline-warning' href="#" onClick={() => router.push('/peppol-smp/operationHistory')}>
-                        <span className="icon glyphicon glyphicon-chevron-left"/> Operation History
+                    <a className='btn btn-outline-warning' href="#" onClick={e => this.showPage('operationHistory', e)}>
+                        <span className="icon glyphicon glyphicon-chevron-left"/>
+                        Operation History
+                        <span className="icon glyphicon glyphicon-chevron-right"/>
                     </a>
                 </div>
             </div>

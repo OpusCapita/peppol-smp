@@ -243,7 +243,7 @@ class OperationHistory extends Components.ContextComponent {
                 </div>
 
                 <div className="footer-wrapper">
-                    <a className='btn btn-default' href="#" onClick={() => router.push('/peppol-smp')}>
+                    <a className='btn btn-default' href="#" onClick={() => this.context.router.push('/peppol-smp')}>
                         <span className="icon glyphicon glyphicon-chevron-left"/> Go Back
                     </a>
                 </div>
