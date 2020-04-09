@@ -34,6 +34,25 @@ public class OperationHistory {
     @Version
     private Integer version;
 
+    public OperationHistory() {
+        this.date = new Date();
+    }
+
+    public OperationHistory(String user) {
+        this();
+        this.user = user;
+    }
+
+    public OperationHistory(String user, String participant) {
+        this(user);
+        this.participant = participant;
+    }
+
+    public OperationHistory(String user, String participant, OperationType type) {
+        this(user, participant);
+        this.type = type;
+    }
+
     public Long getId() {
         return id;
     }

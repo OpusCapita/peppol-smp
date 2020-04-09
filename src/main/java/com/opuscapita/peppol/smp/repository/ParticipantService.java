@@ -16,11 +16,11 @@ public interface ParticipantService {
 
     Page<Participant> getAllParticipants(ParticipantRequestDto request);
 
-    void saveParticipant(Participant participant);
+    void saveParticipant(Participant participant, String userId);
 
     boolean saveParticipantRemote(Participant participant);
 
-    void deleteParticipant(Participant participant);
+    void deleteParticipant(Participant participant, String userId);
 
     boolean deleteParticipantRemote(Participant participant);
 }

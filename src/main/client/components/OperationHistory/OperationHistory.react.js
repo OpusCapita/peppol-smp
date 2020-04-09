@@ -1,7 +1,8 @@
 import React from 'react';
 import {Components} from '@opuscapita/service-base-ui';
 import ReactTable from 'react-table';
-import {ApiBase, Countries} from '../../api';
+import {ApiBase} from '../../api';
+import ReactTooltip from 'react-tooltip';
 import Select from '@opuscapita/react-select';
 import 'react-table/react-table.css';
 import './OperationHistory.css';
@@ -10,10 +11,7 @@ class OperationHistory extends Components.ContextComponent {
 
     static types = [
         'REGISTER',
-        'BULK_REGISTER',
-        'MODIFY_INFO',
-        'ADD_DOCUMENT',
-        'REMOVE_DOCUMENT',
+        'UPDATE',
         'DELETE'
     ];
 
@@ -211,9 +209,20 @@ class OperationHistory extends Components.ContextComponent {
 
                         },
                         {
-                            width: 200,
-                            accessor: 'type',
-                            Header: 'Operation Type'
+                            id: 'type',
+                            width: 150,
+                            accessor: row => row,
+                            Header: 'Operation Type',
+                            Cell: ({value}) =>
+                                <span>
+                                    <span data-tip data-for={`type-tooltip-${value.id}`}>
+                                        {value.type}
+                                    </span>
+                                    <ReactTooltip id={`type-tooltip-${value.id}`}
+                                                  className="sticky" effect="solid" delayHide={100}>
+                                        <p>Document Types: {value.description}</p>
+                                    </ReactTooltip>
+                                </span>
                         },
                         {
                             id: 'user',

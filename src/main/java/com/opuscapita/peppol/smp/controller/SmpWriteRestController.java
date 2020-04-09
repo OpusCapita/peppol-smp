@@ -62,7 +62,7 @@ public class SmpWriteRestController {
         }
 
         if (participantService.saveParticipantRemote(participant)) {
-            participantService.saveParticipant(participant);
+            participantService.saveParticipant(participant, userId);
         }
         return ResponseEntity.ok().build();
     }
@@ -71,7 +71,7 @@ public class SmpWriteRestController {
     public ResponseEntity<?> deleteParticipant(@PathVariable String userId, @PathVariable Long id) {
         Participant participant = participantService.getParticipant(id);
         if (participantService.deleteParticipantRemote(participant)) {
-            participantService.deleteParticipant(participant);
+            participantService.deleteParticipant(participant, userId);
         }
         return ResponseEntity.ok().build();
     }
@@ -101,7 +101,7 @@ public class SmpWriteRestController {
         }).collect(Collectors.toSet());
 
         ExecutorService executor = Executors.newFixedThreadPool(10);
-        Set<Callable<Boolean>> asyncTasks = participants.stream().map(participant -> new SaveParticipantAsyncTask(participant, participantService)).collect(Collectors.toSet());
+        Set<Callable<Boolean>> asyncTasks = participants.stream().map(participant -> new SaveParticipantAsyncTask(userId, participant, participantService)).collect(Collectors.toSet());
 
         try {
             executor.invokeAll(asyncTasks);
@@ -118,10 +118,12 @@ class SaveParticipantAsyncTask implements Callable<Boolean> {
 
     private static final Logger logger = LoggerFactory.getLogger(SaveParticipantAsyncTask.class);
 
+    private final String userId;
     private final Participant participant;
     private final ParticipantService participantService;
 
-    public SaveParticipantAsyncTask(Participant participant, ParticipantService participantService) {
+    public SaveParticipantAsyncTask(String userId, Participant participant, ParticipantService participantService) {
+        this.userId = userId;
         this.participant = participant;
         this.participantService = participantService;
     }
@@ -130,7 +132,7 @@ class SaveParticipantAsyncTask implements Callable<Boolean> {
     public Boolean call() {
         try {
             if (participantService.saveParticipantRemote(participant)) {
-                participantService.saveParticipant(participant);
+                participantService.saveParticipant(participant, userId);
                 return true;
             } else {
                 logger.error(getErrorMessage());

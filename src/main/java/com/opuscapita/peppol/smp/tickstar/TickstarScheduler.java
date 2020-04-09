@@ -89,7 +89,7 @@ public class TickstarScheduler {
         persistedParticipant.setEndpoint(endpoint);
         persistedParticipant.setDocumentTypes(convertDocumentTypeForParticipant(queriedParticipant, endpoint));
 
-        participantService.saveParticipant(persistedParticipant);
+        participantService.saveParticipant(persistedParticipant, "system");
     }
 
     private Set<DocumentType> convertDocumentTypeForParticipant(TickstarParticipant queriedParticipant, Endpoint endpoint) {

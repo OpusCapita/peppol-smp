@@ -94,6 +94,10 @@ public class Participant {
         this.identifier = identifier;
     }
 
+    public String getIcdIdentifier() {
+        return this.icd + ":" + this.identifier;
+    }
+
     public String getCountry() {
         return country;
     }
