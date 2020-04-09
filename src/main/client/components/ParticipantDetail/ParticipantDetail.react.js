@@ -40,7 +40,7 @@ class ParticipantDetail extends Components.ContextComponent {
         e && e.preventDefault();
         this.setState({loading: true});
 
-        this.api.deleteParticipant(this.state.participant.id).then(() => {
+        this.api.deleteParticipant(this.state.participant.id, this.context.userData.id).then(() => {
             this.context.showNotification('The participant is deleted successfully', 'success', 10);
 
         }).catch(e => {

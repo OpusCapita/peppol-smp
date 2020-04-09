@@ -46,8 +46,8 @@ public class SmpWriteRestController {
         this.dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
     }
 
-    @PostMapping("/add-participant")
-    public ResponseEntity<?> addParticipant(@RequestBody ParticipantDto participantDto) {
+    @PostMapping("/add-participant/{userId}")
+    public ResponseEntity<?> addParticipant(@PathVariable String userId, @RequestBody ParticipantDto participantDto) {
         participantDto.setRegisteredAt(dateFormat.format(new Date()));
         Participant participant = Participant.of(participantDto);
 
@@ -67,8 +67,8 @@ public class SmpWriteRestController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/delete-participant/{id}")
-    public ResponseEntity<?> deleteParticipant(@PathVariable Long id) {
+    @PostMapping("/delete-participant/{userId}/{id}")
+    public ResponseEntity<?> deleteParticipant(@PathVariable String userId, @PathVariable Long id) {
         Participant participant = participantService.getParticipant(id);
         if (participantService.deleteParticipantRemote(participant)) {
             participantService.deleteParticipant(participant);
@@ -76,8 +76,8 @@ public class SmpWriteRestController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/bulk-register")
-    public ResponseEntity<?> bulkRegister(@RequestBody ParticipantBulkRegisterRequestDto requestDto) {
+    @PostMapping("/bulk-register/{userId}")
+    public ResponseEntity<?> bulkRegister(@PathVariable String userId, @RequestBody ParticipantBulkRegisterRequestDto requestDto) {
         Set<DocumentType> difiDocumentTypes = requestDto.getDocumentTypes().stream()
                 .map(documentTypeDto -> documentTypeService.getDocumentTypeByInternalId(documentTypeDto.getInternalId(), SmpName.DIFI))
                 .filter(Objects::nonNull)

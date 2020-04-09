@@ -277,6 +277,12 @@ class ParticipantList extends Components.ContextComponent {
                 <div className="text-center media">
                     <p>{`${pagination.page * pagination.pageSize} to ${Math.min((pagination.page * pagination.pageSize + pagination.pageSize), totalCount)} of ${totalCount} participants`}</p>
                 </div>
+
+                <div className="footer-wrapper">
+                    <a className='btn btn-outline-warning' href="#" onClick={() => router.push('/peppol-smp/operationHistory')}>
+                        <span className="icon glyphicon glyphicon-chevron-left"/> Operation History
+                    </a>
+                </div>
             </div>
         );
     }

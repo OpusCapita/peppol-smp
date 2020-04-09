@@ -2,16 +2,16 @@ package com.opuscapita.peppol.smp.controller.dto;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
-public class ParticipantRequestDto {
+public class OperationHistoryRequestDto {
 
-    private ParticipantFilterDto filter;
+    private OperationHistoryFilterDto filter;
     private CommonPaginationDto pagination;
 
-    public ParticipantFilterDto getFilter() {
+    public OperationHistoryFilterDto getFilter() {
         return filter;
     }
 
-    public void setFilter(ParticipantFilterDto filter) {
+    public void setFilter(OperationHistoryFilterDto filter) {
         this.filter = filter;
     }
 

@@ -28,7 +28,7 @@ class BulkRegister extends Components.ContextComponent {
         try {
             const documentTypes = await this.api.getDocumentTypes();
             const filteredDocumentTypes = documentTypes.filter(d => {
-                return ["PEPPOL_BIS30", "EHF", "SVE", "BEAst"].includes(d.archetype);
+                return ["PEPPOL_BIS30", "SVE", "BEAst"].includes(d.archetype);
             });
             filteredDocumentTypes.forEach(d => {
                 d.value = d.id;
@@ -72,12 +72,6 @@ class BulkRegister extends Components.ContextComponent {
                 finalDocumentTypes = pushIfNotExist(preDocumentTypes, documentTypes.filter(d => d.archetype === 'PEPPOL_BIS30' && ![158, 160].includes(d.id)));
             } else {
                 finalDocumentTypes = preDocumentTypes.filter(d => d.archetype !== 'PEPPOL_BIS30' || [158, 160].includes(d.id));
-            }
-        } else if (item === "ehf") {
-            if (isChecked) {
-                finalDocumentTypes = pushIfNotExist(preDocumentTypes, documentTypes.filter(d => d.archetype === 'EHF'));
-            } else {
-                finalDocumentTypes = preDocumentTypes.filter(d => d.archetype !== 'EHF');
             }
         } else if (item === "sve") {
             if (isChecked) {
@@ -145,21 +139,10 @@ class BulkRegister extends Components.ContextComponent {
             hideModalDialog();
 
             if (btn === 'yes') {
-                console.log("participantList: ");
-                console.log(participantList);
-                console.log("selectedDocumentTypes: ");
-                console.log(selectedDocumentTypes);
-
-                const selectedDocumentTypeInternalIds = selectedDocumentTypes.map(d => {
-                    const temp = {};
-                    temp.internalId = d.id;
-                    return temp;
-                });
-
                 this.context.showSpinner();
 
                 setTimeout(() => {
-                    this.api.bulkRegister({participants: participantList, documentTypes: selectedDocumentTypes.map(d => { return {internalId: d.id}; })}).then(() => {
+                    this.api.bulkRegister({participants: participantList, documentTypes: selectedDocumentTypes.map(d => { return {internalId: d.id}; })}, userData.id).then(() => {
                         this.context.showNotification('Bulk register operation has been successfully initialized', 'info', 3);
 
                     }).catch(e => {
@@ -218,12 +201,6 @@ class BulkRegister extends Components.ContextComponent {
                                             Order
                                             Response, Invoice Response...)
                                             <input type="checkbox" name="bis3-1"
-                                                   onChange={e => this.handleProfileChange(e)}/>
-                                            <span className="checkmark"/>
-                                        </label>
-                                        <label className="container">EHF v2 (Invoice, CreditNote, Catalogue, Order,
-                                            OrderResponse...)
-                                            <input type="checkbox" name="ehf"
                                                    onChange={e => this.handleProfileChange(e)}/>
                                             <span className="checkmark"/>
                                         </label>

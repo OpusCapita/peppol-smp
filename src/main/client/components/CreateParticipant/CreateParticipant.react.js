@@ -59,7 +59,7 @@ class CreateParticipant extends Components.ContextComponent {
         try {
             const documentTypes = await this.api.getDocumentTypes();
             const filteredDocumentTypes = documentTypes.filter(d => {
-                return ["PEPPOL_BIS30", "EHF", "SVE", "BEAst"].includes(d.archetype);
+                return ["PEPPOL_BIS30", "SVE", "BEAst"].includes(d.archetype);
             });
             filteredDocumentTypes.forEach(d => {
                 d.value = d.id;
@@ -125,12 +125,6 @@ class CreateParticipant extends Components.ContextComponent {
             } else {
                 finalDocumentTypes = preDocumentTypes.filter(d => d.archetype !== 'PEPPOL_BIS30' || [158, 160].includes(d.id));
             }
-        } else if (item === "ehf") {
-            if (isChecked) {
-                finalDocumentTypes = pushIfNotExist(preDocumentTypes, documentTypes.filter(d => d.archetype === 'EHF'));
-            } else {
-                finalDocumentTypes = preDocumentTypes.filter(d => d.archetype !== 'EHF');
-            }
         } else if (item === "sve") {
             if (isChecked) {
                 finalDocumentTypes = pushIfNotExist(preDocumentTypes, documentTypes.filter(d => d.archetype === 'SVE'));
@@ -172,7 +166,7 @@ class CreateParticipant extends Components.ContextComponent {
             return temp;
         });
 
-        this.api.addParticipant(participant).then(response => {
+        this.api.addParticipant(participant, this.context.userData.id).then(response => {
             this.handleReset();
             this.context.showNotification('The participant is registered successfully', 'success', 10);
         }).catch(e => {
@@ -308,11 +302,6 @@ class CreateParticipant extends Components.ContextComponent {
                                         Response, Invoice Response...)
                                         <input type="checkbox" name="bis3-1"
                                                onChange={e => this.handleProfileChange(e)}/>
-                                        <span className="checkmark"/>
-                                    </label>
-                                    <label className="container">EHF v2 (Invoice, CreditNote, Catalogue, Order,
-                                        OrderResponse...)
-                                        <input type="checkbox" name="ehf" onChange={e => this.handleProfileChange(e)}/>
                                         <span className="checkmark"/>
                                     </label>
                                     <label className="container">SVEFaktura (Svefaktura v1 Invoice, Invoice+Envelope,

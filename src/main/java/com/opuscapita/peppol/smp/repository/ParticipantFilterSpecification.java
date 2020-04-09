@@ -1,7 +1,7 @@
 package com.opuscapita.peppol.smp.repository;
 
 import com.opuscapita.peppol.smp.controller.dto.ParticipantFilterDto;
-import com.opuscapita.peppol.smp.controller.dto.ParticipantPaginationDto;
+import com.opuscapita.peppol.smp.controller.dto.CommonPaginationDto;
 import com.opuscapita.peppol.smp.entity.Participant;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.jpa.domain.Specification;
@@ -13,7 +13,7 @@ import java.util.List;
 
 public class ParticipantFilterSpecification {
 
-    public static Specification<Participant> filter(ParticipantFilterDto filterDto, List<ParticipantPaginationDto.SortingDto> sortingDtos) {
+    public static Specification<Participant> filter(ParticipantFilterDto filterDto, List<CommonPaginationDto.SortingDto> sortingDtos) {
         return (Specification<Participant>) (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
 
@@ -61,7 +61,7 @@ public class ParticipantFilterSpecification {
 
             if (sortingDtos != null && !sortingDtos.isEmpty()) {
                 List<Order> orderList = new ArrayList<>();
-                for (ParticipantPaginationDto.SortingDto sortingDto : sortingDtos) {
+                for (CommonPaginationDto.SortingDto sortingDto : sortingDtos) {
                     orderList.add(sortingDto.getDesc()
                             ? criteriaBuilder.desc(root.get(sortingDto.getId()))
                             : criteriaBuilder.asc(root.get(sortingDto.getId()))

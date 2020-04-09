@@ -1,9 +1,9 @@
 package com.opuscapita.peppol.smp.controller;
 
-import com.opuscapita.peppol.smp.controller.dto.ParticipantDto;
-import com.opuscapita.peppol.smp.controller.dto.ParticipantRequestDto;
-import com.opuscapita.peppol.smp.controller.dto.ParticipantResponseDto;
+import com.opuscapita.peppol.smp.controller.dto.*;
+import com.opuscapita.peppol.smp.entity.OperationHistory;
 import com.opuscapita.peppol.smp.entity.Participant;
+import com.opuscapita.peppol.smp.repository.OperationHistoryService;
 import com.opuscapita.peppol.smp.repository.ParticipantService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -14,16 +14,24 @@ import org.springframework.web.bind.annotation.*;
 public class SmpReadRestController {
 
     private final ParticipantService participantService;
+    private final OperationHistoryService operationHistoryService;
 
     @Autowired
-    public SmpReadRestController(ParticipantService participantService) {
+    public SmpReadRestController(ParticipantService participantService, OperationHistoryService operationHistoryService) {
         this.participantService = participantService;
+        this.operationHistoryService = operationHistoryService;
     }
 
     @PostMapping("/get-participants")
     public ParticipantResponseDto getParticipants(@RequestBody ParticipantRequestDto request) {
         Page<Participant> participants = participantService.getAllParticipants(request);
         return new ParticipantResponseDto(participants.getContent(), participants.getTotalElements());
+    }
+
+    @PostMapping("/get-operation-history")
+    public OperationHistoryResponseDto getOperationHistory(@RequestBody OperationHistoryRequestDto request) {
+        Page<OperationHistory> participants = operationHistoryService.getOperationHistory(request);
+        return new OperationHistoryResponseDto(participants.getContent(), participants.getTotalElements());
     }
 
     @GetMapping("/get-participant/{icd}/{identifier}")
