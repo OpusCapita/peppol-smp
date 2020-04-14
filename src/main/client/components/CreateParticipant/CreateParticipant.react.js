@@ -148,7 +148,8 @@ class CreateParticipant extends Components.ContextComponent {
     }
 
     handleSubmit(event) {
-        this.context.showSpinner();
+        event && event.preventDefault();
+        const {userData, router, showNotification, showSpinner, hideSpinner} = this.context;
 
         const {participant} = this.state;
         participant.icd = participant.icd.value;
@@ -159,13 +160,14 @@ class CreateParticipant extends Components.ContextComponent {
             return temp;
         });
 
-        this.api.addParticipant(participant, this.context.userData.id).then(response => {
-            this.context.showNotification(`The participant is ${this.state.editMode ? 'updated' : 'registered'} successfully`, 'success', 10);
+        showSpinner();
+        this.api.addParticipant(participant, userData.id).then(() => {
+            hideSpinner();
+            showNotification(`The participant is ${this.state.editMode ? 'updated' : 'registered'} successfully`, 'success', 10);
+            router.push(`/peppol-smp`);
         }).catch(e => {
-            this.context.showNotification(e.message, 'error', 10);
-        }).finally(() => {
-            this.context.hideSpinner();
-            this.handleCancel(event);
+            hideSpinner();
+            showNotification(e.message, 'error', 10);
         });
     }
 
