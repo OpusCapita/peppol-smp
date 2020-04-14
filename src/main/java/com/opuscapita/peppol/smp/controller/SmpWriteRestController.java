@@ -53,6 +53,7 @@ public class SmpWriteRestController {
         Smp smp = smpService.getSmpByIcd(participant.getIcd());
         participant.setEndpoint(endpointService.getEndpoint(smp.getName()));
 
+        participant.getDocumentTypes().clear();
         for (DocumentTypeDto documentTypeDto : participantDto.getDocumentTypes()) {
             List<DocumentType> documentTypes = documentTypeService.getDocumentTypeByInternalId(documentTypeDto.getInternalId(), smp.getName());
             participant.getDocumentTypes().addAll(documentTypes);

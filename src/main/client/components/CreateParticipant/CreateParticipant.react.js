@@ -9,7 +9,6 @@ class CreateParticipant extends Components.ContextComponent {
 
     state = {
         participant: {
-            endpointType: "TEST",
             documentTypes: []
         },
         documentTypes: [],
@@ -140,7 +139,7 @@ class CreateParticipant extends Components.ContextComponent {
     }
 
     handleReset() {
-        this.setState({participant: {endpointType: this.state.participant.endpointType, documentTypes: []}});
+        this.setState({participant: {documentTypes: []}});
     }
 
     handleCancel(event) {
@@ -161,12 +160,12 @@ class CreateParticipant extends Components.ContextComponent {
         });
 
         this.api.addParticipant(participant, this.context.userData.id).then(response => {
-            this.handleReset();
-            this.context.showNotification('The participant is registered successfully', 'success', 10);
+            this.context.showNotification(`The participant is ${this.state.editMode ? 'updated' : 'registered'} successfully`, 'success', 10);
         }).catch(e => {
             this.context.showNotification(e.message, 'error', 10);
         }).finally(() => {
             this.context.hideSpinner();
+            this.handleCancel(event);
         });
     }
 
