@@ -154,20 +154,16 @@ public class Participant {
         this.endpoint = endpoint;
     }
 
-    public static Participant of(ParticipantDto participantDto) {
-        Participant participant = new Participant();
+    public Participant copy(ParticipantDto participantDto) {
+        setIcd(participantDto.getIcd());
+        setName(participantDto.getName());
+        setIdentifier(participantDto.getIdentifier());
+        setCountry(participantDto.getCountry());
+        setContactName(participantDto.getContactName());
+        setContactEmail(participantDto.getContactEmail());
+        setContactPhone(participantDto.getContactPhone());
 
-        participant.setId(participantDto.getId());
-        participant.setIcd(participantDto.getIcd());
-        participant.setName(participantDto.getName());
-        participant.setIdentifier(participantDto.getIdentifier());
-        participant.setCountry(participantDto.getCountry());
-        participant.setContactName(participantDto.getContactName());
-        participant.setContactEmail(participantDto.getContactEmail());
-        participant.setContactPhone(participantDto.getContactPhone());
-        participant.setRegisteredAt(participantDto.getRegisteredAt());
-
-        return participant;
+        return this;
     }
 
     @Override

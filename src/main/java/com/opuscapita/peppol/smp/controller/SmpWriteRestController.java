@@ -46,8 +46,9 @@ public class SmpWriteRestController {
 
     @PostMapping("/add-participant/{userId}")
     public ResponseEntity<?> addParticipant(@PathVariable String userId, @RequestBody ParticipantDto participantDto) {
-        participantDto.setRegisteredAt(dateFormat.format(new Date()));
-        Participant participant = Participant.of(participantDto);
+        Participant participant = participantDto.getId() != null ? participantService.getParticipant(participantDto.getId()) : new Participant();
+        participant.copy(participantDto);
+        participant.setRegisteredAt(dateFormat.format(new Date()));
 
         Smp smp = smpService.getSmpByIcd(participant.getIcd());
         participant.setEndpoint(endpointService.getEndpoint(smp.getName()));
@@ -65,14 +66,7 @@ public class SmpWriteRestController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/delete-participant/{userId}/{id}")
-    public ResponseEntity<?> deleteParticipant(@PathVariable String userId, @PathVariable Long id) {
-        Participant participant = participantService.getParticipant(id);
-        if (participantService.deleteParticipantRemote(participant)) {
-            participantService.deleteParticipant(participant, userId);
-        }
-        return ResponseEntity.ok().build();
-    }
+
 
     @PostMapping("/bulk-register/{userId}")
     public ResponseEntity<?> bulkRegister(@PathVariable String userId, @RequestBody ParticipantBulkRegisterRequestDto requestDto) {
@@ -88,8 +82,8 @@ public class SmpWriteRestController {
 
         String registerDate = dateFormat.format(new Date());
         Set<Participant> participants = requestDto.getParticipants().stream().map(participantDto -> {
-            participantDto.setRegisteredAt(registerDate);
-            Participant participant = Participant.of(participantDto);
+            Participant participant = new Participant().copy(participantDto);
+            participant.setRegisteredAt(registerDate);
 
             Smp smp = smpService.getSmpByIcd(participantDto.getIcd());
             participant.setEndpoint(endpointService.getEndpoint(smp.getName()));
@@ -108,6 +102,15 @@ public class SmpWriteRestController {
             e.printStackTrace();
         }
 
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/delete-participant/{userId}/{id}")
+    public ResponseEntity<?> deleteParticipant(@PathVariable String userId, @PathVariable Long id) {
+        Participant participant = participantService.getParticipant(id);
+        if (participantService.deleteParticipantRemote(participant)) {
+            participantService.deleteParticipant(participant, userId);
+        }
         return ResponseEntity.ok().build();
     }
 }
