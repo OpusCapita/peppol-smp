@@ -57,9 +57,11 @@ public class SmpWriteRestController {
             participant.getDocumentTypes().addAll(documentTypes);
         }
 
-        if (participantService.saveParticipantRemote(participant)) {
-            participantService.saveParticipant(participant, userId);
+        if (!participantService.saveParticipantRemote(participant)) {
+            return ResponseEntity.badRequest().body("Failed to save participant");
         }
+
+        participantService.saveParticipant(participant, userId);
         return ResponseEntity.ok().build();
     }
 

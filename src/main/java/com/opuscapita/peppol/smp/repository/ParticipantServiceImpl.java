@@ -84,14 +84,16 @@ public class ParticipantServiceImpl implements ParticipantService {
 
     @Override
     public boolean saveParticipantRemote(Participant participant) {
-        return SmpName.DIFI.equals(participant.getEndpoint().getSmp().getName()) ?
-                saveDifiParticipant(participant) : saveTickstarParticipant(participant);
+        if (SmpName.DIFI.equals(participant.getEndpoint().getSmp().getName())) {
+            return saveDifiParticipant(participant);
+        }
+        return saveTickstarParticipant(participant);
     }
 
     private boolean saveDifiParticipant(Participant participant) {
         ParticipantType participantType = new DifiParticipantBuilder()
                 .setName(participant.getName())
-                .setOrganizationNumber(participant.getIcd() + ":" + participant.getIdentifier())
+                .setOrganizationNumber(participant.getIcdIdentifier())
                 .setContactName(participant.getContactName())
                 .setContactEmail(participant.getContactEmail())
                 .setContactTelephone(participant.getContactPhone())
@@ -99,13 +101,15 @@ public class ParticipantServiceImpl implements ParticipantService {
                 .addAllProfiles(participant.getDocumentTypes().stream().map(DocumentType::getExternalId).collect(Collectors.toList()))
                 .build();
 
-        AddParticipantResponse response = difiClient.addParticipant(participantType);
-        return response.getSuccess().isValue();
+        if (participant.getId() != null) {
+            return difiClient.editParticipant(participant.getIcdIdentifier(), participantType).getSuccess().isValue();
+        }
+        return difiClient.addParticipant(participantType).getSuccess().isValue();
     }
 
     private boolean saveTickstarParticipant(Participant participant) {
         TickstarParticipant addRequest = TickstarParticipant.of(participant);
-        HttpStatus responseStatus = tickstarClient.addParticipant(addRequest);
+        HttpStatus responseStatus = participant.getId() == null ? tickstarClient.addParticipant(addRequest) : tickstarClient.editParticipant(addRequest);
         return responseStatus.is2xxSuccessful();
     }
 

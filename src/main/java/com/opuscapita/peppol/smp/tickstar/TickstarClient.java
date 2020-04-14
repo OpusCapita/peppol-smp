@@ -42,9 +42,9 @@ public class TickstarClient {
         return restTemplate.exchange(getApiUrl("/participant"), HttpMethod.POST, entity, String.class).getStatusCode();
     }
 
-    public String editParticipant(TickstarParticipant request) {
+    public HttpStatus editParticipant(TickstarParticipant request) {
         HttpEntity<TickstarParticipant> entity = new HttpEntity<>(request, getCommonHeaders());
-        return exchange("/participant", HttpMethod.PUT, entity, String.class);
+        return restTemplate.exchange(getApiUrl("/participant"), HttpMethod.PUT, entity, String.class).getStatusCode();
     }
 
     public HttpStatus deleteParticipant(String icd, String identifier) {
