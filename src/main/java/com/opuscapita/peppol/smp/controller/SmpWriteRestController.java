@@ -50,7 +50,7 @@ public class SmpWriteRestController {
         Participant participant = Participant.of(participantDto);
 
         Smp smp = smpService.getSmpByIcd(participant.getIcd());
-        participant.setEndpoint(endpointService.getEndpoint(smp.getName(), participantDto.getEndpointType()));
+        participant.setEndpoint(endpointService.getEndpoint(smp.getName()));
 
         for (DocumentTypeDto documentTypeDto : participantDto.getDocumentTypes()) {
             List<DocumentType> documentTypes = documentTypeService.getDocumentTypeByInternalId(documentTypeDto.getInternalId(), smp.getName());
@@ -90,7 +90,7 @@ public class SmpWriteRestController {
             Participant participant = Participant.of(participantDto);
 
             Smp smp = smpService.getSmpByIcd(participantDto.getIcd());
-            participant.setEndpoint(endpointService.getEndpoint(smp.getName(), participantDto.getEndpointType()));
+            participant.setEndpoint(endpointService.getEndpoint(smp.getName()));
             participant.setDocumentTypes(SmpName.DIFI.equals(smp.getName()) ? difiDocumentTypes : tickstarDocumentTypes);
 
             return participant;

@@ -64,6 +64,10 @@ public class DifiClient extends WebServiceGatewaySupport {
         return elmaPort.editParticipant(editParticipantType);
     }
 
+    public DeleteParticipantResponse deleteParticipant(String icd, String identifier) {
+        return deleteParticipant(icd + ":" + identifier);
+    }
+
     public DeleteParticipantResponse deleteParticipant(String organizationNumber) {
         DeleteParticipantType deleteParticipantType = new DeleteParticipantType();
         OrganizationNumberType organizationNumberType = new OrganizationNumberType();

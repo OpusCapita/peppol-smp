@@ -8,6 +8,10 @@ import com.opuscapita.peppol.smp.repository.EndpointService;
 import com.opuscapita.peppol.smp.repository.ParticipantService;
 import com.opuscapita.peppol.smp.repository.SmpName;
 import com.opuscapita.peppol.smp.tickstar.dto.*;
+import no.difi.elma.smp.webservice.types.ContactType;
+import no.difi.elma.smp.webservice.types.OrganizationType;
+import no.difi.elma.smp.webservice.types.ParticipantType;
+import no.difi.elma.smp.webservice.types.ProfileType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,29 +74,41 @@ public class TickstarScheduler {
             TickstarParticipantIdentifier identifier = queriedParticipant.getMeta().getParticipantIdentifier();
             Participant persistedParticipant = participantService.getParticipant(identifier.getIdentifierCode(), identifier.getIdentifierValue());
             try {
-                convertParticipant(persistedParticipant, queriedParticipant, endpoint);
+                convertParticipant(identifier.getIdentifierCode(), identifier.getIdentifierValue(), persistedParticipant, queriedParticipant, endpoint);
             } catch (Exception e) {
                 logger.error("Failed to convert the participant: " + identifier.getIdentifierValue(), e);
             }
         }
     }
 
-    private void convertParticipant(Participant persistedParticipant, TickstarParticipant queriedParticipant, Endpoint endpoint) {
+    private void convertParticipant(String icd, String identifier, Participant persistedParticipant, TickstarParticipant queriedParticipant, Endpoint endpoint) {
         if (persistedParticipant == null) {
-            logger.warn("......TickstarScheduler found a new participant: " + queriedParticipant.getBusinessCard().getBusinessEntity().get(0).getNames().getName().get(0).getName() + ", saving");
+            logger.warn("......TickstarScheduler found a new participant: " + icd + ":" + identifier + ", saving");
             persistedParticipant = new Participant();
+
+        } else if (!isThereAnyUpdate(persistedParticipant, queriedParticipant, endpoint)) {
+            logger.debug("......TickstarScheduler found participant: " + icd + ":" + identifier + ", ignoring with no-change");
+            return;
         }
 
-        persistedParticipant.setName(queriedParticipant.getBusinessCard().getBusinessEntity().get(0).getNames().getName().get(0).getName());
-        persistedParticipant.setIcd(queriedParticipant.getMeta().getParticipantIdentifier().getIdentifierCode());
-        persistedParticipant.setIdentifier(queriedParticipant.getMeta().getParticipantIdentifier().getIdentifierValue());
-        persistedParticipant.setCountry(queriedParticipant.getBusinessCard().getBusinessEntity().get(0).getCountryCode());
+        logger.info("......TickstarScheduler found an update for participant: " + icd + ":" + identifier + ", saving");
+        TickstarParticipantBusinessCard businessCard = queriedParticipant.getBusinessCard() != null ? queriedParticipant.getBusinessCard() : new TickstarParticipantBusinessCard();
+        TickstarParticipantBusinessEntity businessEntity = businessCard.getBusinessEntity() != null && !businessCard.getBusinessEntity().isEmpty() ? businessCard.getBusinessEntity().get(0) : new TickstarParticipantBusinessEntity();
+        TickstarParticipantContact businessContact = businessEntity.getContacts() != null && businessEntity.getContacts().getContact() != null && !businessEntity.getContacts().getContact().isEmpty() ? businessEntity.getContacts().getContact().get(0) : new TickstarParticipantContact();
+
+        persistedParticipant.setIcd(icd);
+        persistedParticipant.setIdentifier(identifier);
+        persistedParticipant.setName(businessEntity.getNames().getName().get(0).getName());
+        persistedParticipant.setCountry(businessEntity.getCountryCode());
         persistedParticipant.setRegisteredAt(queriedParticipant.getMeta().getRegistrationDate());
+        persistedParticipant.setContactName(businessContact.getName());
+        persistedParticipant.setContactEmail(businessContact.getEmail());
+        persistedParticipant.setContactPhone(businessContact.getPhoneNumber());
 
         persistedParticipant.setEndpoint(endpoint);
         persistedParticipant.setDocumentTypes(convertDocumentTypeForParticipant(queriedParticipant, endpoint));
 
-        participantService.saveParticipant(persistedParticipant, "system");
+        participantService.saveParticipant(persistedParticipant, "System");
     }
 
     private Set<DocumentType> convertDocumentTypeForParticipant(TickstarParticipant queriedParticipant, Endpoint endpoint) {
@@ -129,5 +145,39 @@ public class TickstarScheduler {
     private boolean checkEnvironment(TickstarParticipant queriedParticipant, Endpoint endpoint) {
         TickstarParticipantAccessPointConfigurationMetadata metadata = getTickstarMetadataProfileIds(queriedParticipant, endpoint);
         return metadata.getProfileId() != null && !metadata.getProfileId().isEmpty();
+    }
+
+    private boolean isThereAnyUpdate(Participant persistedParticipant, TickstarParticipant queriedParticipant, Endpoint endpoint) {
+        TickstarParticipantBusinessCard businessCard = queriedParticipant.getBusinessCard() != null ? queriedParticipant.getBusinessCard() : new TickstarParticipantBusinessCard();
+        TickstarParticipantBusinessEntity businessEntity = businessCard.getBusinessEntity() != null && !businessCard.getBusinessEntity().isEmpty() ? businessCard.getBusinessEntity().get(0) : new TickstarParticipantBusinessEntity();
+        if (!persistedParticipant.getName().equals(businessEntity.getNames().getName().get(0).getName())) {
+            return true;
+        }
+        if (!persistedParticipant.getCountry().equals(businessEntity.getCountryCode())) {
+            return true;
+        }
+
+        TickstarParticipantContact businessContact = businessEntity.getContacts() != null && businessEntity.getContacts().getContact() != null && !businessEntity.getContacts().getContact().isEmpty() ? businessEntity.getContacts().getContact().get(0) : new TickstarParticipantContact();
+        if (businessContact.getName() != null && !businessContact.getName().equals(persistedParticipant.getContactName())) {
+            return true;
+        }
+        if (businessContact.getEmail() != null && !businessContact.getEmail().equals(persistedParticipant.getContactEmail())) {
+            return true;
+        }
+        if (businessContact.getPhoneNumber() != null && !businessContact.getPhoneNumber().equals(persistedParticipant.getContactPhone())) {
+            return true;
+        }
+
+        TickstarParticipantAccessPointConfigurationMetadata metadata = getTickstarMetadataProfileIds(queriedParticipant, endpoint);
+        if (metadata.getProfileId().size() != persistedParticipant.getDocumentTypes().size()) {
+            return true;
+        }
+        for (Integer profileId : metadata.getProfileId()) {
+            if (persistedParticipant.getDocumentTypes().stream().noneMatch(d -> d.getExternalId().equals(String.valueOf(profileId)))) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

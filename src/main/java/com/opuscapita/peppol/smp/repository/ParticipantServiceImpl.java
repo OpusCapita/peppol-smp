@@ -4,13 +4,13 @@ import com.opuscapita.peppol.smp.controller.dto.ParticipantRequestDto;
 import com.opuscapita.peppol.smp.difi.DifiClient;
 import com.opuscapita.peppol.smp.difi.dto.DifiParticipantBuilder;
 import com.opuscapita.peppol.smp.entity.DocumentType;
-import com.opuscapita.peppol.smp.entity.OperationHistory;
 import com.opuscapita.peppol.smp.entity.OperationType;
 import com.opuscapita.peppol.smp.entity.Participant;
 import com.opuscapita.peppol.smp.tickstar.TickstarClient;
 import com.opuscapita.peppol.smp.tickstar.dto.TickstarParticipant;
+import no.difi.elma.smp.webservice.responses.AddParticipantResponse;
+import no.difi.elma.smp.webservice.responses.DeleteParticipantResponse;
 import no.difi.elma.smp.webservice.types.ParticipantType;
-import no.difi.elma.smp.webservice.responses.*;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -91,7 +91,7 @@ public class ParticipantServiceImpl implements ParticipantService {
     private boolean saveDifiParticipant(Participant participant) {
         ParticipantType participantType = new DifiParticipantBuilder()
                 .setName(participant.getName())
-                .setOrganizationNumber(participant.getIcd() + ":" +participant.getIdentifier())
+                .setOrganizationNumber(participant.getIcd() + ":" + participant.getIdentifier())
                 .setContactName(participant.getContactName())
                 .setContactEmail(participant.getContactEmail())
                 .setContactTelephone(participant.getContactPhone())
@@ -116,7 +116,7 @@ public class ParticipantServiceImpl implements ParticipantService {
     }
 
     private boolean deleteDifiParticipant(Participant participant) {
-        DeleteParticipantResponse response = difiClient.deleteParticipant(participant.getIdentifier());
+        DeleteParticipantResponse response = difiClient.deleteParticipant(participant.getIcdIdentifier());
         return response.getSuccess().isValue();
     }
 

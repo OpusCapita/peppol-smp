@@ -184,41 +184,6 @@ class CreateParticipant extends Components.ContextComponent {
                 <div className="form-horizontal participant-form">
                     <div className="row">
                         <div className="col-md-12">
-                            {
-                                editMode &&
-                                <div className="form-group">
-                                    <div className="col-sm-3">
-                                        <label className="control-label btn-link">Target Environment</label>
-                                    </div>
-                                    <div className="offset-md-1 col-md-8">
-                                        {participant.endpointType}
-                                    </div>
-                                </div>
-                            }
-                            {
-                                !editMode &&
-                                <div className="form-group">
-                                    <div className="col-sm-3">
-                                        <label className="control-label btn-link">Target Environment</label>
-                                    </div>
-                                    <div className="offset-md-1 col-md-4">
-                                        <label className="container">TEST
-                                            <input type="radio" name="environment" value="TEST"
-                                                   checked={participant.endpointType === "TEST"}
-                                                   onChange={e => this.handleFormChange('endpointType', e.target.value)}/>
-                                            <span className="radiomark"/>
-                                        </label>
-                                    </div>
-                                    <div className="offset-md-1 col-md-4">
-                                        <label className="container">PROD
-                                            <input type="radio" name="environment" value="PROD"
-                                                   checked={participant.endpointType === "PROD"}
-                                                   onChange={e => this.handleFormChange('endpointType', e.target.value)}/>
-                                            <span className="radiomark"/>
-                                        </label>
-                                    </div>
-                                </div>
-                            }
                             <div className="form-group">
                                 <div className="col-sm-3">
                                     <label className="control-label btn-link">Organization Identifier</label>
