@@ -4,13 +4,13 @@ import com.opuscapita.peppol.smp.controller.dto.ParticipantRequestDto;
 import com.opuscapita.peppol.smp.difi.DifiClient;
 import com.opuscapita.peppol.smp.difi.dto.DifiParticipantBuilder;
 import com.opuscapita.peppol.smp.entity.DocumentType;
-import com.opuscapita.peppol.smp.entity.OperationHistory;
 import com.opuscapita.peppol.smp.entity.OperationType;
 import com.opuscapita.peppol.smp.entity.Participant;
 import com.opuscapita.peppol.smp.tickstar.TickstarClient;
 import com.opuscapita.peppol.smp.tickstar.dto.TickstarParticipant;
+import no.difi.elma.smp.webservice.responses.AddParticipantResponse;
+import no.difi.elma.smp.webservice.responses.DeleteParticipantResponse;
 import no.difi.elma.smp.webservice.types.ParticipantType;
-import no.difi.elma.smp.webservice.responses.*;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -84,14 +84,16 @@ public class ParticipantServiceImpl implements ParticipantService {
 
     @Override
     public boolean saveParticipantRemote(Participant participant) {
-        return SmpName.DIFI.equals(participant.getEndpoint().getSmp().getName()) ?
-                saveDifiParticipant(participant) : saveTickstarParticipant(participant);
+        if (SmpName.DIFI.equals(participant.getEndpoint().getSmp().getName())) {
+            return saveDifiParticipant(participant);
+        }
+        return saveTickstarParticipant(participant);
     }
 
     private boolean saveDifiParticipant(Participant participant) {
         ParticipantType participantType = new DifiParticipantBuilder()
                 .setName(participant.getName())
-                .setOrganizationNumber(participant.getIcd() + ":" +participant.getIdentifier())
+                .setOrganizationNumber(participant.getIcdIdentifier())
                 .setContactName(participant.getContactName())
                 .setContactEmail(participant.getContactEmail())
                 .setContactTelephone(participant.getContactPhone())
@@ -99,13 +101,15 @@ public class ParticipantServiceImpl implements ParticipantService {
                 .addAllProfiles(participant.getDocumentTypes().stream().map(DocumentType::getExternalId).collect(Collectors.toList()))
                 .build();
 
-        AddParticipantResponse response = difiClient.addParticipant(participantType);
-        return response.getSuccess().isValue();
+        if (participant.getId() != null) {
+            return difiClient.editParticipant(participant.getIcdIdentifier(), participantType).getSuccess().isValue();
+        }
+        return difiClient.addParticipant(participantType).getSuccess().isValue();
     }
 
     private boolean saveTickstarParticipant(Participant participant) {
         TickstarParticipant addRequest = TickstarParticipant.of(participant);
-        HttpStatus responseStatus = tickstarClient.addParticipant(addRequest);
+        HttpStatus responseStatus = participant.getId() == null ? tickstarClient.addParticipant(addRequest) : tickstarClient.editParticipant(addRequest);
         return responseStatus.is2xxSuccessful();
     }
 
@@ -116,7 +120,7 @@ public class ParticipantServiceImpl implements ParticipantService {
     }
 
     private boolean deleteDifiParticipant(Participant participant) {
-        DeleteParticipantResponse response = difiClient.deleteParticipant(participant.getIdentifier());
+        DeleteParticipantResponse response = difiClient.deleteParticipant(participant.getIcdIdentifier());
         return response.getSuccess().isValue();
     }
 

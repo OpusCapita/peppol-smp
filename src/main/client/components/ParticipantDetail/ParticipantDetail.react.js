@@ -38,19 +38,34 @@ class ParticipantDetail extends Components.ContextComponent {
 
     deleteParticipant(e) {
         e && e.preventDefault();
-        this.setState({loading: true});
+        const {userData, router, showNotification, showModalDialog, hideModalDialog, showSpinner, hideSpinner} = this.context;
 
-        this.api.deleteParticipant(this.state.participant.id, this.context.userData.id).then(() => {
-            this.context.showNotification('The participant is deleted successfully', 'success', 10);
+        const onConfirmationClick = (btn) => {
+            hideModalDialog();
 
-        }).catch(e => {
-            this.context.showNotification(e.message, 'error', 10);
+            if (btn === 'yes') {
+                showSpinner();
 
-        }).finally(() => {
-            this.setState({loading: false});
-            this.context.router.push('/peppol-smp');
-        });
+                setTimeout(() => {
+                    this.api.deleteParticipant(this.state.participant.id, userData.id).then(() => {
+                        showNotification('The participant is deleted successfully', 'info', 3);
+                    }).catch(e => {
+                        showNotification(e.message, 'error', 10);
+                    }).finally(() => {
+                        hideSpinner();
+                        router.push('/peppol-smp');
+                    });
+                }, 500);
+            }
+        };
+
+        const modalTitle = "Delete";
+        const modalText = `Are you sure?`;
+        const modalButtons = {no: 'No', yes: 'Yes'};
+        showModalDialog(modalTitle, modalText, onConfirmationClick, modalButtons);
     }
+
+
 
     editParticipant(e) {
         e && e.preventDefault();
@@ -66,6 +81,10 @@ class ParticipantDetail extends Components.ContextComponent {
             }
             return ext;
         });
+    }
+
+    getRegisteredAt(participant) {
+        return participant.smpName === "TICKSTAR" ? this.context.i18n.formatDateTime(participant.registeredAt) : participant.registeredAt;
     }
 
     render() {
@@ -116,7 +135,7 @@ class ParticipantDetail extends Components.ContextComponent {
                                 </div>
                                 <div className="offset-md-1 col-md-8">
                                     <label
-                                        className="control-label">{participant.smpName}-{participant.endpointType} {`at ${i18n.formatDateTime(participant.registeredAt)}`}</label>
+                                        className="control-label">{participant.smpName}-{participant.endpointType} at {this.getRegisteredAt(participant)}</label>
                                 </div>
                             </div>
                         </div>

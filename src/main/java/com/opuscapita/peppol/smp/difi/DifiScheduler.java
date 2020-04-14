@@ -89,8 +89,13 @@ public class DifiScheduler {
         if (persistedParticipant == null) {
             logger.warn("......DifiScheduler found a new participant: " + icd + ":" + identifier + ", saving");
             persistedParticipant = new Participant();
+
+        } else if (!isThereAnyUpdate(persistedParticipant, queriedParticipant)) {
+            logger.debug("......DifiScheduler found participant: " + icd + ":" + identifier + ", ignoring with no-change");
+            return;
         }
 
+        logger.info("......DifiScheduler found an update for participant: " + icd + ":" + identifier + ", saving");
         OrganizationType organization = queriedParticipant.getOrganization();
         persistedParticipant.setName(organization.getName().getValue());
         persistedParticipant.setCountry("NO");
@@ -107,7 +112,7 @@ public class DifiScheduler {
         persistedParticipant.setEndpoint(endpoint);
         persistedParticipant.setDocumentTypes(convertDocumentTypeForParticipant(queriedParticipant, endpoint));
 
-        participantService.saveParticipant(persistedParticipant, "system");
+        participantService.saveParticipant(persistedParticipant, "System");
     }
 
     private Set<DocumentType> convertDocumentTypeForParticipant(ParticipantType queriedParticipant, Endpoint endpoint) {
@@ -127,5 +132,34 @@ public class DifiScheduler {
         newDocumentType.setName(queriedDocumentType.getDescription().getValue());
 
         documentTypeService.saveDocumentType(newDocumentType, endpoint.getSmp());
+    }
+
+    private boolean isThereAnyUpdate(Participant persistedParticipant, ParticipantType queriedParticipant) {
+        OrganizationType organization = queriedParticipant.getOrganization();
+        if (!persistedParticipant.getName().equals(organization.getName().getValue())) {
+            return true;
+        }
+
+        ContactType contact = organization.getContact();
+        if (contact != null && contact.getName() != null && contact.getName().getValue() != null && !contact.getName().getValue().equals(persistedParticipant.getContactName())) {
+            return true;
+        }
+        if (contact != null && contact.getEmail() != null && contact.getEmail().getValue() != null && !contact.getEmail().getValue().equals(persistedParticipant.getContactEmail())) {
+            return true;
+        }
+        if (contact != null && contact.getTelephone() != null && contact.getTelephone().getValue() != null && !contact.getTelephone().getValue().equals(persistedParticipant.getContactPhone())) {
+            return true;
+        }
+
+        if (queriedParticipant.getProfiles().size() != persistedParticipant.getDocumentTypes().size()) {
+            return true;
+        }
+        for (ProfileType profileType : queriedParticipant.getProfiles()) {
+            if (persistedParticipant.getDocumentTypes().stream().noneMatch(d -> d.getExternalId().equals(profileType.getValue()))) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

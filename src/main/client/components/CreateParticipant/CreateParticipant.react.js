@@ -9,7 +9,6 @@ class CreateParticipant extends Components.ContextComponent {
 
     state = {
         participant: {
-            endpointType: "TEST",
             documentTypes: []
         },
         documentTypes: [],
@@ -32,8 +31,8 @@ class CreateParticipant extends Components.ContextComponent {
     }
 
     async componentDidMount() {
-        await this.fetchParticipantToEdit();
         await this.fetchDocumentTypesFromValidator();
+        await this.fetchParticipantToEdit();
     }
 
     async fetchParticipantToEdit() {
@@ -65,12 +64,6 @@ class CreateParticipant extends Components.ContextComponent {
                 d.value = d.id;
                 d.label = "[" + d.id + "] " + d.description;
             });
-
-            if (this.state.editMode) {
-                const participant = this.state;
-                participant.documentTypes = participant.documentTypes.map(d => filteredDocumentTypes.find(i => i.id === d.internalId)).filter(d => !!d);
-                this.setState({participant});
-            }
 
             this.setState({documentTypes: filteredDocumentTypes});
         } catch (e) {
@@ -146,7 +139,7 @@ class CreateParticipant extends Components.ContextComponent {
     }
 
     handleReset() {
-        this.setState({participant: {endpointType: this.state.participant.endpointType, documentTypes: []}});
+        this.setState({participant: {documentTypes: []}});
     }
 
     handleCancel(event) {
@@ -155,7 +148,8 @@ class CreateParticipant extends Components.ContextComponent {
     }
 
     handleSubmit(event) {
-        this.context.showSpinner();
+        event && event.preventDefault();
+        const {userData, router, showNotification, showSpinner, hideSpinner} = this.context;
 
         const {participant} = this.state;
         participant.icd = participant.icd.value;
@@ -166,13 +160,14 @@ class CreateParticipant extends Components.ContextComponent {
             return temp;
         });
 
-        this.api.addParticipant(participant, this.context.userData.id).then(response => {
-            this.handleReset();
-            this.context.showNotification('The participant is registered successfully', 'success', 10);
+        showSpinner();
+        this.api.addParticipant(participant, userData.id).then(() => {
+            hideSpinner();
+            showNotification(`The participant is ${this.state.editMode ? 'updated' : 'registered'} successfully`, 'success', 10);
+            router.push(`/peppol-smp`);
         }).catch(e => {
-            this.context.showNotification(e.message, 'error', 10);
-        }).finally(() => {
-            this.context.hideSpinner();
+            hideSpinner();
+            showNotification(e.message, 'error', 10);
         });
     }
 
@@ -184,41 +179,6 @@ class CreateParticipant extends Components.ContextComponent {
                 <div className="form-horizontal participant-form">
                     <div className="row">
                         <div className="col-md-12">
-                            {
-                                editMode &&
-                                <div className="form-group">
-                                    <div className="col-sm-3">
-                                        <label className="control-label btn-link">Target Environment</label>
-                                    </div>
-                                    <div className="offset-md-1 col-md-8">
-                                        {participant.endpointType}
-                                    </div>
-                                </div>
-                            }
-                            {
-                                !editMode &&
-                                <div className="form-group">
-                                    <div className="col-sm-3">
-                                        <label className="control-label btn-link">Target Environment</label>
-                                    </div>
-                                    <div className="offset-md-1 col-md-4">
-                                        <label className="container">TEST
-                                            <input type="radio" name="environment" value="TEST"
-                                                   checked={participant.endpointType === "TEST"}
-                                                   onChange={e => this.handleFormChange('endpointType', e.target.value)}/>
-                                            <span className="radiomark"/>
-                                        </label>
-                                    </div>
-                                    <div className="offset-md-1 col-md-4">
-                                        <label className="container">PROD
-                                            <input type="radio" name="environment" value="PROD"
-                                                   checked={participant.endpointType === "PROD"}
-                                                   onChange={e => this.handleFormChange('endpointType', e.target.value)}/>
-                                            <span className="radiomark"/>
-                                        </label>
-                                    </div>
-                                </div>
-                            }
                             <div className="form-group">
                                 <div className="col-sm-3">
                                     <label className="control-label btn-link">Organization Identifier</label>

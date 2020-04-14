@@ -15,6 +15,7 @@ import no.difi.elma.smp.webservice.types.OrganizationNumberType;
 import no.difi.elma.smp.webservice.types.ParticipantType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 import java.nio.charset.StandardCharsets;
@@ -133,9 +134,9 @@ public class SmpStandaloneTask implements CommandLineRunner {
         }
 
         apConfig.getMetadataProfileIds().getProfileId().addAll(missingProfiles);
-        String result = tickstarClient.editParticipant(participant);
+        HttpStatus responseStatus = tickstarClient.editParticipant(participant);
 
         System.out.println("Running for " + identifier);
-        logs.add("Running for " + identifier + ", adding missing profiles [" + missingProfiles.stream().map(Object::toString).collect(Collectors.joining(", ")) + "], result: " + result);
+        logs.add("Running for " + identifier + ", adding missing profiles [" + missingProfiles.stream().map(Object::toString).collect(Collectors.joining(", ")) + "], result: " + responseStatus);
     }
 }

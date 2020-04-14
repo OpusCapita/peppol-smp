@@ -13,8 +13,8 @@ public class EndpointServiceImpl implements EndpointService {
 
     private static final Logger logger = LoggerFactory.getLogger(EndpointServiceImpl.class);
 
-    @Value("${type:prod}")
-    private String type;
+    @Value("${mode:'prod'}")
+    private String mode;
 
     private final SmpService smpService;
     private final EndpointType defaultType;
@@ -25,9 +25,9 @@ public class EndpointServiceImpl implements EndpointService {
         this.smpService = smpService;
         this.repository = repository;
         this.defaultType = EndpointType.PROD;
-//        this.defaultType = (type == "prod") ? EndpointType.PROD : EndpointType.TEST;
+//        this.defaultType = (mode == "prod") ? EndpointType.PROD : EndpointType.TEST;
 
-        logger.info("EndpointService started, mode: " + (type == null ? "null" : type));
+        logger.info("EndpointService started, mode: " + defaultType);
     }
 
     @Override
