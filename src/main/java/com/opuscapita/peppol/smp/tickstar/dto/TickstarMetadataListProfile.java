@@ -4,7 +4,6 @@ public class TickstarMetadataListProfile {
 
     private String commonName;
     private Integer profileId;
-    private TickstarMetadataListConstraints constraints;
     private TickstarMetadataListProcessIdentifier processIdentifier;
     private TickstarMetadataListDocumentIdentifier documentIdentifier;
 
@@ -22,14 +21,6 @@ public class TickstarMetadataListProfile {
 
     public void setProfileId(Integer profileId) {
         this.profileId = profileId;
-    }
-
-    public TickstarMetadataListConstraints getConstraints() {
-        return constraints;
-    }
-
-    public void setConstraints(TickstarMetadataListConstraints constraints) {
-        this.constraints = constraints;
     }
 
     public TickstarMetadataListProcessIdentifier getProcessIdentifier() {

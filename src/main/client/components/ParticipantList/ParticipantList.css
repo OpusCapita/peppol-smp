@@ -1,0 +1,63 @@
+.participant-add-btn {
+    width: 16%;
+    float: right;
+    margin-right: 10px;
+}
+
+.participant-search .react-select {
+    min-width: 150px;
+    vertical-align: middle;
+}
+
+.form-submit {
+    overflow: inherit;
+}
+
+.form-submit .btn.float-left {
+    float: left;
+}
+
+.form-submit .btn-group.float-left {
+    float: left;
+}
+
+.form-submit .btn-group .dropdown-item {
+    display: block;
+    font-size: 16px;
+    padding: 5px 10px;
+}
+
+.participant-list-table .label + .label {
+    margin-left: 3px;
+}
+
+.participant-list-table .rt-td {
+    display: flex;
+    align-items: center;
+}
+
+.participant-list-table .well {
+    margin: 0;
+    padding: 5px;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+}
+
+.participant-list-table .detail-link {
+    padding: 0;
+    margin: 0 auto;
+}
+
+.participant-list-table .detail-link .glyphicon {
+    font-size: 20px;
+}
+
+.participant-list-table .sticky {
+    pointer-events: auto !important;
+}
+
+.participant-list-table .sticky:hover {
+    visibility: visible !important;
+    opacity: 1 !important;
+}

@@ -4,13 +4,13 @@ import java.util.List;
 
 public class TickstarMetadataListResponse {
 
-    private List<TickstarMetadataListProfile> MetadataProfile;
+    private List<TickstarMetadataListProfile> metadataProfile;
 
     public List<TickstarMetadataListProfile> getMetadataProfile() {
-        return MetadataProfile;
+        return metadataProfile;
     }
 
     public void setMetadataProfile(List<TickstarMetadataListProfile> metadataProfile) {
-        MetadataProfile = metadataProfile;
+        this.metadataProfile = metadataProfile;
     }
 }

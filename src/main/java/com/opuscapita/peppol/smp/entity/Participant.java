@@ -1,20 +1,18 @@
 package com.opuscapita.peppol.smp.entity;
 
+import com.opuscapita.peppol.smp.controller.dto.ParticipantDto;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
 @DynamicUpdate
-@Table(name = "participants", indexes = {
-        @Index(name = "ix_icd", columnList = "icd"),
-        @Index(name = "ix_name", columnList = "name"),
-        @Index(name = "ix_identifier", columnList = "identifier")
-})
+@Table(name = "participants")
 public class Participant {
 
     @Id
@@ -25,23 +23,26 @@ public class Participant {
     @Column(name = "name", nullable = false)
     private String name;
 
-    @Column(name = "icd", nullable = false, length = 10)
+    @Column(name = "icd", nullable = false, length = 20)
     private String icd;
 
-    @Column(name = "identifier", nullable = false, length = 20)
+    @Column(name = "identifier", nullable = false, length = 50)
     private String identifier;
 
     @Column(name = "country", length = 5)
     private String country;
 
-    @Column(name = "contact_info")
-    private String contactInfo;
+    @Column(name = "contact_name")
+    private String contactName;
+
+    @Column(name = "contact_email")
+    private String contactEmail;
+
+    @Column(name = "contact_phone")
+    private String contactPhone;
 
     @Column(name = "registered_at")
     private String registeredAt;
-
-    @Version
-    private Integer version;
 
     @ManyToMany
     @JoinTable(name = "participant_document_type",
@@ -53,6 +54,9 @@ public class Participant {
     @JoinColumn(name = "endpoint_id", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Endpoint endpoint;
+
+    @Version
+    private Integer version;
 
     public Participant() {
         this.documentTypes = new HashSet<>();
@@ -90,6 +94,10 @@ public class Participant {
         this.identifier = identifier;
     }
 
+    public String getIcdIdentifier() {
+        return this.icd + ":" + this.identifier;
+    }
+
     public String getCountry() {
         return country;
     }
@@ -98,12 +106,28 @@ public class Participant {
         this.country = country;
     }
 
-    public String getContactInfo() {
-        return contactInfo;
+    public String getContactName() {
+        return contactName;
     }
 
-    public void setContactInfo(String contactInfo) {
-        this.contactInfo = contactInfo;
+    public void setContactName(String contactName) {
+        this.contactName = contactName;
+    }
+
+    public String getContactEmail() {
+        return contactEmail;
+    }
+
+    public void setContactEmail(String contactEmail) {
+        this.contactEmail = contactEmail;
+    }
+
+    public String getContactPhone() {
+        return contactPhone;
+    }
+
+    public void setContactPhone(String contactPhone) {
+        this.contactPhone = contactPhone;
     }
 
     public String getRegisteredAt() {
@@ -112,14 +136,6 @@ public class Participant {
 
     public void setRegisteredAt(String registeredAt) {
         this.registeredAt = registeredAt;
-    }
-
-    public Integer getVersion() {
-        return version;
-    }
-
-    public void setVersion(Integer version) {
-        this.version = version;
     }
 
     public Set<DocumentType> getDocumentTypes() {
@@ -136,5 +152,30 @@ public class Participant {
 
     public void setEndpoint(Endpoint endpoint) {
         this.endpoint = endpoint;
+    }
+
+    public Participant copy(ParticipantDto participantDto) {
+        setIcd(participantDto.getIcd());
+        setName(participantDto.getName());
+        setIdentifier(participantDto.getIdentifier());
+        setCountry(participantDto.getCountry());
+        setContactName(participantDto.getContactName());
+        setContactEmail(participantDto.getContactEmail());
+        setContactPhone(participantDto.getContactPhone());
+
+        return this;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Participant that = (Participant) o;
+        return icd.equals(that.icd) && identifier.equals(that.identifier);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(icd, identifier);
     }
 }

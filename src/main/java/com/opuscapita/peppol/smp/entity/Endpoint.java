@@ -1,5 +1,6 @@
 package com.opuscapita.peppol.smp.entity;
 
+import com.opuscapita.peppol.smp.repository.EndpointType;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -12,12 +13,12 @@ import javax.persistence.*;
 public class Endpoint {
 
     @Id
-    @GeneratedValue
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "endpoint_id")
-    private int endpointId;
+    @Column(name = "type", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private EndpointType type;
 
     @Column(name = "name", nullable = false)
     private String name;
@@ -35,12 +36,12 @@ public class Endpoint {
         this.id = id;
     }
 
-    public int getEndpointId() {
-        return endpointId;
+    public EndpointType getType() {
+        return type;
     }
 
-    public void setEndpointId(int endpointId) {
-        this.endpointId = endpointId;
+    public void setType(EndpointType type) {
+        this.type = type;
     }
 
     public String getName() {

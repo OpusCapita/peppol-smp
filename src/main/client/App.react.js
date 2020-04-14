@@ -1,25 +1,71 @@
 import React from 'react';
-import {Containers} from '@opuscapita/service-base-ui';
-import PeppolSmp from './components/PeppolSmp';
-
 import {Route} from 'react-router';
-
-const menuButton = (router) => (
-    <div className="footer-wrapper">
-        <a className='btn btn-default' href="#" onClick={() => router.push('/peppol-smp/')}>
-            <span className="icon glyphicon glyphicon-chevron-left"/> Go to Menu
-        </a>
-    </div>
-);
+import {ApiBase} from './api';
+import {Provider} from './api/DocumentTypes';
+import {Containers} from '@opuscapita/service-base-ui';
+import BulkRegister from "./components/BulkRegister";
+import ParticipantList from './components/ParticipantList';
+import OperationHistory from "./components/OperationHistory";
+import ParticipantDetail from "./components/ParticipantDetail";
+import CreateParticipant from './components/CreateParticipant';
 
 const home = (props) => (
-    <PeppolSmp/>
+    <ParticipantList/>
 );
 
-const App = () => (
-    <Containers.ServiceLayout serviceName="peppol-smp">
-        <Route path="/" component={home}/>
-    </Containers.ServiceLayout>
+const create = (props) => (
+    <CreateParticipant/>
 );
+
+const edit = (props) => (
+    <CreateParticipant id={props.params.id}/>
+);
+
+const bulkRegister = (props) => (
+    <BulkRegister/>
+);
+
+const operationHistory = (props) => (
+    <OperationHistory/>
+);
+
+const detail = (props) => (
+    <ParticipantDetail icd={props.params.icd} identifier={props.params.identifier}/>
+);
+
+class App extends React.Component {
+
+    state = {
+        documentTypes: [],
+    };
+
+    constructor(props) {
+        super(props);
+        this.api = new ApiBase();
+    }
+
+    componentDidMount() {
+        this.api.getDocumentTypes().then(documentTypes => {
+            this.setState({documentTypes: documentTypes});
+        }).catch(e => {
+            this.context.showNotification(e.message, 'error', 10);
+        });
+    }
+
+    render() {
+        return (
+            <Provider value={this.state}>
+                <Containers.ServiceLayout serviceName="peppol-smp">
+                    <Route path="/" component={home}/>
+                    <Route path="/create" component={create}/>
+                    <Route path="/edit/:id" component={edit}/>
+                    <Route path="/bulkRegister" component={bulkRegister}/>
+                    <Route path="/detail/:icd/:identifier" component={detail}/>
+                    <Route path="/operationHistory" component={operationHistory}/>
+                </Containers.ServiceLayout>
+            </Provider>
+        );
+    }
+}
 
 export default App;

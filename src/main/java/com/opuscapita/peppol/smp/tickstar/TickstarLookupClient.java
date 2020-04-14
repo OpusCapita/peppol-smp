@@ -14,7 +14,7 @@ import org.springframework.web.client.RestTemplate;
 @Component
 public class TickstarLookupClient {
 
-    @Value("${tickstar.token:secret}")
+    @Value("${apis.tickstar.token:secret}")
     private String token;
 
     private final RestTemplate restTemplate;

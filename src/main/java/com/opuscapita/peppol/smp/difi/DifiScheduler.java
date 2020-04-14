@@ -3,14 +3,14 @@ package com.opuscapita.peppol.smp.difi;
 import com.opuscapita.peppol.smp.entity.DocumentType;
 import com.opuscapita.peppol.smp.entity.Endpoint;
 import com.opuscapita.peppol.smp.entity.Participant;
-import com.opuscapita.peppol.smp.entity.Smp;
-import com.opuscapita.peppol.smp.repository.*;
+import com.opuscapita.peppol.smp.repository.DocumentTypeService;
+import com.opuscapita.peppol.smp.repository.EndpointService;
+import com.opuscapita.peppol.smp.repository.ParticipantService;
+import com.opuscapita.peppol.smp.repository.SmpName;
 import no.difi.elma.smp.webservice.responses.GetAllParticipantsResponse;
 import no.difi.elma.smp.webservice.responses.GetParticipantResponse;
 import no.difi.elma.smp.webservice.responses.ProfilesSupportedResponse;
-import no.difi.elma.smp.webservice.types.CenbiiProfileType;
-import no.difi.elma.smp.webservice.types.OrganizationNumberType;
-import no.difi.elma.smp.webservice.types.ProfileType;
+import no.difi.elma.smp.webservice.types.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,8 +18,9 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Component
 @EnableScheduling
@@ -27,21 +28,16 @@ public class DifiScheduler {
 
     private static final Logger logger = LoggerFactory.getLogger(DifiScheduler.class);
 
-    private static final String ICD_9908 = "9908";
-    private static final String ICD_0192 = "0192";
-
     private DifiClient client;
-    private SmpRepository smpRepository;
-    private EndpointRepository endpointRepository;
+    private EndpointService endpointService;
     private ParticipantService participantService;
     private DocumentTypeService documentTypeService;
 
     @Autowired
-    public DifiScheduler(DifiClient client, SmpRepository smpRepository, EndpointRepository endpointRepository,
+    public DifiScheduler(DifiClient client, EndpointService endpointService,
                          ParticipantService participantService, DocumentTypeService documentTypeService) {
         this.client = client;
-        this.smpRepository = smpRepository;
-        this.endpointRepository = endpointRepository;
+        this.endpointService = endpointService;
         this.participantService = participantService;
         this.documentTypeService = documentTypeService;
     }
@@ -49,69 +45,121 @@ public class DifiScheduler {
     @Scheduled(cron = "0 0 0 * * *")
     public void updateLocalDatabase() {
         logger.info("DifiScheduler started!");
+        Endpoint endpoint = endpointService.getEndpoint(SmpName.DIFI);
 
-        Smp smp = smpRepository.findByName(SmpName.DIFI.name());
-        updateDocumentTypes(smp);
-        updateParticipants(smp);
+        updateDocumentTypes(endpoint);
+        updateParticipants(endpoint);
     }
 
-    private void updateDocumentTypes(Smp smp) {
-        logger.info("DifiScheduler updating document types...");
+    private void updateDocumentTypes(Endpoint endpoint) {
+        logger.info("...DifiScheduler updating document types");
+
         ProfilesSupportedResponse response = client.getSupportedProfiles();
-
-        int id = 0;
-        for (CenbiiProfileType difiMetadata : response.getCenbiiProfiles()) {
-            DocumentType documentType = documentTypeService.getDocumentType(difiMetadata.getName().getValue(), smp);
-            updateDocumentType(documentType, difiMetadata, smp, id++);
+        for (CenbiiProfileType queriedDocumentType : response.getCenbiiProfiles()) {
+            DocumentType persistedDocumentType = documentTypeService.getDocumentType(queriedDocumentType.getName().getValue(), SmpName.DIFI);
+            convertDocumentType(persistedDocumentType, queriedDocumentType, endpoint);
         }
     }
 
-    private void updateDocumentType(DocumentType documentType, CenbiiProfileType difiMetadata, Smp smp, int id) {
-        if (documentType == null) {
-            documentType = new DocumentType();
-        }
-        documentType.setDocumentTypeId(id);
-        documentType.setName(difiMetadata.getName().getValue());
-        documentType.setSmp(smp);
+    private void updateParticipants(Endpoint endpoint) {
+        logger.info("...DifiScheduler updating participants");
 
-        documentTypeService.saveDocumentType(documentType);
-    }
-
-    private void updateParticipants(Smp smp) {
-        logger.info("DifiScheduler updating participants...");
         GetAllParticipantsResponse response = client.getAllParticipants();
         for (OrganizationNumberType difiParticipantIdentifier : response.getOrganizationNumber()) {
-            GetParticipantResponse difiParticipant = client.getParticipant(difiParticipantIdentifier.getValue());
-            Participant participant = participantService.getParticipant(ICD_9908, difiParticipantIdentifier.getValue());
-            updateParticipant(participant, difiParticipant, smp);
+            String identifier = difiParticipantIdentifier.getValue();
+            for (String icd : DifiClient.getDifiIcd()) {
+                GetParticipantResponse getResponse = client.getParticipant(icd + ":" + identifier);
+
+                if (getResponse == null || getResponse.getParticipant() == null || getResponse.getParticipant().getOrganization() == null ||
+                        getResponse.getParticipant().getOrganization().getName() == null) {
+                    return;
+                }
+
+                Participant persistedParticipant = participantService.getParticipant(icd, identifier);
+                try {
+                    convertParticipant(icd, identifier, persistedParticipant, getResponse.getParticipant(), endpoint);
+                } catch (Exception e) {
+                    logger.error("Failed to convert the participant: " + icd + ":" + identifier, e);
+                }
+            }
         }
     }
 
-    private void updateParticipant(Participant participant, GetParticipantResponse difiParticipant, Smp smp) {
-        if (participant == null) {
-            participant = new Participant();
+    private void convertParticipant(String icd, String identifier, Participant persistedParticipant, ParticipantType queriedParticipant, Endpoint endpoint) {
+        if (persistedParticipant == null) {
+            logger.warn("......DifiScheduler found a new participant: " + icd + ":" + identifier + ", saving");
+            persistedParticipant = new Participant();
+
+        } else if (!isThereAnyUpdate(persistedParticipant, queriedParticipant)) {
+            logger.debug("......DifiScheduler found participant: " + icd + ":" + identifier + ", ignoring with no-change");
+            return;
         }
-        participant.setName(difiParticipant.getParticipant().getOrganization().getName().getValue());
-        participant.setCountry("NO");
-        participant.setIcd(ICD_9908);
-        participant.setIdentifier(difiParticipant.getParticipant().getOrganization().getOrganizationNumber().getValue());
-        participant.setContactInfo(difiParticipant.getParticipant().getOrganization().getContact().getName().getValue());
 
-        participant.setEndpoint(updateEndpoint(smp));
-        participant.setDocumentTypes(getDocumentTypes(difiParticipant, smp));
+        logger.info("......DifiScheduler found an update for participant: " + icd + ":" + identifier + ", saving");
+        OrganizationType organization = queriedParticipant.getOrganization();
+        persistedParticipant.setName(organization.getName().getValue());
+        persistedParticipant.setCountry("NO");
+        persistedParticipant.setIcd(icd);
+        persistedParticipant.setIdentifier(identifier);
 
-        participantService.saveParticipant(participant);
+        ContactType contact = organization.getContact();
+        if (contact != null) {
+            persistedParticipant.setContactName(contact.getName() != null ? contact.getName().getValue() : null);
+            persistedParticipant.setContactEmail(contact.getEmail() != null ? contact.getEmail().getValue() : null);
+            persistedParticipant.setContactPhone(contact.getTelephone() != null ? contact.getTelephone().getValue() : null);
+        }
+
+        persistedParticipant.setEndpoint(endpoint);
+        persistedParticipant.setDocumentTypes(convertDocumentTypeForParticipant(queriedParticipant, endpoint));
+
+        participantService.saveParticipant(persistedParticipant, "System");
     }
 
-    private Set<DocumentType> getDocumentTypes(GetParticipantResponse difiParticipant, Smp smp) {
-        Set<DocumentType> documentTypes = new HashSet<>();
-        for (ProfileType profileType : difiParticipant.getParticipant().getProfiles()) {
-            documentTypes.add(documentTypeService.getDocumentType(profileType.getValue(), smp));
-        }
-        return documentTypes;
+    private Set<DocumentType> convertDocumentTypeForParticipant(ParticipantType queriedParticipant, Endpoint endpoint) {
+        return queriedParticipant.getProfiles().stream()
+                .map(profile -> documentTypeService.getDocumentType(profile.getValue(), endpoint.getSmp()))
+                .filter(Objects::nonNull).collect(Collectors.toSet());
     }
 
-    private Endpoint updateEndpoint(Smp smp) {
-        return endpointRepository.findBySmp(smp).stream().findFirst().orElse(null);
+    private void convertDocumentType(DocumentType persistedDocumentType, CenbiiProfileType queriedDocumentType, Endpoint endpoint) {
+        if (persistedDocumentType != null) {
+            return;
+        }
+
+        logger.warn("......DifiScheduler found a new document type: " + queriedDocumentType.getDescription().getValue() + ", saving");
+        DocumentType newDocumentType = new DocumentType();
+        newDocumentType.setExternalId(queriedDocumentType.getName().getValue());
+        newDocumentType.setName(queriedDocumentType.getDescription().getValue());
+
+        documentTypeService.saveDocumentType(newDocumentType, endpoint.getSmp());
+    }
+
+    private boolean isThereAnyUpdate(Participant persistedParticipant, ParticipantType queriedParticipant) {
+        OrganizationType organization = queriedParticipant.getOrganization();
+        if (!persistedParticipant.getName().equals(organization.getName().getValue())) {
+            return true;
+        }
+
+        ContactType contact = organization.getContact();
+        if (contact != null && contact.getName() != null && contact.getName().getValue() != null && !contact.getName().getValue().equals(persistedParticipant.getContactName())) {
+            return true;
+        }
+        if (contact != null && contact.getEmail() != null && contact.getEmail().getValue() != null && !contact.getEmail().getValue().equals(persistedParticipant.getContactEmail())) {
+            return true;
+        }
+        if (contact != null && contact.getTelephone() != null && contact.getTelephone().getValue() != null && !contact.getTelephone().getValue().equals(persistedParticipant.getContactPhone())) {
+            return true;
+        }
+
+        if (queriedParticipant.getProfiles().size() != persistedParticipant.getDocumentTypes().size()) {
+            return true;
+        }
+        for (ProfileType profileType : queriedParticipant.getProfiles()) {
+            if (persistedParticipant.getDocumentTypes().stream().noneMatch(d -> d.getExternalId().equals(profileType.getValue()))) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

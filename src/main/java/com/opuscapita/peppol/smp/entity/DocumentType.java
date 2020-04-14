@@ -5,14 +5,11 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.Objects;
 
 @Entity
 @DynamicUpdate
-@Table(name = "document_types", indexes = {
-        @Index(name = "ix_name", columnList = "name")
-})
+@Table(name = "document_types")
 public class DocumentType {
 
     @Id
@@ -20,20 +17,14 @@ public class DocumentType {
     @GeneratedValue
     private Long id;
 
-    @Column(name = "document_type_id")
-    private Integer documentTypeId;
+    @Column(name = "external_id", nullable = false)
+    private String externalId;
 
-    @Column(name = "name", nullable = false)
+    @Column(name = "internal_id")
+    private Integer internalId;
+
+    @Column(name = "name")
     private String name;
-
-    @Column(name = "profile_identifier")
-    private String profileIdentifier;
-
-    @Column(name = "document_identifier")
-    private String documentIdentifier;
-
-    @ManyToMany(mappedBy = "documentTypes")
-    private Set<Participant> participants;
 
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "smp_id", nullable = false)
@@ -41,7 +32,6 @@ public class DocumentType {
     private Smp smp;
 
     public DocumentType() {
-        this.participants = new HashSet<>();
     }
 
     public Long getId() {
@@ -52,12 +42,28 @@ public class DocumentType {
         this.id = id;
     }
 
-    public Integer getDocumentTypeId() {
-        return documentTypeId;
+    public String getExternalId() {
+        return externalId;
     }
 
-    public void setDocumentTypeId(Integer documentTypeId) {
-        this.documentTypeId = documentTypeId;
+    public Integer getExternalIdAsInteger() {
+        return Integer.parseInt(externalId);
+    }
+
+    public void setExternalId(String externalId) {
+        this.externalId = externalId;
+    }
+
+    public void setExternalIdAsInteger(Integer externalId) {
+        this.externalId = String.valueOf(externalId);
+    }
+
+    public Integer getInternalId() {
+        return internalId;
+    }
+
+    public void setInternalId(Integer internalId) {
+        this.internalId = internalId;
     }
 
     public String getName() {
@@ -68,35 +74,24 @@ public class DocumentType {
         this.name = name;
     }
 
-    public String getProfileIdentifier() {
-        return profileIdentifier;
-    }
-
-    public void setProfileIdentifier(String profileIdentifier) {
-        this.profileIdentifier = profileIdentifier;
-    }
-
-    public String getDocumentIdentifier() {
-        return documentIdentifier;
-    }
-
-    public void setDocumentIdentifier(String documentIdentifier) {
-        this.documentIdentifier = documentIdentifier;
-    }
-
-    public Set<Participant> getParticipants() {
-        return participants;
-    }
-
-    public void setParticipants(Set<Participant> participants) {
-        this.participants = participants;
-    }
-
     public Smp getSmp() {
         return smp;
     }
 
     public void setSmp(Smp smp) {
         this.smp = smp;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        DocumentType that = (DocumentType) o;
+        return Objects.equals(externalId, that.externalId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(externalId);
     }
 }

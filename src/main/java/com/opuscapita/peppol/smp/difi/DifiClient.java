@@ -6,7 +6,13 @@ import no.difi.elma.smp.webservice.responses.*;
 import no.difi.elma.smp.webservice.types.*;
 import org.springframework.ws.client.core.support.WebServiceGatewaySupport;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class DifiClient extends WebServiceGatewaySupport {
+
+    private static final String ICD_9908 = "9908";
+    private static final String ICD_0192 = "0192";
 
     private final Difi elmaPort;
     private final String username;
@@ -58,6 +64,10 @@ public class DifiClient extends WebServiceGatewaySupport {
         return elmaPort.editParticipant(editParticipantType);
     }
 
+    public DeleteParticipantResponse deleteParticipant(String icd, String identifier) {
+        return deleteParticipant(icd + ":" + identifier);
+    }
+
     public DeleteParticipantResponse deleteParticipant(String organizationNumber) {
         DeleteParticipantType deleteParticipantType = new DeleteParticipantType();
         OrganizationNumberType organizationNumberType = new OrganizationNumberType();
@@ -70,6 +80,21 @@ public class DifiClient extends WebServiceGatewaySupport {
     public ProfilesSupportedResponse getSupportedProfiles() {
         ProfilesSupportedType profilesSupportedType = new ProfilesSupportedType();
         return elmaPort.profilesSupported(profilesSupportedType);
+    }
+
+//    elmaPort.addProfileToAllParticipants();
+
+//    elmaPort.removeProfileFromAllParticipants();
+
+    public static List<String> getDifiIcd() {
+        List<String> icd = new ArrayList<>();
+        icd.add(DifiClient.ICD_9908);
+        icd.add(DifiClient.ICD_0192);
+        return icd;
+    }
+
+    public static Boolean isDifiIcd(String icd) {
+        return DifiClient.ICD_9908.equals(icd) || DifiClient.ICD_0192.equals(icd);
     }
 
     private UserType getAuthUser() {
