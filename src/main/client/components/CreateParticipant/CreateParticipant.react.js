@@ -32,8 +32,8 @@ class CreateParticipant extends Components.ContextComponent {
     }
 
     async componentDidMount() {
-        await this.fetchParticipantToEdit();
         await this.fetchDocumentTypesFromValidator();
+        await this.fetchParticipantToEdit();
     }
 
     async fetchParticipantToEdit() {
@@ -65,12 +65,6 @@ class CreateParticipant extends Components.ContextComponent {
                 d.value = d.id;
                 d.label = "[" + d.id + "] " + d.description;
             });
-
-            if (this.state.editMode) {
-                const participant = this.state;
-                participant.documentTypes = participant.documentTypes.map(d => filteredDocumentTypes.find(i => i.id === d.internalId)).filter(d => !!d);
-                this.setState({participant});
-            }
 
             this.setState({documentTypes: filteredDocumentTypes});
         } catch (e) {

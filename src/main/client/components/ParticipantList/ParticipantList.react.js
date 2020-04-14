@@ -110,6 +110,10 @@ class ParticipantList extends Components.ContextComponent {
         this.setState({searchValues}, () => this.loadParticipantList());
     }
 
+    getRegisteredAt(participant) {
+        return participant.smpName === "TICKSTAR" ? this.context.i18n.formatDateTime(participant.registeredAt) : participant.registeredAt;
+    }
+
     render() {
         const {i18n} = this.context;
         const {loading, participantList, pagination, totalCount, searchValues} = this.state;
@@ -267,9 +271,9 @@ class ParticipantList extends Components.ContextComponent {
                         {
                             id: 'registeredAt',
                             width: 200,
-                            accessor: 'registeredAt',
+                            accessor: row => row,
                             Header: 'Registered At',
-                            Cell: props => <span>{i18n.formatDateTime(props.value)}</span>
+                            Cell: ({value}) => <span>{this.getRegisteredAt(value)}</span>
                         }
                     ]}
                 />
