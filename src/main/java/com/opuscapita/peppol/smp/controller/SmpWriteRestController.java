@@ -41,7 +41,7 @@ public class SmpWriteRestController {
         this.endpointService = endpointService;
         this.participantService = participantService;
         this.documentTypeService = documentTypeService;
-        this.dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+        this.dateFormat = new SimpleDateFormat("YYYY-MM-DDTHH:mm:ssZ");
     }
 
     @PostMapping("/add-participant/{userId}")
