@@ -83,10 +83,6 @@ class ParticipantDetail extends Components.ContextComponent {
         });
     }
 
-    getRegisteredAt(participant) {
-        return participant.smpName === "TICKSTAR" ? this.context.i18n.formatDateTime(participant.registeredAt) : participant.registeredAt;
-    }
-
     render() {
         const {i18n, router} = this.context;
         const {loading, participant} = this.state;
@@ -134,8 +130,7 @@ class ParticipantDetail extends Components.ContextComponent {
                                     <label className="control-label btn-link">Register Info</label>
                                 </div>
                                 <div className="offset-md-1 col-md-8">
-                                    <label
-                                        className="control-label">{participant.smpName}-{participant.endpointType} at {this.getRegisteredAt(participant)}</label>
+                                    <label className="control-label">{participant.smpName}-{participant.endpointType} at {i18n.formatDateTime(participant.registeredAt)}</label>
                                 </div>
                             </div>
                         </div>
