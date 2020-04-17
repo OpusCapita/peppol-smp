@@ -1,3 +1,11 @@
+INSERT INTO `peppol-smp`.smps (id, name) VALUES (1, 'DIFI');
+INSERT INTO `peppol-smp`.smps (id, name) VALUES (2, 'TICKSTAR');
+
+INSERT INTO `peppol-smp`.endpoints (id, type, name, smp_id) VALUES (1, 'PROD', 'OpusCapita AP services', 1);
+INSERT INTO `peppol-smp`.endpoints (id, type, name, smp_id) VALUES (100, 'PROD', 'OpusCapita PEPPOL AP', 2);
+INSERT INTO `peppol-smp`.endpoints (id, type, name, smp_id) VALUES (110, 'TEST', 'OpusCapita PEPPOL Test AP', 2);
+INSERT INTO `peppol-smp`.endpoints (id, type, name, smp_id) VALUES (2, 'TEST', 'OpusCapita Access Point Test Mode', 1);
+
 UPDATE `peppol-smp`.document_types SET internal_id=24 WHERE external_id='BIS04 V2' AND smp_id=1;
 UPDATE `peppol-smp`.document_types SET internal_id=116 WHERE external_id='BIS05 V2' AND smp_id=1;
 UPDATE `peppol-smp`.document_types SET internal_id=129 WHERE external_id='BIS36 - MLR' AND smp_id=1;

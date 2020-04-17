@@ -113,9 +113,10 @@ class BulkRegister extends Components.ContextComponent {
                     participant.name = columns[0];
                     participant.icd = columns[1].split(":")[0];
                     participant.identifier = columns[1].split(":")[1];
-                    participant.contactName = columns[2];
-                    participant.contactEmail = columns[3];
-                    participant.contactPhone = columns[4];
+                    participant.country = columns[2];
+                    participant.contactName = columns[3];
+                    participant.contactEmail = columns[4];
+                    participant.contactPhone = columns[5];
                     participantList.push(participant);
                 }
                 this.setState({participantList, showDocumentTypes: true});

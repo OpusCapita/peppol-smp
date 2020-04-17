@@ -89,9 +89,11 @@ public class TickstarScheduler {
         } else if (!isThereAnyUpdate(persistedParticipant, queriedParticipant, endpoint)) {
             logger.debug("......TickstarScheduler found participant: " + icd + ":" + identifier + ", ignoring with no-change");
             return;
+
+        } else {
+            logger.info("......TickstarScheduler found an update for participant: " + icd + ":" + identifier + ", saving");
         }
 
-        logger.info("......TickstarScheduler found an update for participant: " + icd + ":" + identifier + ", saving");
         TickstarParticipantBusinessCard businessCard = queriedParticipant.getBusinessCard() != null ? queriedParticipant.getBusinessCard() : new TickstarParticipantBusinessCard();
         TickstarParticipantBusinessEntity businessEntity = businessCard.getBusinessEntity() != null && !businessCard.getBusinessEntity().isEmpty() ? businessCard.getBusinessEntity().get(0) : new TickstarParticipantBusinessEntity();
         TickstarParticipantContact businessContact = businessEntity.getContacts() != null && businessEntity.getContacts().getContact() != null && !businessEntity.getContacts().getContact().isEmpty() ? businessEntity.getContacts().getContact().get(0) : new TickstarParticipantContact();

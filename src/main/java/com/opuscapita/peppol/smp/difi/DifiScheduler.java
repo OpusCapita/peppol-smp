@@ -93,9 +93,11 @@ public class DifiScheduler {
         } else if (!isThereAnyUpdate(persistedParticipant, queriedParticipant)) {
             logger.debug("......DifiScheduler found participant: " + icd + ":" + identifier + ", ignoring with no-change");
             return;
+
+        } else {
+            logger.info("......DifiScheduler found an update for participant: " + icd + ":" + identifier + ", saving");
         }
 
-        logger.info("......DifiScheduler found an update for participant: " + icd + ":" + identifier + ", saving");
         OrganizationType organization = queriedParticipant.getOrganization();
         persistedParticipant.setName(organization.getName().getValue());
         persistedParticipant.setCountry("NO");

@@ -271,9 +271,9 @@ class ParticipantList extends Components.ContextComponent {
                         {
                             id: 'registeredAt',
                             width: 200,
-                            accessor: row => row,
+                            accessor: 'registeredAt',
                             Header: 'Registered At',
-                            Cell: ({value}) => <span>{this.getRegisteredAt(value)}</span>
+                            Cell: ({value}) => <span>{i18n.formatDateTime(value)}</span>
                         }
                     ]}
                 />
