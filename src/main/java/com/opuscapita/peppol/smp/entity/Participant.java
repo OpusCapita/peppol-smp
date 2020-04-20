@@ -44,7 +44,7 @@ public class Participant {
     @Column(name = "registered_at")
     private String registeredAt;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "participant_document_type",
             joinColumns = @JoinColumn(name = "participant_id"),
             inverseJoinColumns = @JoinColumn(name = "document_type_id"))
