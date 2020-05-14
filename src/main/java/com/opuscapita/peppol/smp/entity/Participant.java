@@ -29,7 +29,8 @@ public class Participant {
     @Column(name = "identifier", nullable = false, length = 50)
     private String identifier;
 
-    @Column(name = "business_platform")
+    @Column(name = "business_platform", length = 20)
+    @Enumerated(EnumType.STRING)
     private BusinessPlatform businessPlatform;
 
     @Column(name = "country", length = 5)
