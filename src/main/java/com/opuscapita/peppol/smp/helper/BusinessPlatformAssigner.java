@@ -16,10 +16,12 @@ public class BusinessPlatformAssigner {
     @Autowired
     public BusinessPlatformAssigner(RoutingConfiguration routingConfiguration) {
         this.routingConfiguration = routingConfiguration;
+
+        logger.info("Routing configuration loaded with " + routingConfiguration.getRoutes().size() + " routes.");
     }
 
     public void assign(Participant participant) {
-        for (RoutingConfiguration.Route route : routingConfiguration.getRoutes()) {
+        for (Route route : routingConfiguration.getRoutes()) {
             if (participant.getIcdIdentifier().matches(route.getMask())) {
                 participant.setBusinessPlatform(route.getPlatform());
                 logger.info("BusinessPlatform assigned to " + participant.getIcdIdentifier() + " as: " + route.getPlatform());
