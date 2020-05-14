@@ -13,6 +13,12 @@ class ParticipantList extends Components.ContextComponent {
         'PROD'
     ];
 
+    static businessPlatforms = [
+        'A2A',
+        'XIB',
+        'SIRIUS'
+    ];
+
     static smpNames = [
         'DIFI',
         'TICKSTAR'
@@ -80,6 +86,12 @@ class ParticipantList extends Components.ContextComponent {
         });
     }
 
+    mapBusinessPlatformsSelect() {
+        return CreateParticipant.businessPlatforms.map(value => {
+            return {value: value, label: value};
+        });
+    }
+
     mapCountriesSelect() {
         return Countries.map(value => {
             return {value: value.code, label: value.name};
@@ -104,14 +116,11 @@ class ParticipantList extends Components.ContextComponent {
             identifier: '',
             smpNames: [],
             countries: [],
-            endpointTypes: []
+            endpointTypes: [],
+            businessPlatforms: []
         };
 
         this.setState({searchValues}, () => this.loadParticipantList());
-    }
-
-    getRegisteredAt(participant) {
-        return participant.smpName === "TICKSTAR" ? this.context.i18n.formatDateTime(participant.registeredAt) : participant.registeredAt;
     }
 
     render() {
@@ -121,7 +130,7 @@ class ParticipantList extends Components.ContextComponent {
         return (
             <div>
                 <h3>Participant List
-                    <button className="btn btn-info participant-add-btn" onClick={(e) => this.showPage('create', e)}>
+                    <button className="btn btn-info participant-add-btn" onClick={e => this.showPage('create', e)}>
                         New Participant
                     </button>
                 </h3>
@@ -194,13 +203,13 @@ class ParticipantList extends Components.ContextComponent {
                                 </div>
                                 <div className="form-group">
                                     <div className="col-sm-3">
-                                        <label className="control-label">Type</label>
+                                        <label className="control-label">B. Platform</label>
                                     </div>
                                     <div className="offset-md-1 col-md-8">
                                         <Select className="react-select" isMulti={true}
-                                                options={this.mapTypesSelect()}
-                                                onChange={value => this.handleSearchFormChange('endpointTypes', value)}
-                                                value={searchValues.endpointTypes && searchValues.endpointTypes.map(cts => ({
+                                                options={this.mapBusinessPlatformsSelect()}
+                                                onChange={value => this.handleSearchFormChange('businessPlatforms', value)}
+                                                value={searchValues.businessPlatforms && searchValues.businessPlatforms.map(cts => ({
                                                     label: cts,
                                                     value: cts
                                                 }))}
@@ -260,13 +269,12 @@ class ParticipantList extends Components.ContextComponent {
                             Header: 'SMP'
                         },
                         {
-                            id: 'endpointType',
+                            id: 'businessPlatform',
                             width: 100,
-                            accessor: 'endpointType',
+                            accessor: 'businessPlatform',
                             Header: 'Type',
                             Cell: ({value}) =>
-                                <span
-                                    className={`label label-${value === 'PROD' ? 'success' : 'info'}`}>{value.toLowerCase()}</span>
+                                <span className={`label label-${value === 'SIRIUS' ? 'danger' : (value === 'A2A' ? 'warning' : 'info')}`}>{value}</span>
                         },
                         {
                             id: 'registeredAt',
