@@ -1,5 +1,6 @@
 package com.opuscapita.peppol.smp.controller.dto;
 
+import com.opuscapita.peppol.smp.entity.BusinessPlatform;
 import com.opuscapita.peppol.smp.repository.EndpointType;
 import com.opuscapita.peppol.smp.repository.SmpName;
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -14,6 +15,7 @@ public class ParticipantFilterDto {
     private List<String> countries;
     private List<SmpName> smpNames;
     private List<EndpointType> endpointTypes;
+    private List<BusinessPlatform> businessPlatforms;
 
     public String getIcd() {
         return icd;
@@ -61,6 +63,14 @@ public class ParticipantFilterDto {
 
     public void setEndpointTypes(List<EndpointType> endpointTypes) {
         this.endpointTypes = endpointTypes;
+    }
+
+    public List<BusinessPlatform> getBusinessPlatforms() {
+        return businessPlatforms;
+    }
+
+    public void setBusinessPlatforms(List<BusinessPlatform> businessPlatforms) {
+        this.businessPlatforms = businessPlatforms;
     }
 
     @Override

@@ -7,6 +7,12 @@ import './CreateParticipant.css';
 
 class CreateParticipant extends Components.ContextComponent {
 
+    static businessPlatforms = [
+        'A2A',
+        'XIB',
+        'SIRIUS'
+    ];
+
     state = {
         participant: {
             documentTypes: []
@@ -80,6 +86,12 @@ class CreateParticipant extends Components.ContextComponent {
     mapCountriesSelect() {
         return Countries.map(value => {
             return {value: value.code, label: value.name};
+        });
+    }
+
+    mapBusinessPlatformsSelect() {
+        return CreateParticipant.businessPlatforms.map(value => {
+            return {value: value, label: value};
         });
     }
 
@@ -297,6 +309,18 @@ class CreateParticipant extends Components.ContextComponent {
                                     </div>
                                 </div>
                             }
+                            <div className="form-group">
+                                <div className="col-sm-3">
+                                    <label className="control-label btn-link">Business Platform</label>
+                                </div>
+                                <div className="offset-md-1 col-md-8">
+                                    <Select className="react-select" isMulti={false}
+                                            value={participant.businessPlatform}
+                                            options={this.mapBusinessPlatformsSelect()}
+                                            onChange={value => this.handleFormChange('businessPlatform', value)}
+                                    />
+                                </div>
+                            </div>
                         </div>
                     </div>
 
