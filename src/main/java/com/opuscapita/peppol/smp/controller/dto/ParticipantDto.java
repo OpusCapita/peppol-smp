@@ -144,6 +144,7 @@ public class ParticipantDto {
         dto.setContactPhone(participant.getContactPhone());
         dto.setRegisteredAt(participant.getRegisteredAt());
         dto.setEndpointType(participant.getEndpoint().getType());
+        dto.setBusinessPlatform(participant.getBusinessPlatform());
         dto.setDocumentTypes(DocumentTypeDto.of(participant.getDocumentTypes()));
         dto.setSmpName(participant.getEndpoint().getSmp().getName());
         return dto;
