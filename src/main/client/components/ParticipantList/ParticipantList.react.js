@@ -87,7 +87,7 @@ class ParticipantList extends Components.ContextComponent {
     }
 
     mapBusinessPlatformsSelect() {
-        return CreateParticipant.businessPlatforms.map(value => {
+        return ParticipantList.businessPlatforms.map(value => {
             return {value: value, label: value};
         });
     }
