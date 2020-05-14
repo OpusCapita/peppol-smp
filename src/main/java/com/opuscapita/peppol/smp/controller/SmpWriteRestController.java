@@ -6,6 +6,7 @@ import com.opuscapita.peppol.smp.controller.dto.ParticipantDto;
 import com.opuscapita.peppol.smp.entity.DocumentType;
 import com.opuscapita.peppol.smp.entity.Participant;
 import com.opuscapita.peppol.smp.entity.Smp;
+import com.opuscapita.peppol.smp.helper.BusinessPlatformAssigner;
 import com.opuscapita.peppol.smp.repository.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,16 +33,32 @@ public class SmpWriteRestController {
     private final SimpleDateFormat dateFormat;
     private final EndpointService endpointService;
     private final ParticipantService participantService;
+    private final ParticipantRepository participantRepository;
     private final DocumentTypeService documentTypeService;
+
+    private final BusinessPlatformAssigner businessPlatformAssigner;
 
     @Autowired
     public SmpWriteRestController(SmpService smpService, EndpointService endpointService,
-                                  ParticipantService participantService, DocumentTypeService documentTypeService) {
+                                  ParticipantService participantService, DocumentTypeService documentTypeService,
+                                  ParticipantRepository participantRepository, BusinessPlatformAssigner businessPlatformAssigner) {
         this.smpService = smpService;
         this.endpointService = endpointService;
         this.participantService = participantService;
         this.documentTypeService = documentTypeService;
+        this.participantRepository = participantRepository;
+        this.businessPlatformAssigner = businessPlatformAssigner;
         this.dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+    }
+
+    @GetMapping("/start-assigning")
+    public ResponseEntity<?> businessPlatformAssign() {
+        List<Participant> participants = participantRepository.findAll();
+        for (Participant participant : participants) {
+            businessPlatformAssigner.assign(participant);
+            participantRepository.save(participant);
+        }
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/add-participant/{userId}")
