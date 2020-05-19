@@ -1,7 +1,7 @@
 import React from 'react';
 import {Components} from '@opuscapita/service-base-ui';
 import ReactTable from 'react-table';
-import {ApiBase, Countries} from '../../api';
+import {ApiBase, Countries, BusinessPlatforms} from '../../api';
 import Select from '@opuscapita/react-select';
 import 'react-table/react-table.css';
 import './ParticipantList.css';
@@ -11,12 +11,6 @@ class ParticipantList extends Components.ContextComponent {
     static types = [
         'TEST',
         'PROD'
-    ];
-
-    static businessPlatforms = [
-        'A2A',
-        'XIB',
-        'SIRIUS'
     ];
 
     static smpNames = [
@@ -87,8 +81,8 @@ class ParticipantList extends Components.ContextComponent {
     }
 
     mapBusinessPlatformsSelect() {
-        return ParticipantList.businessPlatforms.map(value => {
-            return {value: value, label: value};
+        return BusinessPlatforms.map(value => {
+            return {value: value.name, label: value.name};
         });
     }
 

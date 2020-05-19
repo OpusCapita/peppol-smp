@@ -6,7 +6,6 @@ import com.opuscapita.peppol.smp.controller.dto.ParticipantDto;
 import com.opuscapita.peppol.smp.entity.DocumentType;
 import com.opuscapita.peppol.smp.entity.Participant;
 import com.opuscapita.peppol.smp.entity.Smp;
-import com.opuscapita.peppol.smp.helper.BusinessPlatformAssigner;
 import com.opuscapita.peppol.smp.repository.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,29 +35,16 @@ public class SmpWriteRestController {
     private final ParticipantRepository participantRepository;
     private final DocumentTypeService documentTypeService;
 
-    private final BusinessPlatformAssigner businessPlatformAssigner;
-
     @Autowired
     public SmpWriteRestController(SmpService smpService, EndpointService endpointService,
                                   ParticipantService participantService, DocumentTypeService documentTypeService,
-                                  ParticipantRepository participantRepository, BusinessPlatformAssigner businessPlatformAssigner) {
+                                  ParticipantRepository participantRepository) {
         this.smpService = smpService;
         this.endpointService = endpointService;
         this.participantService = participantService;
         this.documentTypeService = documentTypeService;
         this.participantRepository = participantRepository;
-        this.businessPlatformAssigner = businessPlatformAssigner;
         this.dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-    }
-
-    @GetMapping("/start-assigning")
-    public ResponseEntity<?> businessPlatformAssign() {
-        List<Participant> participants = participantRepository.findAll();
-        for (Participant participant : participants) {
-            businessPlatformAssigner.assign(participant);
-            participantRepository.save(participant);
-        }
-        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/add-participant/{userId}")
@@ -85,7 +71,6 @@ public class SmpWriteRestController {
     }
 
 
-
     @PostMapping("/bulk-register/{userId}")
     public ResponseEntity<?> bulkRegister(@PathVariable String userId, @RequestBody ParticipantBulkRegisterRequestDto requestDto) {
         Set<DocumentType> difiDocumentTypes = requestDto.getDocumentTypes().stream()
@@ -102,6 +87,7 @@ public class SmpWriteRestController {
         Set<Participant> participants = requestDto.getParticipants().stream().map(participantDto -> {
             Participant participant = new Participant().copy(participantDto);
             participant.setRegisteredAt(registerDate);
+            participant.setBusinessPlatform(requestDto.getBusinessPlatform());
 
             Smp smp = smpService.getSmpByIcd(participantDto.getIcd());
             participant.setEndpoint(endpointService.getEndpoint(smp.getName()));

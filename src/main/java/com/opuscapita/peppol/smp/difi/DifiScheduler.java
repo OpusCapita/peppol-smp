@@ -3,6 +3,7 @@ package com.opuscapita.peppol.smp.difi;
 import com.opuscapita.peppol.smp.entity.DocumentType;
 import com.opuscapita.peppol.smp.entity.Endpoint;
 import com.opuscapita.peppol.smp.entity.Participant;
+import com.opuscapita.peppol.smp.helper.BusinessPlatformDefiner;
 import com.opuscapita.peppol.smp.repository.DocumentTypeService;
 import com.opuscapita.peppol.smp.repository.EndpointService;
 import com.opuscapita.peppol.smp.repository.ParticipantService;
@@ -32,14 +33,17 @@ public class DifiScheduler {
     private EndpointService endpointService;
     private ParticipantService participantService;
     private DocumentTypeService documentTypeService;
+    private BusinessPlatformDefiner businessPlatformDefiner;
 
     @Autowired
     public DifiScheduler(DifiClient client, EndpointService endpointService,
-                         ParticipantService participantService, DocumentTypeService documentTypeService) {
+                         ParticipantService participantService, DocumentTypeService documentTypeService,
+                         BusinessPlatformDefiner businessPlatformDefiner) {
         this.client = client;
         this.endpointService = endpointService;
         this.participantService = participantService;
         this.documentTypeService = documentTypeService;
+        this.businessPlatformDefiner = businessPlatformDefiner;
     }
 
     @Scheduled(cron = "0 0 0 * * *")
@@ -112,6 +116,7 @@ public class DifiScheduler {
         }
 
         persistedParticipant.setEndpoint(endpoint);
+        persistedParticipant.setBusinessPlatform(businessPlatformDefiner.define(persistedParticipant));
         persistedParticipant.setDocumentTypes(convertDocumentTypeForParticipant(queriedParticipant, endpoint));
 
         participantService.saveParticipant(persistedParticipant, "System");
@@ -160,6 +165,11 @@ public class DifiScheduler {
             if (persistedParticipant.getDocumentTypes().stream().noneMatch(d -> d.getExternalId().equals(profileType.getValue()))) {
                 return true;
             }
+        }
+
+        // if we have a participant without businessPlatform, we fix it using scheduler
+        if (persistedParticipant.getBusinessPlatform() == null) {
+            return true;
         }
 
         return false;
