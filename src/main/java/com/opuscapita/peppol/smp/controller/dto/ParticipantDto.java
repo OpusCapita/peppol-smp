@@ -1,5 +1,6 @@
 package com.opuscapita.peppol.smp.controller.dto;
 
+import com.opuscapita.peppol.smp.entity.BusinessPlatform;
 import com.opuscapita.peppol.smp.entity.Participant;
 import com.opuscapita.peppol.smp.repository.EndpointType;
 import com.opuscapita.peppol.smp.repository.SmpName;
@@ -12,6 +13,7 @@ public class ParticipantDto {
     private String icd;
     private String name;
     private String identifier;
+    private BusinessPlatform businessPlatform;
     private String country;
     private String contactName;
     private String contactEmail;
@@ -52,6 +54,14 @@ public class ParticipantDto {
 
     public void setIdentifier(String identifier) {
         this.identifier = identifier;
+    }
+
+    public BusinessPlatform getBusinessPlatform() {
+        return businessPlatform;
+    }
+
+    public void setBusinessPlatform(BusinessPlatform businessPlatform) {
+        this.businessPlatform = businessPlatform;
     }
 
     public String getCountry() {
@@ -134,6 +144,7 @@ public class ParticipantDto {
         dto.setContactPhone(participant.getContactPhone());
         dto.setRegisteredAt(participant.getRegisteredAt());
         dto.setEndpointType(participant.getEndpoint().getType());
+        dto.setBusinessPlatform(participant.getBusinessPlatform());
         dto.setDocumentTypes(DocumentTypeDto.of(participant.getDocumentTypes()));
         dto.setSmpName(participant.getEndpoint().getSmp().getName());
         return dto;

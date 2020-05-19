@@ -32,15 +32,18 @@ public class SmpWriteRestController {
     private final SimpleDateFormat dateFormat;
     private final EndpointService endpointService;
     private final ParticipantService participantService;
+    private final ParticipantRepository participantRepository;
     private final DocumentTypeService documentTypeService;
 
     @Autowired
     public SmpWriteRestController(SmpService smpService, EndpointService endpointService,
-                                  ParticipantService participantService, DocumentTypeService documentTypeService) {
+                                  ParticipantService participantService, DocumentTypeService documentTypeService,
+                                  ParticipantRepository participantRepository) {
         this.smpService = smpService;
         this.endpointService = endpointService;
         this.participantService = participantService;
         this.documentTypeService = documentTypeService;
+        this.participantRepository = participantRepository;
         this.dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
     }
 
@@ -68,7 +71,6 @@ public class SmpWriteRestController {
     }
 
 
-
     @PostMapping("/bulk-register/{userId}")
     public ResponseEntity<?> bulkRegister(@PathVariable String userId, @RequestBody ParticipantBulkRegisterRequestDto requestDto) {
         Set<DocumentType> difiDocumentTypes = requestDto.getDocumentTypes().stream()
@@ -85,6 +87,7 @@ public class SmpWriteRestController {
         Set<Participant> participants = requestDto.getParticipants().stream().map(participantDto -> {
             Participant participant = new Participant().copy(participantDto);
             participant.setRegisteredAt(registerDate);
+            participant.setBusinessPlatform(requestDto.getBusinessPlatform());
 
             Smp smp = smpService.getSmpByIcd(participantDto.getIcd());
             participant.setEndpoint(endpointService.getEndpoint(smp.getName()));

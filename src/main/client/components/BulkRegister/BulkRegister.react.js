@@ -1,6 +1,6 @@
 import React from 'react';
 import {Components} from '@opuscapita/service-base-ui';
-import {ApiBase} from '../../api';
+import {ApiBase, BusinessPlatforms} from '../../api';
 import Select from '@opuscapita/react-select';
 import './BulkRegister.css';
 
@@ -12,6 +12,7 @@ class BulkRegister extends Components.ContextComponent {
         showDocumentTypes: false,
         documentTypes: [],
         selectedDocumentTypes: [],
+        selectedBusinessPlatform: null,
         participantList: []
     };
 
@@ -132,7 +133,7 @@ class BulkRegister extends Components.ContextComponent {
     }
 
     async bulkRegister() {
-        const {participantList, selectedDocumentTypes} = this.state;
+        const {participantList, selectedDocumentTypes, selectedBusinessPlatform} = this.state;
         const {userData, showModalDialog, hideModalDialog} = this.context;
 
         const onConfirmationClick = (btn) => {
@@ -142,7 +143,13 @@ class BulkRegister extends Components.ContextComponent {
                 this.context.showSpinner();
 
                 setTimeout(() => {
-                    this.api.bulkRegister({participants: participantList, documentTypes: selectedDocumentTypes.map(d => { return {internalId: d.id}; })}, userData.id).then(() => {
+                    const requestBody = {
+                        participants: participantList,
+                        businessPlatform: selectedBusinessPlatform,
+                        documentTypes: selectedDocumentTypes.map(d => { return {internalId: d.id}; })
+                    };
+
+                    this.api.bulkRegister(requestBody, userData.id).then(() => {
                         this.context.showNotification('Bulk register operation has been successfully initialized', 'info', 3);
 
                     }).catch(e => {
@@ -163,8 +170,14 @@ class BulkRegister extends Components.ContextComponent {
         showModalDialog(modalTitle, modalText, onConfirmationClick, modalButtons);
     }
 
+    mapBusinessPlatformsSelect() {
+        return BusinessPlatforms.map(value => {
+            return {value: value.name, label: value.name};
+        });
+    }
+
     render() {
-        const {participantList, documentTypes, selectedDocumentTypes, showDocumentTypes, showOther} = this.state;
+        const {participantList, documentTypes, selectedDocumentTypes, selectedBusinessPlatform, showDocumentTypes, showOther} = this.state;
         return (
             <div>
                 <h2>Bulk Register</h2>
@@ -237,6 +250,18 @@ class BulkRegister extends Components.ContextComponent {
                                         </div>
                                     </div>
                                 }
+                                <div className="form-group">
+                                    <div className="col-sm-3">
+                                        <label className="control-label btn-link">Business Platform</label>
+                                    </div>
+                                    <div className="offset-md-1 col-md-8">
+                                        <Select className="react-select" isMulti={false}
+                                                value={selectedBusinessPlatform}
+                                                options={this.mapBusinessPlatformsSelect()}
+                                                onChange={value => this.setState({selectedBusinessPlatform: value})}
+                                        />
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>

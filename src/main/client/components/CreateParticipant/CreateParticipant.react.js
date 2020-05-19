@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {ApiBase, Countries, IcdValues} from '../../api';
+import {ApiBase, Countries, IcdValues, BusinessPlatforms} from '../../api';
 import {Components} from '@opuscapita/service-base-ui';
 import Select from '@opuscapita/react-select';
 import './CreateParticipant.css';
@@ -46,6 +46,8 @@ class CreateParticipant extends Components.ContextComponent {
         participant.icd = {value: icdValue.icd, label: `${icdValue.icd} - ${icdValue.code}`};
         const countryValue = Countries.findByCode(participant.country);
         participant.country = !!countryValue ?  {value: countryValue.code, label: countryValue.name} : countryValue;
+        const businessPlatformValue = BusinessPlatforms.findByName(participant.businessPlatform);
+        participant.businessPlatform = {value: businessPlatformValue.name, label: businessPlatformValue.name};
 
         const documentTypes = this.state.documentTypes;
         if (documentTypes && documentTypes.length) {
@@ -80,6 +82,12 @@ class CreateParticipant extends Components.ContextComponent {
     mapCountriesSelect() {
         return Countries.map(value => {
             return {value: value.code, label: value.name};
+        });
+    }
+
+    mapBusinessPlatformsSelect() {
+        return BusinessPlatforms.map(value => {
+            return {value: value.name, label: value.name};
         });
     }
 
@@ -297,6 +305,18 @@ class CreateParticipant extends Components.ContextComponent {
                                     </div>
                                 </div>
                             }
+                            <div className="form-group">
+                                <div className="col-sm-3">
+                                    <label className="control-label btn-link">Business Platform</label>
+                                </div>
+                                <div className="offset-md-1 col-md-8">
+                                    <Select className="react-select" isMulti={false}
+                                            value={participant.businessPlatform}
+                                            options={this.mapBusinessPlatformsSelect()}
+                                            onChange={value => this.handleFormChange('businessPlatform', value)}
+                                    />
+                                </div>
+                            </div>
                         </div>
                     </div>
 
