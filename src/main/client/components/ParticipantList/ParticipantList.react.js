@@ -266,7 +266,7 @@ class ParticipantList extends Components.ContextComponent {
                             id: 'businessPlatform',
                             width: 100,
                             accessor: 'businessPlatform',
-                            Header: 'Type',
+                            Header: 'Route',
                             Cell: ({value}) =>
                                 <span className={`label label-${value === 'SIRIUS' ? 'danger' : (value === 'A2A' ? 'warning' : 'info')}`}>{value}</span>
                         },
