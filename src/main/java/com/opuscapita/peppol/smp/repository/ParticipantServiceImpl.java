@@ -110,6 +110,9 @@ public class ParticipantServiceImpl implements ParticipantService {
     private boolean saveTickstarParticipant(Participant participant) {
         TickstarParticipant addRequest = TickstarParticipant.of(participant);
         HttpStatus responseStatus = participant.getId() == null ? tickstarClient.addParticipant(addRequest) : tickstarClient.editParticipant(addRequest);
+        if (responseStatus.equals(HttpStatus.CONFLICT)) {
+            responseStatus = tickstarClient.editParticipant(addRequest);
+        }
         return responseStatus.is2xxSuccessful();
     }
 
