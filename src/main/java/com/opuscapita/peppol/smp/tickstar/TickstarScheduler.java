@@ -12,8 +12,6 @@ import com.opuscapita.peppol.smp.tickstar.dto.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -22,7 +20,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
-@EnableScheduling
 public class TickstarScheduler {
 
     private static final Logger logger = LoggerFactory.getLogger(TickstarScheduler.class);
@@ -44,7 +41,6 @@ public class TickstarScheduler {
         this.businessPlatformDefiner = businessPlatformDefiner;
     }
 
-    @Scheduled(cron = "0 0 0 * * *")
     public void updateLocalDatabase() {
         logger.info("TickstarScheduler started!");
         Endpoint endpoint = endpointService.getEndpoint(SmpName.TICKSTAR);
