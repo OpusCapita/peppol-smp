@@ -8,6 +8,7 @@ import ParticipantList from './components/ParticipantList';
 import OperationHistory from './components/OperationHistory';
 import ParticipantDetail from './components/ParticipantDetail';
 import CreateParticipant from './components/CreateParticipant';
+import LookupParticipant from './components/LookupParticipant';
 
 const home = (props) => (
     <ParticipantList/>
@@ -33,6 +34,10 @@ const detail = (props) => (
     <ParticipantDetail icd={props.params.icd} identifier={props.params.identifier}/>
 );
 
+const lookup = (props) => (
+    <LookupParticipant />
+);
+
 class App extends React.Component {
 
     state = {
@@ -56,7 +61,9 @@ class App extends React.Component {
         return (
             <Provider value={this.state}>
                 <Containers.ServiceLayout serviceName="peppol-smp">
-                    <Route path="/" component={home}/>
+                    <Route path="/" component={home}>
+                        <Route path="lookup" components={lookup}/>
+                    </Route>
                     <Route path="/create" component={create}/>
                     <Route path="/edit/:id" component={edit}/>
                     <Route path="/bulkRegister" component={bulkRegister}/>

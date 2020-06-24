@@ -1,9 +1,7 @@
 import React from 'react';
 import {Components} from '@opuscapita/service-base-ui';
 import ReactTable from 'react-table';
-import {Route} from 'react-router';
 import {ApiBase, Countries, BusinessPlatforms} from '../../api';
-import LookupParticipant from "../LookupParticipant";
 import Select from '@opuscapita/react-select';
 import 'react-table/react-table.css';
 import './ParticipantList.css';
@@ -125,7 +123,6 @@ class ParticipantList extends Components.ContextComponent {
 
         return (
             <div>
-                <Route path="lookup" component={<LookupParticipant/>}/>
                 <h3>Participant List
                     <button className="btn btn-info participant-add-btn" onClick={e => this.showPage('create', e)}>
                         New Participant
