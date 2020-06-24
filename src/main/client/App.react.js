@@ -66,7 +66,7 @@ class App extends React.Component {
                     <Route path="/edit/:id" component={edit}/>
                     <Route path="/bulkRegister" component={bulkRegister}/>
                     <Route path="/detail/:icd/:identifier" component={detail}/>
-                    <Route path="/lookup/:icd?/:identifier?" component={lookup}/>
+                    <Route path="/lookup/:icd/:identifier" component={lookup}/>
                     <Route path="/operationHistory" component={operationHistory}/>
                 </Containers.ServiceLayout>
             </Provider>
