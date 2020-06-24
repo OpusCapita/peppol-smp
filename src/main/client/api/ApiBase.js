@@ -36,6 +36,10 @@ class ApiBase {
     getParticipantDetailById(id) {
         return this.ajax.get(`/peppol-smp/api/get-participant-by-id/${id}`).then(res => res.body).catch(ApiError.getErrorFromResponse);
     }
+
+    lookupParticipant(icd, identifier) {
+        return this.ajax.get(`/peppol-outbound/api/public/lookup/${icd}/${identifier}`).then(res => res.body).catch(ApiError.getErrorFromResponse);
+    }
 }
 
 export default ApiBase;
