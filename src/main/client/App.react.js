@@ -8,7 +8,6 @@ import ParticipantList from './components/ParticipantList';
 import OperationHistory from './components/OperationHistory';
 import ParticipantDetail from './components/ParticipantDetail';
 import CreateParticipant from './components/CreateParticipant';
-import LookupParticipant from './components/LookupParticipant';
 
 const home = (props) => (
     <ParticipantList/>
@@ -32,10 +31,6 @@ const operationHistory = (props) => (
 
 const detail = (props) => (
     <ParticipantDetail icd={props.params.icd} identifier={props.params.identifier}/>
-);
-
-const lookupId = (props) => (
-    <LookupParticipant icd={props.params.icd} identifier={props.params.identifier}/>
 );
 
 class App extends React.Component {
@@ -66,7 +61,6 @@ class App extends React.Component {
                     <Route path="/edit/:id" component={edit}/>
                     <Route path="/bulkRegister" component={bulkRegister}/>
                     <Route path="/detail/:icd/:identifier" component={detail}/>
-                    <Route path="/lookup/:icd?/:identifier?" component={lookupId}/>
                     <Route path="/operationHistory" component={operationHistory}/>
                 </Containers.ServiceLayout>
             </Provider>
