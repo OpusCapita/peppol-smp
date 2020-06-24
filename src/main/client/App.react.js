@@ -34,10 +34,6 @@ const detail = (props) => (
     <ParticipantDetail icd={props.params.icd} identifier={props.params.identifier}/>
 );
 
-const lookup = (props) => (
-    <LookupParticipant/>
-);
-
 const lookupId = (props) => (
     <LookupParticipant icd={props.params.icd} identifier={props.params.identifier}/>
 );
@@ -69,9 +65,8 @@ class App extends React.Component {
                     <Route path="/create" component={create}/>
                     <Route path="/edit/:id" component={edit}/>
                     <Route path="/bulkRegister" component={bulkRegister}/>
-                    <Route path="/lookup" component={lookup}/>
-                    <Route path="/lookup/:icd/:identifier" component={lookupId}/>
                     <Route path="/detail/:icd/:identifier" component={detail}/>
+                    <Route path="/lookup/:icd?/:identifier?" component={lookupId}/>
                     <Route path="/operationHistory" component={operationHistory}/>
                 </Containers.ServiceLayout>
             </Provider>
