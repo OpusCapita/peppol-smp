@@ -26,7 +26,11 @@ class LookupParticipant extends Components.ContextComponent {
 
     componentDidMount() {
         if (this.props.icd && this.props.identifier) {
-            this.setState({icd: this.props.icd, identifier: this.props.identifier});
+            const icdObj = IcdValues.findByIcd(this.props.icd);
+            this.setState({
+                icd: {value: icdObj.icd, label: `${icdObj.icd} - ${icdObj.code}`},
+                identifier: this.props.identifier
+            });
             this.handleSubmit();
         }
     }
@@ -63,7 +67,7 @@ class LookupParticipant extends Components.ContextComponent {
         }
 
         showSpinner();
-        this.api.lookupParticipant(icd, identifier).then((response) => {
+        this.api.lookupParticipant(icd.value, identifier).then((response) => {
             hideSpinner();
 
             if (response.errorMessage) {
@@ -174,7 +178,7 @@ class LookupParticipant extends Components.ContextComponent {
     renderSupportedDocumentTypes(documentTypeList, ourDocumentTypes) {
         return documentTypeList.map(documentType =>
             <label className="container">
-                {ourDocumentTypes.find(d => d.documentId === documentType.documentTypeIdentifier.identifier && d.processId === documentType.processIdentifier.identifier).description}
+                {(ourDocumentTypes.find(d => d.documentId === documentType.documentTypeIdentifier.identifier && d.processId === documentType.processIdentifier.identifier) || {description: "Unknown"}).description}
                 <input type="checkbox" checked={true}/><span className="checkmark"/>
             </label>
         );
