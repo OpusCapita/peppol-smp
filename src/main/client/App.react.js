@@ -61,13 +61,12 @@ class App extends React.Component {
         return (
             <Provider value={this.state}>
                 <Containers.ServiceLayout serviceName="peppol-smp">
-                    <Route path="/" component={home}>
-                        <Route path="lookup" components={lookup}/>
-                    </Route>
+                    <Route path="/" component={home}/>
                     <Route path="/create" component={create}/>
                     <Route path="/edit/:id" component={edit}/>
                     <Route path="/bulkRegister" component={bulkRegister}/>
                     <Route path="/detail/:icd/:identifier" component={detail}/>
+                    <Route path="/lookup" component={lookup}/>
                     <Route path="/operationHistory" component={operationHistory}/>
                 </Containers.ServiceLayout>
             </Provider>
