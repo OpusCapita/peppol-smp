@@ -1,5 +1,3 @@
-import IcdValues from "./IcdValues";
-
 const Countries = [
     {name: "Andorra", code: "AD"},
     {name: "Albania", code: "AL"},

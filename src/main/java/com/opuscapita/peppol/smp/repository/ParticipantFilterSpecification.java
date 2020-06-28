@@ -59,6 +59,13 @@ public class ParticipantFilterSpecification {
                 predicates.add(endpointPredicate);
             }
 
+            if (filterDto.getBusinessPlatforms() != null && !filterDto.getBusinessPlatforms().isEmpty()) {
+                Predicate businessPlatformPredicate = criteriaBuilder.and(
+                        criteriaBuilder.in(root.get("businessPlatform")).value(filterDto.getBusinessPlatforms())
+                );
+                predicates.add(businessPlatformPredicate);
+            }
+
             if (sortingDtos != null && !sortingDtos.isEmpty()) {
                 List<Order> orderList = new ArrayList<>();
                 for (CommonPaginationDto.SortingDto sortingDto : sortingDtos) {

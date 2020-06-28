@@ -29,6 +29,10 @@ public class Participant {
     @Column(name = "identifier", nullable = false, length = 50)
     private String identifier;
 
+    @Column(name = "business_platform", length = 20)
+    @Enumerated(EnumType.STRING)
+    private BusinessPlatform businessPlatform;
+
     @Column(name = "country", length = 5)
     private String country;
 
@@ -98,6 +102,14 @@ public class Participant {
         return this.icd + ":" + this.identifier;
     }
 
+    public BusinessPlatform getBusinessPlatform() {
+        return businessPlatform;
+    }
+
+    public void setBusinessPlatform(BusinessPlatform businessPlatform) {
+        this.businessPlatform = businessPlatform;
+    }
+
     public String getCountry() {
         return country;
     }
@@ -158,6 +170,7 @@ public class Participant {
         setIcd(participantDto.getIcd());
         setName(participantDto.getName());
         setIdentifier(participantDto.getIdentifier());
+        setBusinessPlatform(participantDto.getBusinessPlatform());
         setCountry(participantDto.getCountry());
         setContactName(participantDto.getContactName());
         setContactEmail(participantDto.getContactEmail());

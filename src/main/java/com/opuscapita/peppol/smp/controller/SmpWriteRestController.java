@@ -3,10 +3,12 @@ package com.opuscapita.peppol.smp.controller;
 import com.opuscapita.peppol.smp.controller.dto.DocumentTypeDto;
 import com.opuscapita.peppol.smp.controller.dto.ParticipantBulkRegisterRequestDto;
 import com.opuscapita.peppol.smp.controller.dto.ParticipantDto;
+import com.opuscapita.peppol.smp.difi.DifiScheduler;
 import com.opuscapita.peppol.smp.entity.DocumentType;
 import com.opuscapita.peppol.smp.entity.Participant;
 import com.opuscapita.peppol.smp.entity.Smp;
 import com.opuscapita.peppol.smp.repository.*;
+import com.opuscapita.peppol.smp.tickstar.TickstarScheduler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,16 +34,32 @@ public class SmpWriteRestController {
     private final SimpleDateFormat dateFormat;
     private final EndpointService endpointService;
     private final ParticipantService participantService;
+    private final ParticipantRepository participantRepository;
     private final DocumentTypeService documentTypeService;
+
+    private final DifiScheduler difiScheduler;
+    private final TickstarScheduler tickstarScheduler;
 
     @Autowired
     public SmpWriteRestController(SmpService smpService, EndpointService endpointService,
-                                  ParticipantService participantService, DocumentTypeService documentTypeService) {
+                                  ParticipantService participantService, DocumentTypeService documentTypeService,
+                                  ParticipantRepository participantRepository,
+                                  DifiScheduler difiScheduler, TickstarScheduler tickstarScheduler) {
         this.smpService = smpService;
         this.endpointService = endpointService;
         this.participantService = participantService;
         this.documentTypeService = documentTypeService;
+        this.participantRepository = participantRepository;
+        this.difiScheduler = difiScheduler;
+        this.tickstarScheduler = tickstarScheduler;
         this.dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+    }
+
+    @PostMapping("/trigger-sync-task")
+    public ResponseEntity<?> triggerSyncTask() {
+        difiScheduler.updateLocalDatabase();
+        tickstarScheduler.updateLocalDatabase();
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/add-participant/{userId}")
@@ -68,7 +86,6 @@ public class SmpWriteRestController {
     }
 
 
-
     @PostMapping("/bulk-register/{userId}")
     public ResponseEntity<?> bulkRegister(@PathVariable String userId, @RequestBody ParticipantBulkRegisterRequestDto requestDto) {
         Set<DocumentType> difiDocumentTypes = requestDto.getDocumentTypes().stream()
@@ -85,6 +102,7 @@ public class SmpWriteRestController {
         Set<Participant> participants = requestDto.getParticipants().stream().map(participantDto -> {
             Participant participant = new Participant().copy(participantDto);
             participant.setRegisteredAt(registerDate);
+            participant.setBusinessPlatform(requestDto.getBusinessPlatform());
 
             Smp smp = smpService.getSmpByIcd(participantDto.getIcd());
             participant.setEndpoint(endpointService.getEndpoint(smp.getName()));

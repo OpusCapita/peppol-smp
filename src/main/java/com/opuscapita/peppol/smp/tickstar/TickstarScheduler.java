@@ -3,20 +3,15 @@ package com.opuscapita.peppol.smp.tickstar;
 import com.opuscapita.peppol.smp.entity.DocumentType;
 import com.opuscapita.peppol.smp.entity.Endpoint;
 import com.opuscapita.peppol.smp.entity.Participant;
+import com.opuscapita.peppol.smp.helper.BusinessPlatformDefiner;
 import com.opuscapita.peppol.smp.repository.DocumentTypeService;
 import com.opuscapita.peppol.smp.repository.EndpointService;
 import com.opuscapita.peppol.smp.repository.ParticipantService;
 import com.opuscapita.peppol.smp.repository.SmpName;
 import com.opuscapita.peppol.smp.tickstar.dto.*;
-import no.difi.elma.smp.webservice.types.ContactType;
-import no.difi.elma.smp.webservice.types.OrganizationType;
-import no.difi.elma.smp.webservice.types.ParticipantType;
-import no.difi.elma.smp.webservice.types.ProfileType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -25,7 +20,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
-@EnableScheduling
 public class TickstarScheduler {
 
     private static final Logger logger = LoggerFactory.getLogger(TickstarScheduler.class);
@@ -34,16 +28,19 @@ public class TickstarScheduler {
     private EndpointService endpointService;
     private ParticipantService participantService;
     private DocumentTypeService documentTypeService;
+    private BusinessPlatformDefiner businessPlatformDefiner;
 
     @Autowired
-    public TickstarScheduler(TickstarClient client, EndpointService endpointService, ParticipantService participantService, DocumentTypeService documentTypeService) {
+    public TickstarScheduler(TickstarClient client, EndpointService endpointService,
+                             ParticipantService participantService, DocumentTypeService documentTypeService,
+                             BusinessPlatformDefiner businessPlatformDefiner) {
         this.client = client;
         this.endpointService = endpointService;
         this.participantService = participantService;
         this.documentTypeService = documentTypeService;
+        this.businessPlatformDefiner = businessPlatformDefiner;
     }
 
-    @Scheduled(cron = "0 0 0 * * *")
     public void updateLocalDatabase() {
         logger.info("TickstarScheduler started!");
         Endpoint endpoint = endpointService.getEndpoint(SmpName.TICKSTAR);
@@ -108,6 +105,7 @@ public class TickstarScheduler {
         persistedParticipant.setContactPhone(businessContact.getPhoneNumber());
 
         persistedParticipant.setEndpoint(endpoint);
+        persistedParticipant.setBusinessPlatform(businessPlatformDefiner.define(persistedParticipant));
         persistedParticipant.setDocumentTypes(convertDocumentTypeForParticipant(queriedParticipant, endpoint));
 
         participantService.saveParticipant(persistedParticipant, "System");
@@ -178,6 +176,11 @@ public class TickstarScheduler {
             if (persistedParticipant.getDocumentTypes().stream().noneMatch(d -> d.getExternalId().equals(String.valueOf(profileId)))) {
                 return true;
             }
+        }
+
+        // if we have a participant without businessPlatform, we fix it using scheduler
+        if (persistedParticipant.getBusinessPlatform() == null) {
+            return true;
         }
 
         return false;
