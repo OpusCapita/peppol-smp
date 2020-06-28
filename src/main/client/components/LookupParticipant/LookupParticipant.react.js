@@ -170,7 +170,7 @@ class LookupParticipant extends Components.ContextComponent {
 
     renderSupportedDocumentTypes(documentTypeList, ourDocumentTypes) {
         return documentTypeList.map(documentType =>
-            <>
+            <span>
                 <label className="container">
                     {(ourDocumentTypes.find(d => d.documentId === documentType.documentTypeIdentifier.identifier && d.processId === documentType.processIdentifier.identifier) || {description: "Unknown"}).description}
                     <input type="checkbox" checked={true}/><span className="checkmark"/>
@@ -178,7 +178,7 @@ class LookupParticipant extends Components.ContextComponent {
                 <ul className="endpoint-list">
                     {this.renderEndpoints(documentType.endpointList)}
                 </ul>
-            </>
+            </span>
         );
     }
 
