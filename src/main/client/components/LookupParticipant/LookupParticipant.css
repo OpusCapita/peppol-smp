@@ -114,6 +114,10 @@
 	transform: rotate(45deg);
 }
 
+.participant-form .endpoint-list {
+	list-style: square;
+}
+
 .participant-detail .form-group {
 	margin-bottom: 0;
 }
