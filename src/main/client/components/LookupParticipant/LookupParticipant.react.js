@@ -123,17 +123,10 @@ class LookupParticipant extends Components.ContextComponent {
     }
 
     renderLookupResult(response) {
-        return <div className="form-horizontal participant-detail">
+        return <div className="form-horizontal participant-form">
+            <hr style={{margin: "10px 0"}}/>
             <div className="row">
                 <div className="col-md-12">
-                    <div className="form-group">
-                        <div className="col-sm-3">
-                            <label className="control-label btn-link">Name</label>
-                        </div>
-                        <div className="offset-md-1 col-md-8">
-                            <label className="control-label">{response.name}</label>
-                        </div>
-                    </div>
                     <div className="form-group">
                         <div className="col-sm-3">
                             <label className="control-label btn-link">Contact Name</label>
@@ -177,10 +170,25 @@ class LookupParticipant extends Components.ContextComponent {
 
     renderSupportedDocumentTypes(documentTypeList, ourDocumentTypes) {
         return documentTypeList.map(documentType =>
-            <label className="container">
-                {(ourDocumentTypes.find(d => d.documentId === documentType.documentTypeIdentifier.identifier && d.processId === documentType.processIdentifier.identifier) || {description: "Unknown"}).description}
-                <input type="checkbox" checked={true}/><span className="checkmark"/>
-            </label>
+            <span>
+                <label className="container">
+                    {(ourDocumentTypes.find(d => d.documentId === documentType.documentTypeIdentifier.identifier && d.processId === documentType.processIdentifier.identifier) || {description: "Unknown"}).description}
+                    <input type="checkbox" checked={true}/><span className="checkmark"/>
+                </label>
+                <ul className="endpoint-list">
+                    {this.renderEndpoints(documentType.endpointList)}
+                </ul>
+            </span>
+        );
+    }
+
+    renderEndpoints(endpointList) {
+        return endpointList.map(endpoint =>
+            <li>
+                <code>Protocol</code> = <mark>{endpoint.transportProfile}</mark>
+                <br /><code>Address</code> = <i>{endpoint.address}</i>
+                <br /><code>Certificate</code> = <small>{endpoint.certificateSubject}</small>
+            </li>
         );
     }
 }
