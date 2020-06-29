@@ -30,9 +30,24 @@ class LookupParticipant extends Components.ContextComponent {
             this.setState({
                 icd: {value: icdObj.icd, label: `${icdObj.icd} - ${icdObj.code}`},
                 identifier: this.props.identifier
-            });
-            this.handleSubmit();
+            }, () => this.handleSubmit());
         }
+    }
+
+    copyToClipboard(e) {
+        e && e.preventDefault();
+        const {icd, identifier} = this.state;
+
+        const el = document.createElement('textarea');
+        el.value = `${location.origin}/peppol-smp?r=lookup/${icd.value}/${identifier}`;
+        el.setAttribute('readonly', '');
+        el.style.position = 'absolute';
+        el.style.left = '-9999px';
+        document.body.appendChild(el);
+        el.select();
+        document.execCommand('copy');
+        document.body.removeChild(el);
+        this.context.showNotification('Link copied to clipboard', 'info', 1);
     }
 
     getDocumentTypes(documentTypes) {
@@ -85,7 +100,10 @@ class LookupParticipant extends Components.ContextComponent {
         const {icd, identifier, response} = this.state;
         return (
             <div>
-                <h3>Participant Lookup</h3>
+                <h3>
+                    Participant Lookup
+                    <button onClick={e => this.copyToClipboard(e)} className="btn btn-info participant-share-btn">Share</button>
+                </h3>
                 <div className="form-horizontal participant-form">
                     <div className="row">
                         <div className="col-md-12">
@@ -172,7 +190,9 @@ class LookupParticipant extends Components.ContextComponent {
         return documentTypeList.map(documentType =>
             <span>
                 <label className="container">
-                    {(ourDocumentTypes.find(d => d.documentId === documentType.documentTypeIdentifier.identifier && d.processId === documentType.processIdentifier.identifier) || {description: "Unknown"}).description}
+                    <mark>
+                        {(ourDocumentTypes.find(d => d.documentId === documentType.documentTypeIdentifier.identifier && d.processId === documentType.processIdentifier.identifier) || {description: "Unknown"}).description}
+                    </mark>
                     <input type="checkbox" checked={true}/><span className="checkmark"/>
                 </label>
                 <ul className="endpoint-list">
@@ -185,11 +205,23 @@ class LookupParticipant extends Components.ContextComponent {
     renderEndpoints(endpointList) {
         return endpointList.map(endpoint =>
             <li>
-                <code>Protocol</code> = <mark>{endpoint.transportProfile}</mark>
-                <br /><code>Address</code> = <i>{endpoint.address}</i>
-                <br /><code>Certificate</code> = <small>{endpoint.certificateSubject}</small>
+                <i>Protocol</i> = <b>{this.getProtocolName(endpoint.transportProfile)}</b>
+                <br /><i>Address</i> = <code>{endpoint.address}</code>
+                <br /><i>Certificate</i> = <small>{endpoint.certificateSubject}</small>
             </li>
         );
+    }
+
+    getProtocolName(protocolCode) {
+        if (protocolCode === "peppol-transport-as4-v2_0")
+            return "AS4";
+        if (protocolCode === "busdox-transport-as2-ver2p0")
+            return "AS2v2";
+        if (protocolCode === "busdox-transport-as2-ver1p0")
+            return "AS2v1";
+        if (protocolCode === "busdox-transport-start")
+            return "START";
+        return protocolCode;
     }
 }
 

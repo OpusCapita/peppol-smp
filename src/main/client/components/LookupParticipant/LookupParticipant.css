@@ -1,3 +1,8 @@
+.participant-share-btn {
+	width: 70px;
+	float: right;
+}
+
 .participant-form .flex-box {
 	display: flex;
 	margin: 40px 10px;
