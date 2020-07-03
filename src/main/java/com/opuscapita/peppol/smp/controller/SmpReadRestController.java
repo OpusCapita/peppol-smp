@@ -4,8 +4,11 @@ import com.opuscapita.peppol.smp.controller.dto.*;
 import com.opuscapita.peppol.smp.entity.BusinessPlatform;
 import com.opuscapita.peppol.smp.entity.OperationHistory;
 import com.opuscapita.peppol.smp.entity.Participant;
+import com.opuscapita.peppol.smp.helper.BusinessPlatformDefiner;
 import com.opuscapita.peppol.smp.repository.OperationHistoryService;
 import com.opuscapita.peppol.smp.repository.ParticipantService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
@@ -14,12 +17,17 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api")
 public class SmpReadRestController {
 
+    private static final Logger logger = LoggerFactory.getLogger(SmpReadRestController.class);
+
     private final ParticipantService participantService;
+    private final BusinessPlatformDefiner businessPlatformDefiner;
     private final OperationHistoryService operationHistoryService;
 
     @Autowired
-    public SmpReadRestController(ParticipantService participantService, OperationHistoryService operationHistoryService) {
+    public SmpReadRestController(ParticipantService participantService, BusinessPlatformDefiner businessPlatformDefiner,
+                                 OperationHistoryService operationHistoryService) {
         this.participantService = participantService;
+        this.businessPlatformDefiner = businessPlatformDefiner;
         this.operationHistoryService = operationHistoryService;
     }
 
@@ -49,6 +57,11 @@ public class SmpReadRestController {
 
     @GetMapping("/get-business-platform/{icd}/{identifier}")
     public BusinessPlatform getBusinessPlatform(@PathVariable String icd, @PathVariable String identifier) {
-        return participantService.getBusinessPlatform(icd, identifier);
+        BusinessPlatform businessPlatform = participantService.getBusinessPlatform(icd, identifier);
+        if (businessPlatform == null) {
+            logger.warn("This SHOULD NOT happen, no route info for participant: " + icd + ":" + identifier);
+            businessPlatform = businessPlatformDefiner.define(icd, identifier);
+        }
+        return businessPlatform;
     }
 }
