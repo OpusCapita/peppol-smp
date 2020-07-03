@@ -47,7 +47,7 @@ class CreateParticipant extends Components.ContextComponent {
         const countryValue = Countries.findByCode(participant.country);
         participant.country = !!countryValue ?  {value: countryValue.code, label: countryValue.name} : countryValue;
         const businessPlatformValue = BusinessPlatforms.findByName(participant.businessPlatform);
-        participant.businessPlatform = {value: businessPlatformValue.name, label: businessPlatformValue.name};
+        participant.businessPlatform = !!businessPlatformValue ? {value: businessPlatformValue.name, label: businessPlatformValue.name} : businessPlatformValue;
 
         const documentTypes = this.state.documentTypes;
         if (documentTypes && documentTypes.length) {
@@ -162,6 +162,7 @@ class CreateParticipant extends Components.ContextComponent {
         const {participant} = this.state;
         participant.icd = participant.icd.value;
         participant.country = participant.country.value;
+        participant.businessPlatform = participant.businessPlatform.value;
         participant.documentTypes = participant.documentTypes.map(d => {
             const temp = {};
             temp.internalId = d.id;

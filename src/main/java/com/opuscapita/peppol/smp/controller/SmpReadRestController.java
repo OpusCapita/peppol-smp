@@ -1,6 +1,7 @@
 package com.opuscapita.peppol.smp.controller;
 
 import com.opuscapita.peppol.smp.controller.dto.*;
+import com.opuscapita.peppol.smp.entity.BusinessPlatform;
 import com.opuscapita.peppol.smp.entity.OperationHistory;
 import com.opuscapita.peppol.smp.entity.Participant;
 import com.opuscapita.peppol.smp.repository.OperationHistoryService;
@@ -44,5 +45,10 @@ public class SmpReadRestController {
     public ParticipantDto getParticipantById(@PathVariable Long id) {
         Participant participant = participantService.getParticipant(id);
         return ParticipantDto.of(participant);
+    }
+
+    @GetMapping("/get-business-platform/{icd}/{identifier}")
+    public BusinessPlatform getBusinessPlatform(@PathVariable String icd, @PathVariable String identifier) {
+        return participantService.getBusinessPlatform(icd, identifier);
     }
 }
