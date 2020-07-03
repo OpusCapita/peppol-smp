@@ -57,8 +57,8 @@ public class SmpWriteRestController {
 
     @PostMapping("/trigger-sync-task")
     public ResponseEntity<?> triggerSyncTask() {
-        difiScheduler.updateLocalDatabase();
-        tickstarScheduler.updateLocalDatabase();
+        new Thread(difiScheduler::updateLocalDatabase).start();
+        new Thread(tickstarScheduler::updateLocalDatabase).start();
         return ResponseEntity.ok().build();
     }
 
