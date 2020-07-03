@@ -36,6 +36,12 @@ class ParticipantDetail extends Components.ContextComponent {
         });
     }
 
+    lookupParticipant(e) {
+        e && e.preventDefault();
+        const {icd, identifier} = this.props;
+        this.context.router.push(`/peppol-smp/lookup/${icd}/${identifier}`);
+    }
+
     deleteParticipant(e) {
         e && e.preventDefault();
         const {userData, router, showNotification, showModalDialog, hideModalDialog, showSpinner, hideSpinner} = this.context;
@@ -64,8 +70,6 @@ class ParticipantDetail extends Components.ContextComponent {
         const modalButtons = {no: 'No', yes: 'Yes'};
         showModalDialog(modalTitle, modalText, onConfirmationClick, modalButtons);
     }
-
-
 
     editParticipant(e) {
         e && e.preventDefault();
@@ -145,6 +149,7 @@ class ParticipantDetail extends Components.ContextComponent {
                     </div>
                 </div>
                 <div className="form-submit text-right participant-detail-actions">
+                    <button className="btn btn-info" onClick={e => this.lookupParticipant(e)}>Lookup</button>
                     <button className="btn btn-danger" onClick={e => this.deleteParticipant(e)}>Delete</button>
                     <button className="btn btn-default" onClick={e => this.editParticipant(e)}>Edit</button>
                 </div>
