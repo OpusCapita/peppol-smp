@@ -64,7 +64,7 @@ public class ParticipantServiceImpl implements ParticipantService {
     @Override
     public BusinessPlatform getBusinessPlatform(String icd, String identifier) {
         BusinessParticipant participant = repository.findByIcdAndIdentifier(icd, identifier);
-        return participant.getBusinessPlatform();
+        return participant != null ? participant.getBusinessPlatform() : null;
     }
 
     @Override
