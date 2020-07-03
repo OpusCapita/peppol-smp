@@ -22,9 +22,17 @@ public class BusinessPlatformDefiner {
     }
 
     public BusinessPlatform define(Participant participant) {
+        return define(participant.getIcdIdentifier());
+    }
+
+    public BusinessPlatform define(String icd, String identifier) {
+        return define(icd + ":" + identifier);
+    }
+
+    public BusinessPlatform define(String icdIdentifier) {
         for (Route route : routingConfiguration.getRoutes()) {
-            if (participant.getIcdIdentifier().matches(route.getMask())) {
-                logger.debug("BusinessPlatform assigned to " + participant.getIcdIdentifier() + " as: " + route.getPlatform());
+            if (icdIdentifier.matches(route.getMask())) {
+                logger.debug("BusinessPlatform assigned to " + icdIdentifier + " as: " + route.getPlatform());
                 return route.getPlatform();
             }
         }
