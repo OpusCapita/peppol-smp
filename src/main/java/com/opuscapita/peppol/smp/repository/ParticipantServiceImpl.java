@@ -3,9 +3,7 @@ package com.opuscapita.peppol.smp.repository;
 import com.opuscapita.peppol.smp.controller.dto.ParticipantRequestDto;
 import com.opuscapita.peppol.smp.difi.DifiClient;
 import com.opuscapita.peppol.smp.difi.dto.DifiParticipantBuilder;
-import com.opuscapita.peppol.smp.entity.DocumentType;
-import com.opuscapita.peppol.smp.entity.OperationType;
-import com.opuscapita.peppol.smp.entity.Participant;
+import com.opuscapita.peppol.smp.entity.*;
 import com.opuscapita.peppol.smp.tickstar.TickstarClient;
 import com.opuscapita.peppol.smp.tickstar.dto.TickstarParticipant;
 import no.difi.elma.smp.webservice.responses.AddParticipantResponse;
@@ -61,6 +59,12 @@ public class ParticipantServiceImpl implements ParticipantService {
     @Override
     public Participant getParticipant(String icd, String identifier) {
         return repository.findByIdentifier(identifier).stream().filter(p -> icd.equals(p.getIcd())).findFirst().orElse(null);
+    }
+
+    @Override
+    public BusinessPlatform getBusinessPlatform(String icd, String identifier) {
+        BusinessParticipant participant = repository.findByIcdAndIdentifier(icd, identifier);
+        return participant.getBusinessPlatform();
     }
 
     @Override
