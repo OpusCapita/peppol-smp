@@ -67,14 +67,17 @@ public class DifiScheduler {
         GetAllParticipantsResponse response = client.getAllParticipants();
         for (OrganizationNumberType difiParticipantIdentifier : response.getOrganizationNumber()) {
             String identifier = difiParticipantIdentifier.getValue();
+            logger.info("...checking " + identifier);
             for (String icd : DifiClient.getDifiIcd()) {
                 GetParticipantResponse getResponse = client.getParticipant(icd + ":" + identifier);
 
                 if (getResponse == null || getResponse.getParticipant() == null || getResponse.getParticipant().getOrganization() == null ||
                         getResponse.getParticipant().getOrganization().getName() == null) {
+                    logger.info("...fetched and got null " + icd + ":" + identifier);
                     return;
                 }
 
+                logger.info("...fetched and got participant " + icd + ":" + identifier);
                 Participant persistedParticipant = participantService.getParticipant(icd, identifier);
                 try {
                     convertParticipant(icd, identifier, persistedParticipant, getResponse.getParticipant(), endpoint);
@@ -91,7 +94,7 @@ public class DifiScheduler {
             persistedParticipant = new Participant();
 
         } else if (!isThereAnyUpdate(persistedParticipant, queriedParticipant)) {
-            logger.debug("......DifiScheduler found participant: " + icd + ":" + identifier + ", ignoring with no-change");
+            logger.info("......DifiScheduler found participant: " + icd + ":" + identifier + ", ignoring with no-change");
             return;
 
         } else {
