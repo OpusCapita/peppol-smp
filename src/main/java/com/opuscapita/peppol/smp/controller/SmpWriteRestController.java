@@ -85,7 +85,6 @@ public class SmpWriteRestController {
         return ResponseEntity.ok().build();
     }
 
-
     @PostMapping("/bulk-register/{userId}")
     public ResponseEntity<?> bulkRegister(@PathVariable String userId, @RequestBody ParticipantBulkRegisterRequestDto requestDto) {
         Set<DocumentType> difiDocumentTypes = requestDto.getDocumentTypes().stream()

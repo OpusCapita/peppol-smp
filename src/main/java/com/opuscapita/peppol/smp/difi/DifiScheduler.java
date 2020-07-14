@@ -51,7 +51,7 @@ public class DifiScheduler {
         updateParticipants(endpoint);
     }
 
-    private void updateDocumentTypes(Endpoint endpoint) {
+    public void updateDocumentTypes(Endpoint endpoint) {
         logger.info("...DifiScheduler updating document types");
 
         ProfilesSupportedResponse response = client.getSupportedProfiles();
@@ -61,30 +61,36 @@ public class DifiScheduler {
         }
     }
 
-    private void updateParticipants(Endpoint endpoint) {
+    public void updateParticipants(Endpoint endpoint) {
         logger.info("...DifiScheduler updating participants");
 
         GetAllParticipantsResponse response = client.getAllParticipants();
         for (OrganizationNumberType difiParticipantIdentifier : response.getOrganizationNumber()) {
             String identifier = difiParticipantIdentifier.getValue();
-            logger.info("...checking " + identifier);
-            for (String icd : DifiClient.getDifiIcd()) {
-                GetParticipantResponse getResponse = client.getParticipant(icd + ":" + identifier);
+            updateParticipant(identifier, endpoint);
+        }
+    }
 
-                if (getResponse == null || getResponse.getParticipant() == null || getResponse.getParticipant().getOrganization() == null ||
-                        getResponse.getParticipant().getOrganization().getName() == null) {
-                    logger.info("...fetched and got null " + icd + ":" + identifier);
-                    return;
-                }
+    public void updateParticipant(String identifier, Endpoint endpoint) {
+        for (String icd : DifiClient.getDifiIcd()) {
+            updateParticipant(icd, identifier, endpoint);
+        }
+    }
 
-                logger.info("...fetched and got participant " + icd + ":" + identifier);
-                Participant persistedParticipant = participantService.getParticipant(icd, identifier);
-                try {
-                    convertParticipant(icd, identifier, persistedParticipant, getResponse.getParticipant(), endpoint);
-                } catch (Exception e) {
-                    logger.error("Failed to convert the participant: " + icd + ":" + identifier, e);
-                }
-            }
+    public void updateParticipant(String icd, String identifier, Endpoint endpoint) {
+        GetParticipantResponse getResponse = client.getParticipant(icd + ":" + identifier);
+
+        if (getResponse == null || getResponse.getParticipant() == null ||
+                getResponse.getParticipant().getOrganization() == null ||
+                getResponse.getParticipant().getOrganization().getName() == null) {
+            return;
+        }
+
+        Participant persistedParticipant = participantService.getParticipant(icd, identifier);
+        try {
+            convertParticipant(icd, identifier, persistedParticipant, getResponse.getParticipant(), endpoint);
+        } catch (Exception e) {
+            logger.error("Failed to convert the participant: " + icd + ":" + identifier, e);
         }
     }
 
@@ -94,7 +100,7 @@ public class DifiScheduler {
             persistedParticipant = new Participant();
 
         } else if (!isThereAnyUpdate(persistedParticipant, queriedParticipant)) {
-            logger.info("......DifiScheduler found participant: " + icd + ":" + identifier + ", ignoring with no-change");
+            logger.debug("......DifiScheduler found participant: " + icd + ":" + identifier + ", ignoring with no-change");
             return;
 
         } else {
