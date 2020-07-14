@@ -160,6 +160,12 @@ class CreateParticipant extends Components.ContextComponent {
         const {userData, router, showNotification, showSpinner, hideSpinner} = this.context;
 
         const {participant} = this.state;
+
+        if (!participant.icd || !participant.identifier || !participant.name || !participant.country || !participant.contactName || !participant.contactEmail || !participant.contactPhone || !participant.documentTypes || !participant.businessPlatform) {
+            showNotification("All fields are mandatory!", "error", 5);
+            return;
+        }
+
         participant.icd = participant.icd.value;
         participant.country = participant.country.value;
         participant.businessPlatform = participant.businessPlatform.value;
