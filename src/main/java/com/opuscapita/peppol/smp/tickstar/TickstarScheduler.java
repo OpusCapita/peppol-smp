@@ -64,7 +64,7 @@ public class TickstarScheduler {
 
         TickstarParticipantListResponse response = client.getAllParticipants();
         for (TickstarParticipant queriedParticipant : response.getParticipant()) {
-            if (!checkEnvironment(queriedParticipant, endpoint)) {
+            if (checkEnvironment(queriedParticipant, endpoint)) {
                 continue;
             }
 
@@ -143,8 +143,11 @@ public class TickstarScheduler {
 
     // participant has any document-type registered in this environment
     private boolean checkEnvironment(TickstarParticipant queriedParticipant, Endpoint endpoint) {
+        if (!queriedParticipant.getMeta().getSmlActivation()) {
+            return true;
+        }
         TickstarParticipantAccessPointConfigurationMetadata metadata = getTickstarMetadataProfileIds(queriedParticipant, endpoint);
-        return metadata.getProfileId() != null && !metadata.getProfileId().isEmpty();
+        return metadata.getProfileId() == null || metadata.getProfileId().isEmpty();
     }
 
     private boolean isThereAnyUpdate(Participant persistedParticipant, TickstarParticipant queriedParticipant, Endpoint endpoint) {
