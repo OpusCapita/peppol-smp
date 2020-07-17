@@ -159,7 +159,7 @@ class CreateParticipant extends Components.ContextComponent {
         event && event.preventDefault();
         const {userData, router, showNotification, showSpinner, hideSpinner} = this.context;
 
-        const {participant} = this.state;
+        const {participant, editMode} = this.state;
 
         if (!participant.icd || !participant.identifier || !participant.name || !participant.country || !participant.contactName || !participant.contactEmail || !participant.contactPhone || !participant.documentTypes || !participant.businessPlatform) {
             showNotification("All fields are mandatory!", "error", 5);
@@ -176,13 +176,18 @@ class CreateParticipant extends Components.ContextComponent {
         });
 
         showSpinner();
-        this.api.addParticipant(participant, userData.id).then(() => {
-            hideSpinner();
-            showNotification(`The participant is ${this.state.editMode ? 'updated' : 'registered'} successfully`, 'success', 10);
+        const request = editMode ? this.api.editParticipant(participant, userData.id).then(() => {
+            this.api.clearAPParticipantCache(participant.icd, participant.identifier);
+            showNotification(`The participant is updated successfully`, 'success', 10);
             router.push(`/peppol-smp`);
-        }).catch(e => {
-            hideSpinner();
+        }) : this.api.addParticipant(participant, userData.id).then(() => {
+            showNotification(`The participant is registered successfully`, 'success', 10);
+            router.push(`/peppol-smp`);
+        });
+        request.catch(e => {
             showNotification(e.message, 'error', 10);
+        }).finally(() => {
+            hideSpinner();
         });
     }
 
@@ -200,6 +205,7 @@ class CreateParticipant extends Components.ContextComponent {
                                 </div>
                                 <div className="offset-md-1 col-md-4">
                                     <Select className="react-select" isMulti={false}
+                                            isDisabled={editMode}
                                             value={participant.icd}
                                             options={this.mapIcdValuesSelect()}
                                             onChange={value => this.handleFormChange('icd', value)}
@@ -208,7 +214,7 @@ class CreateParticipant extends Components.ContextComponent {
                                 <div className="offset-md-1 col-md-4">
                                     <input type="text" className="form-control" value={participant.identifier}
                                            onChange={e => this.handleFormChange('identifier', e.target.value)}
-                                           placeholder="Participant Identifier"
+                                           placeholder="Participant Identifier" disabled={editMode}
                                     />
                                 </div>
                             </div>

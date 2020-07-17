@@ -87,14 +87,14 @@ public class ParticipantServiceImpl implements ParticipantService {
     }
 
     @Override
-    public boolean saveParticipantRemote(Participant participant) {
+    public boolean registerParticipant(Participant participant) {
         if (SmpName.DIFI.equals(participant.getEndpoint().getSmp().getName())) {
-            return saveDifiParticipant(participant);
+            return registerDifiParticipant(participant);
         }
-        return saveTickstarParticipant(participant);
+        return registerTickstarParticipant(participant);
     }
 
-    private boolean saveDifiParticipant(Participant participant) {
+    private boolean registerDifiParticipant(Participant participant) {
         ParticipantType participantType = new DifiParticipantBuilder()
                 .setName(participant.getName())
                 .setOrganizationNumber(participant.getIcdIdentifier())
@@ -104,16 +104,12 @@ public class ParticipantServiceImpl implements ParticipantService {
                 .setWebsite("http://www.opuscapita.com")
                 .addAllProfiles(participant.getDocumentTypes().stream().map(DocumentType::getExternalId).collect(Collectors.toList()))
                 .build();
-
-        if (participant.getId() != null) {
-            return difiClient.editParticipant(participant.getIcdIdentifier(), participantType).getSuccess().isValue();
-        }
         return difiClient.addParticipant(participantType).getSuccess().isValue();
     }
 
-    private boolean saveTickstarParticipant(Participant participant) {
+    private boolean registerTickstarParticipant(Participant participant) {
         TickstarParticipant addRequest = TickstarParticipant.of(participant);
-        HttpStatus responseStatus = participant.getId() == null ? tickstarClient.addParticipant(addRequest) : tickstarClient.editParticipant(addRequest);
+        HttpStatus responseStatus = tickstarClient.addParticipant(addRequest);
         if (responseStatus.equals(HttpStatus.CONFLICT)) {
             responseStatus = tickstarClient.editParticipant(addRequest);
         }
@@ -121,17 +117,44 @@ public class ParticipantServiceImpl implements ParticipantService {
     }
 
     @Override
-    public boolean deleteParticipantRemote(Participant participant) {
-        return SmpName.DIFI.equals(participant.getEndpoint().getSmp().getName()) ?
-                deleteDifiParticipant(participant) : deleteTickstarParticipant(participant);
+    public boolean updateParticipantRegistration(Participant participant) {
+        if (SmpName.DIFI.equals(participant.getEndpoint().getSmp().getName())) {
+            return updateDifiParticipantRegistration(participant);
+        }
+        return updateTickstarParticipantRegistration(participant);
     }
 
-    private boolean deleteDifiParticipant(Participant participant) {
+    private boolean updateDifiParticipantRegistration(Participant participant) {
+        ParticipantType participantType = new DifiParticipantBuilder()
+                .setName(participant.getName())
+                .setOrganizationNumber(participant.getIcdIdentifier())
+                .setContactName(participant.getContactName())
+                .setContactEmail(participant.getContactEmail())
+                .setContactTelephone(participant.getContactPhone())
+                .setWebsite("http://www.opuscapita.com")
+                .addAllProfiles(participant.getDocumentTypes().stream().map(DocumentType::getExternalId).collect(Collectors.toList()))
+                .build();
+        return difiClient.editParticipant(participant.getIcdIdentifier(), participantType).getSuccess().isValue();
+    }
+
+    private boolean updateTickstarParticipantRegistration(Participant participant) {
+        TickstarParticipant updateRequest = TickstarParticipant.of(participant);
+        HttpStatus responseStatus = tickstarClient.editParticipant(updateRequest);
+        return responseStatus.is2xxSuccessful();
+    }
+
+    @Override
+    public boolean unregisterParticipant(Participant participant) {
+        return SmpName.DIFI.equals(participant.getEndpoint().getSmp().getName()) ?
+                unregisterDifiParticipant(participant) : unregisterTickstarParticipant(participant);
+    }
+
+    private boolean unregisterDifiParticipant(Participant participant) {
         DeleteParticipantResponse response = difiClient.deleteParticipant(participant.getIcdIdentifier());
         return response.getSuccess().isValue();
     }
 
-    private boolean deleteTickstarParticipant(Participant participant) {
+    private boolean unregisterTickstarParticipant(Participant participant) {
         HttpStatus responseStatus = tickstarClient.deleteParticipant(participant.getIcd(), participant.getIdentifier());
         return responseStatus.is2xxSuccessful();
     }
