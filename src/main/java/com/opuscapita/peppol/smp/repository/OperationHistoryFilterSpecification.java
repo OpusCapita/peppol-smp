@@ -6,6 +6,8 @@ import com.opuscapita.peppol.smp.entity.OperationHistory;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.jpa.domain.Specification;
 
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Order;
 import javax.persistence.criteria.Predicate;
 import java.util.ArrayList;
@@ -19,17 +21,11 @@ public class OperationHistoryFilterSpecification {
             List<Predicate> predicates = new ArrayList<>();
 
             if (StringUtils.isNotBlank(filterDto.getUser())) {
-                Predicate userPredicate = criteriaBuilder.and(
-                        criteriaBuilder.like(root.get("user"), "%" + filterDto.getUser() + "%")
-                );
-                predicates.add(userPredicate);
+                predicates.add(createLikeCriteria(filterDto.getUser(), root.get("user"), criteriaBuilder));
             }
 
             if (StringUtils.isNotBlank(filterDto.getParticipant())) {
-                Predicate participantPredicate = criteriaBuilder.and(
-                        criteriaBuilder.equal(root.get("participant"), filterDto.getParticipant())
-                );
-                predicates.add(participantPredicate);
+                predicates.add(createLikeCriteria(filterDto.getParticipant(), root.get("participant"), criteriaBuilder));
             }
 
             if (filterDto.getStartDate() != null) {
@@ -66,5 +62,14 @@ public class OperationHistoryFilterSpecification {
 
             return criteriaBuilder.and(predicates.toArray(new Predicate[predicates.size()]));
         };
+    }
+
+    private static Predicate createLikeCriteria(String value, Expression<String> path, CriteriaBuilder criteriaBuilder) {
+        boolean isNot = value.startsWith("!");
+        return criteriaBuilder.and(
+                isNot
+                        ? criteriaBuilder.notLike(path, "%" + value.substring(1) + "%")
+                        : criteriaBuilder.like(path, "%" + value + "%")
+        );
     }
 }

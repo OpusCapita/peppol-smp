@@ -6,6 +6,8 @@ import com.opuscapita.peppol.smp.entity.Participant;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.jpa.domain.Specification;
 
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Order;
 import javax.persistence.criteria.Predicate;
 import java.util.ArrayList;
@@ -17,25 +19,25 @@ public class ParticipantFilterSpecification {
         return (Specification<Participant>) (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
 
-            if (StringUtils.isNotBlank(filterDto.getIcd())) {
-                Predicate icdPredicate = criteriaBuilder.and(
-                        criteriaBuilder.equal(root.get("icd"), filterDto.getIcd())
-                );
-                predicates.add(icdPredicate);
+            String icd = filterDto.getIcd();
+            String identifier = filterDto.getIdentifier();
+
+            if (StringUtils.isNotBlank(identifier)) {
+                if (identifier.contains(":")) {
+                    String[] parts = identifier.split(":");
+                    icd = StringUtils.isBlank(icd) ? parts[0] : icd;
+                    identifier = parts[1];
+                }
+
+                predicates.add(createLikeCriteria(identifier, root.get("identifier"), criteriaBuilder));
             }
 
-            if (StringUtils.isNotBlank(filterDto.getIdentifier())) {
-                Predicate identifierPredicate = criteriaBuilder.and(
-                        criteriaBuilder.equal(root.get("identifier"), filterDto.getIdentifier())
-                );
-                predicates.add(identifierPredicate);
+            if (StringUtils.isNotBlank(icd)) {
+                predicates.add(createLikeCriteria(icd, root.get("icd"), criteriaBuilder));
             }
 
             if (StringUtils.isNotBlank(filterDto.getName())) {
-                Predicate namePredicate = criteriaBuilder.and(
-                        criteriaBuilder.like(root.get("name"), "%" + filterDto.getName() + "%")
-                );
-                predicates.add(namePredicate);
+                predicates.add(createLikeCriteria(filterDto.getName(), root.get("name"), criteriaBuilder));
             }
 
             if (filterDto.getCountries() != null && !filterDto.getCountries().isEmpty()) {
@@ -79,5 +81,14 @@ public class ParticipantFilterSpecification {
 
             return criteriaBuilder.and(predicates.toArray(new Predicate[predicates.size()]));
         };
+    }
+
+    private static Predicate createLikeCriteria(String value, Expression<String> path, CriteriaBuilder criteriaBuilder) {
+        boolean isNot = value.startsWith("!");
+        return criteriaBuilder.and(
+                isNot
+                        ? criteriaBuilder.notLike(path, "%" + value.substring(1) + "%")
+                        : criteriaBuilder.like(path, "%" + value + "%")
+        );
     }
 }
