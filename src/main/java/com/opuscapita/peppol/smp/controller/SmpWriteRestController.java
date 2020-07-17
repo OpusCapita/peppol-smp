@@ -9,6 +9,7 @@ import com.opuscapita.peppol.smp.entity.Participant;
 import com.opuscapita.peppol.smp.entity.Smp;
 import com.opuscapita.peppol.smp.repository.*;
 import com.opuscapita.peppol.smp.tickstar.TickstarScheduler;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,21 +65,75 @@ public class SmpWriteRestController {
 
     @PostMapping("/add-participant/{userId}")
     public ResponseEntity<?> addParticipant(@PathVariable String userId, @RequestBody ParticipantDto participantDto) {
-        Participant participant = participantDto.getId() != null ? participantService.getParticipant(participantDto.getId()) : new Participant();
+        Participant participant = new Participant();
         participant.copy(participantDto);
         participant.setRegisteredAt(dateFormat.format(new Date()));
 
         Smp smp = smpService.getSmpByIcd(participant.getIcd());
         participant.setEndpoint(endpointService.getEndpoint(smp.getName()));
 
-        participant.getDocumentTypes().clear();
         for (DocumentTypeDto documentTypeDto : participantDto.getDocumentTypes()) {
             List<DocumentType> documentTypes = documentTypeService.getDocumentTypeByInternalId(documentTypeDto.getInternalId(), smp.getName());
             participant.getDocumentTypes().addAll(documentTypes);
         }
 
-        if (!participantService.saveParticipantRemote(participant)) {
-            return ResponseEntity.badRequest().body("Failed to save participant");
+        if (!participantService.registerParticipant(participant)) {
+            return ResponseEntity.badRequest().body("Failed to save the participant");
+        }
+
+        participantService.saveParticipant(participant, userId);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/edit-participant/{userId}")
+    public ResponseEntity<?> editParticipant(@PathVariable String userId, @RequestBody ParticipantDto participantDto) {
+        Participant participant = participantService.getParticipant(participantDto.getId());
+
+        boolean remoteUpdateRequired = false;
+
+        if (!StringUtils.equals(participant.getName(), participantDto.getName())) {
+            participant.setName(participantDto.getName());
+            remoteUpdateRequired = true;
+        }
+
+        if (!StringUtils.equals(participant.getCountry(), participantDto.getCountry())) {
+            participant.setCountry(participantDto.getCountry());
+            remoteUpdateRequired = true;
+        }
+
+        if (!StringUtils.equals(participant.getContactName(), participantDto.getContactName())) {
+            participant.setContactName(participantDto.getContactName());
+            remoteUpdateRequired = true;
+        }
+
+        if (!StringUtils.equals(participant.getContactEmail(), participantDto.getContactEmail())) {
+            participant.setContactEmail(participantDto.getContactEmail());
+            remoteUpdateRequired = true;
+        }
+
+        if (!StringUtils.equals(participant.getContactPhone(), participantDto.getContactPhone())) {
+            participant.setContactPhone(participantDto.getContactPhone());
+            remoteUpdateRequired = true;
+        }
+
+        if (!participant.getBusinessPlatform().equals(participantDto.getBusinessPlatform())) {
+            participant.setBusinessPlatform(participantDto.getBusinessPlatform());
+        }
+
+        if (isDocumentTypesUpdated(participant.getDocumentTypes(), participantDto.getDocumentTypes())) {
+            participant.getDocumentTypes().clear();
+            Smp smp = smpService.getSmpByIcd(participant.getIcd());
+            for (DocumentTypeDto documentTypeDto : participantDto.getDocumentTypes()) {
+                List<DocumentType> documentTypes = documentTypeService.getDocumentTypeByInternalId(documentTypeDto.getInternalId(), smp);
+                participant.getDocumentTypes().addAll(documentTypes);
+            }
+            remoteUpdateRequired = true;
+        }
+
+        if (remoteUpdateRequired) {
+            if (!participantService.updateParticipantRegistration(participant)) {
+                return ResponseEntity.badRequest().body("Failed to update the participant");
+            }
         }
 
         participantService.saveParticipant(participant, userId);
@@ -126,10 +181,22 @@ public class SmpWriteRestController {
     @PostMapping("/delete-participant/{userId}/{id}")
     public ResponseEntity<?> deleteParticipant(@PathVariable String userId, @PathVariable Long id) {
         Participant participant = participantService.getParticipant(id);
-        if (participantService.deleteParticipantRemote(participant)) {
+        if (participantService.unregisterParticipant(participant)) {
             participantService.deleteParticipant(participant, userId);
         }
         return ResponseEntity.ok().build();
+    }
+
+    private boolean isDocumentTypesUpdated(Set<DocumentType> currentDocumentTypes, Set<DocumentTypeDto> newDocumentTypes) {
+        if (currentDocumentTypes.size() != newDocumentTypes.size()) {
+            return true;
+        }
+        for (DocumentType documentType : currentDocumentTypes) {
+            if (newDocumentTypes.stream().noneMatch(d -> d.getInternalId().equals(documentType.getInternalId()))) {
+                return true;
+            }
+        }
+        return false;
     }
 }
 
@@ -150,7 +217,7 @@ class SaveParticipantAsyncTask implements Callable<Boolean> {
     @Override
     public Boolean call() {
         try {
-            if (participantService.saveParticipantRemote(participant)) {
+            if (participantService.registerParticipant(participant)) {
                 participantService.saveParticipant(participant, userId);
                 return true;
             } else {

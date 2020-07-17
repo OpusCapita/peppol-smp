@@ -25,6 +25,10 @@ class ApiBase {
         return this.ajax.post(`/peppol-smp/api/add-participant/${userId}`).send(participant).then(res => res.body).catch(ApiError.getErrorFromResponse);
     }
 
+    editParticipant(participant, userId) {
+        return this.ajax.post(`/peppol-smp/api/edit-participant/${userId}`).send(participant).then(res => res.body).catch(ApiError.getErrorFromResponse);
+    }
+
     deleteParticipant(id, userId) {
         return this.ajax.post(`/peppol-smp/api/delete-participant/${userId}/${id}`).then(res => res.body).catch(ApiError.getErrorFromResponse);
     }
@@ -39,6 +43,10 @@ class ApiBase {
 
     lookupParticipant(icd, identifier) {
         return this.ajax.get(`/peppol-outbound/api/public/lookup/${icd}/${identifier}`).then(res => res.body).catch(ApiError.getErrorFromResponse);
+    }
+
+    clearAPParticipantCache(icd, identifier) {
+        return this.ajax.get(`/peppol-processor/api/public/clear-cache/${icd}/${identifier}`).then(res => res.body).catch(ApiError.getErrorFromResponse);
     }
 }
 
