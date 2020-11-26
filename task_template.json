@@ -4,13 +4,21 @@
     "log-driver": "gelf",
     "log-opt": ["gelf-address=udp://localhost:12201", "tag=\"${serviceName}\""],
     "constraint": ["engine.labels.nodetype==worker"],
-    "publish": ["mode=host,target=3045,published=3045,protocol=tcp"],
+    "publish": [
+      "mode=host,target=3045,published=3045,protocol=tcp",
+      "mode=host,target=3065,published=3065,protocol=tcp"
+    ],
     "host": ["consul:172.17.0.1"],
     "env": [
       "SERVICE_NAME=${serviceName}",
+      "SERVICE_3061_NAME=${serviceName}",
       "SERVICE_3045_CHECK_HTTP=/api/health/check",
       "SERVICE_3045_CHECK_INTERVAL=15s",
       "SERVICE_3045_CHECK_TIMEOUT=3s",
+      "SERVICE_3065_NAME=${serviceName}-exporter",
+      "SERVICE_3065_CHECK_TCP=true",
+      "SERVICE_3065_CHECK_INTERVAL=15s",
+      "SERVICE_3065_CHECK_TIMEOUT=3s",
       "NODE_ENV=production"
     ],
     "oc-consul-injection": {
@@ -39,6 +47,6 @@
   },
   "prod": {
     "replicas": 2,
-    "limit-memory": "1200M"
+    "limit-memory": "700M"
   }
 }
